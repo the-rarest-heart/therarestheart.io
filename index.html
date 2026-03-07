@@ -1,0 +1,1215 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Rarest Heart | Technology with a Heartbeat</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --navy: #07081a;
+      --navy-mid: #0d0f28;
+      --navy-light: #131535;
+      --white: #f4f4f0;
+      --off-white: #c8c8c4;
+      --accent: #4a6cf7;
+      --accent-glow: rgba(74, 108, 247, 0.25);
+      --pulse: #e84a6f;
+      --pulse-glow: rgba(232, 74, 111, 0.2);
+      --tier1: #4a6cf7;
+      --tier2: #7c4af7;
+      --tier3: #e84a6f;
+    }
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background-color: var(--navy);
+  color: var(--white);
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 300;
+  line-height: 1.7;
+  overflow-x: hidden;
+}
+
+/* ── NOISE OVERLAY ── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.4;
+}
+
+/* ── TYPOGRAPHY ── */
+h1, h2, h3, h4 { font-family: 'Syne', sans-serif; line-height: 1.1; }
+.mono { font-family: 'IBM Plex Mono', monospace; }
+
+/* ── NAV ── */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  padding: 1.25rem 4rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(7, 8, 26, 0.85);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.nav-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+}
+
+.nav-logo-heart {
+  width: 96px;
+  height: 96px;
+}
+
+.nav-logo-text {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 1.3rem;
+  color: var(--white);
+  letter-spacing: -0.02em;
+}
+
+.nav-logo-text span {
+  color: var(--pulse);
+}
+
+.nav-links {
+  display: flex;
+  gap: 2.5rem;
+  list-style: none;
+}
+
+.nav-links a {
+  color: var(--off-white);
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  transition: color 0.2s;
+  position: relative;
+}
+
+.nav-links a::after {
+  content: '';
+  position: absolute;
+  bottom: -4px; left: 0;
+  width: 0; height: 1px;
+  background: var(--accent);
+  transition: width 0.3s;
+}
+
+.nav-links a:hover { color: var(--white); }
+.nav-links a:hover::after { width: 100%; }
+
+.nav-cta {
+  background: var(--accent);
+  color: var(--white) !important;
+  padding: 0.5rem 1.25rem;
+  border-radius: 4px;
+  font-weight: 500 !important;
+  transition: background 0.2s, transform 0.2s !important;
+}
+
+.nav-cta::after { display: none !important; }
+.nav-cta:hover { background: #3a5ce0 !important; transform: translateY(-1px); }
+
+/* ── HERO ── */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  position: relative;
+  padding: 8rem 4rem 4rem;
+  overflow: hidden;
+}
+
+.hero-grid-bg {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(74,108,247,0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(74,108,247,0.05) 1px, transparent 1px);
+  background-size: 60px 60px;
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 50%, black, transparent);
+}
+
+.hero-glow {
+  position: absolute;
+  width: 700px; height: 700px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--pulse-glow) 0%, transparent 70%);
+  top: -200px; right: -200px;
+  pointer-events: none;
+}
+
+.hero-glow-2 {
+  position: absolute;
+  width: 500px; height: 500px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+  bottom: -100px; left: 10%;
+  pointer-events: none;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 1;
+  max-width: 780px;
+}
+
+.hero-eyebrow {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.15em;
+  color: var(--accent);
+  text-transform: uppercase;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  opacity: 0;
+  animation: fadeUp 0.8s ease forwards 0.2s;
+}
+
+.hero-eyebrow::before {
+  content: '';
+  display: inline-block;
+  width: 32px; height: 1px;
+  background: var(--accent);
+}
+
+.hero-headline {
+  font-size: clamp(3rem, 7vw, 5.5rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.0;
+  margin-bottom: 1.5rem;
+  opacity: 0;
+  animation: fadeUp 0.8s ease forwards 0.4s;
+}
+
+.hero-headline em {
+  font-style: normal;
+  color: var(--pulse);
+  position: relative;
+}
+
+.hero-headline em::after {
+  content: '';
+  position: absolute;
+  bottom: 4px; left: 0; right: 0;
+  height: 3px;
+  background: var(--pulse);
+  opacity: 0.4;
+  border-radius: 2px;
+}
+
+.hero-sub {
+  font-size: 1.15rem;
+  color: var(--off-white);
+  max-width: 560px;
+  margin-bottom: 2.5rem;
+  font-weight: 300;
+  opacity: 0;
+  animation: fadeUp 0.8s ease forwards 0.6s;
+}
+
+.hero-sub strong {
+  color: var(--white);
+  font-weight: 500;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  opacity: 0;
+  animation: fadeUp 0.8s ease forwards 0.8s;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: var(--white);
+  padding: 0.875rem 2rem;
+  border-radius: 4px;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.95rem;
+  letter-spacing: 0.01em;
+  transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-primary:hover {
+  background: #3a5ce0;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px var(--accent-glow);
+}
+
+.btn-secondary {
+  border: 1px solid rgba(255,255,255,0.2);
+  color: var(--white);
+  padding: 0.875rem 2rem;
+  border-radius: 4px;
+  text-decoration: none;
+  font-weight: 400;
+  font-size: 0.95rem;
+  transition: border-color 0.2s, background 0.2s, transform 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-secondary:hover {
+  border-color: rgba(255,255,255,0.5);
+  background: rgba(255,255,255,0.05);
+  transform: translateY(-2px);
+}
+
+/* Heartbeat line */
+.hero-heartbeat {
+  position: absolute;
+  bottom: 3rem;
+  left: 4rem; right: 4rem;
+  height: 40px;
+  opacity: 0;
+  animation: fadeUp 1s ease forwards 1.2s;
+}
+
+.hero-heartbeat svg {
+  width: 100%;
+  height: 100%;
+}
+
+.heartbeat-line {
+  stroke-dasharray: 2000;
+  stroke-dashoffset: 2000;
+  animation: drawLine 3s ease forwards 1.5s, pulse-opacity 2s ease-in-out infinite 4.5s;
+}
+
+@keyframes drawLine {
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes pulse-opacity {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* ── SECTION SHARED ── */
+section {
+  position: relative;
+  z-index: 1;
+}
+
+.section-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 4rem;
+}
+
+.section-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 0.75rem;
+}
+
+.section-title {
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-bottom: 1rem;
+}
+
+.section-desc {
+  font-size: 1.05rem;
+  color: var(--off-white);
+  max-width: 560px;
+  font-weight: 300;
+}
+
+/* ── THE GAP SECTION ── */
+.gap-section {
+  padding: 7rem 0;
+  background: var(--navy-mid);
+  border-top: 1px solid rgba(255,255,255,0.05);
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.gap-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5rem;
+  align-items: center;
+}
+
+.gap-quote {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(1.5rem, 2.5vw, 2rem);
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+}
+
+.gap-quote .highlight {
+  color: var(--pulse);
+}
+
+.gap-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.stat-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 8px;
+  padding: 1.5rem;
+}
+
+.stat-number {
+  font-family: 'Syne', sans-serif;
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--accent);
+  letter-spacing: -0.03em;
+  line-height: 1;
+  margin-bottom: 0.4rem;
+}
+
+.stat-label {
+  font-size: 0.8rem;
+  color: var(--off-white);
+  line-height: 1.4;
+}
+
+/* ── HOW IT WORKS (Learn IT / Do IT / Apply IT) ── */
+.how-section {
+  padding: 8rem 0;
+}
+
+.how-header {
+  text-align: center;
+  margin-bottom: 5rem;
+}
+
+.how-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.how-card {
+  background: var(--navy-mid);
+  padding: 3rem 2.5rem;
+  position: relative;
+  transition: background 0.3s;
+}
+
+.how-card:hover {
+  background: var(--navy-light);
+}
+
+.how-card-number {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  color: var(--off-white);
+  opacity: 0.5;
+  margin-bottom: 1.5rem;
+}
+
+.how-card-icon {
+  width: 52px; height: 52px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+  font-size: 1.4rem;
+}
+
+.icon-learn { background: rgba(74, 108, 247, 0.15); }
+.icon-do    { background: rgba(124, 74, 247, 0.15); }
+.icon-apply { background: rgba(232, 74, 111, 0.15); }
+
+.how-card h3 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.75rem;
+}
+
+.how-card h3 .it {
+  font-style: italic;
+  color: var(--accent);
+}
+
+.how-card-2 h3 .it { color: #7c4af7; }
+.how-card-3 h3 .it { color: var(--pulse); }
+
+.how-card p {
+  font-size: 0.9rem;
+  color: var(--off-white);
+  line-height: 1.7;
+}
+
+.how-card-tag {
+  display: inline-block;
+  margin-top: 1.5rem;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.7rem;
+  padding: 0.3rem 0.75rem;
+  border-radius: 20px;
+  letter-spacing: 0.1em;
+}
+
+.tag-learn { background: rgba(74,108,247,0.15); color: #7a9eff; }
+.tag-do    { background: rgba(124,74,247,0.15); color: #b07aff; }
+.tag-apply { background: rgba(232,74,111,0.15); color: #ff7a9a; }
+
+/* ── TOPIC TRACKS ── */
+.tracks-section {
+  padding: 7rem 0;
+  background: var(--navy-mid);
+  border-top: 1px solid rgba(255,255,255,0.05);
+}
+
+.tracks-header {
+  margin-bottom: 3.5rem;
+}
+
+.tracks-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+}
+
+.track-card {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 10px;
+  padding: 2rem;
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+  transition: border-color 0.3s, background 0.3s, transform 0.3s;
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+}
+
+.track-card:hover {
+  border-color: rgba(74,108,247,0.4);
+  background: rgba(74,108,247,0.05);
+  transform: translateY(-3px);
+}
+
+.track-icon {
+  font-size: 1.75rem;
+  flex-shrink: 0;
+  width: 52px; height: 52px;
+  background: rgba(255,255,255,0.04);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.track-info h4 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin-bottom: 0.4rem;
+}
+
+.track-info p {
+  font-size: 0.85rem;
+  color: var(--off-white);
+  line-height: 1.5;
+}
+
+.track-badge {
+  margin-top: 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.badge-t1 { color: var(--tier1); }
+.badge-t2 { color: var(--tier2); }
+
+.badge-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.dot-t1 { background: var(--tier1); }
+.dot-t2 { background: var(--tier2); }
+
+/* ── AI ASSISTANT SECTION ── */
+.ai-section {
+  padding: 8rem 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.ai-glow {
+  position: absolute;
+  width: 600px; height: 600px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(74,108,247,0.12) 0%, transparent 70%);
+  right: -100px; top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.ai-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6rem;
+  align-items: center;
+}
+
+.ai-terminal {
+  background: var(--navy-light);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 32px 80px rgba(0,0,0,0.4);
+}
+
+.terminal-bar {
+  background: rgba(255,255,255,0.04);
+  padding: 0.75rem 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.terminal-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+}
+
+.dot-red   { background: #ff5f57; }
+.dot-yellow{ background: #febc2e; }
+.dot-green { background: #28c840; }
+
+.terminal-title {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--off-white);
+  opacity: 0.5;
+  margin-left: 0.5rem;
+}
+
+.terminal-body {
+  padding: 1.5rem;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.8rem;
+  line-height: 1.9;
+}
+
+.t-prompt { color: var(--accent); }
+.t-user   { color: var(--white); }
+.t-ai     { color: #7affb8; }
+.t-dim    { color: var(--off-white); opacity: 0.5; }
+
+.cursor {
+  display: inline-block;
+  width: 7px; height: 13px;
+  background: var(--accent);
+  margin-left: 2px;
+  vertical-align: middle;
+  animation: blink 1s step-end infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+/* ── VALUES STRIP ── */
+.values-section {
+  padding: 6rem 0;
+  background: var(--navy-mid);
+  border-top: 1px solid rgba(255,255,255,0.05);
+}
+
+.values-scroll {
+  display: flex;
+  gap: 1.5rem;
+  overflow-x: auto;
+  padding-bottom: 1rem;
+  scrollbar-width: none;
+}
+
+.values-scroll::-webkit-scrollbar { display: none; }
+
+.value-pill {
+  flex-shrink: 0;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 8px;
+  padding: 1.75rem 2rem;
+  min-width: 240px;
+}
+
+.value-pill-icon {
+  font-size: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.value-pill h4 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin-bottom: 0.4rem;
+}
+
+.value-pill p {
+  font-size: 0.8rem;
+  color: var(--off-white);
+  line-height: 1.5;
+}
+
+/* ── CTA ── */
+.cta-section {
+  padding: 8rem 0;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.cta-glow {
+  position: absolute;
+  width: 800px; height: 400px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(232,74,111,0.1) 0%, transparent 70%);
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.cta-content {
+  position: relative;
+  z-index: 1;
+}
+
+.cta-content h2 {
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  margin-bottom: 1.25rem;
+}
+
+.cta-content p {
+  font-size: 1.3rem;
+  color: var(--off-white);
+  max-width: 500px;
+  margin: 0 auto 2.5rem;
+}
+
+.cta-content .btn-primary {
+  font-size: 1.05rem;
+  padding: 1rem 2.5rem;
+}
+
+/* ── FOOTER ── */
+footer {
+  border-top: 1px solid rgba(255,255,255,0.06);
+  padding: 3rem 4rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.footer-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.footer-copy {
+  font-size: 0.8rem;
+  color: var(--off-white);
+  opacity: 0.5;
+}
+
+.footer-links {
+  display: flex;
+  gap: 2rem;
+  list-style: none;
+}
+
+.footer-links a {
+  font-size: 0.8rem;
+  color: var(--off-white);
+  opacity: 0.5;
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+
+.footer-links a:hover { opacity: 1; }
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── SCROLL REVEAL ── */
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 900px) {
+  nav { padding: 1rem 1.5rem; }
+  .nav-links { display: none; }
+  .hero { padding: 6rem 1.5rem 3rem; }
+  .section-inner { padding: 0 1.5rem; }
+  .gap-layout, .ai-layout, .tracks-grid { grid-template-columns: 1fr; gap: 3rem; }
+  .how-grid { grid-template-columns: 1fr; gap: 2px; }
+  footer { padding: 2rem 1.5rem; flex-direction: column; align-items: flex-start; }
+}
+
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+
+  <nav>
+    <a href="#" class="nav-logo">
+      <img src="images/trhlogo.svg" alt="The Rarest Heart" class="nav-logo-heart" width="96" height="96">
+      <span class="nav-logo-text">The Rarest <span>Heart</span></span>
+    </a>
+
+<ul class="nav-links">
+  <li><a href="#learn">Learn IT</a></li>
+  <li><a href="#do">Do IT</a></li>
+  <li><a href="#apply">Apply IT</a></li>
+  <li><a href="#topics">Topics</a></li>
+  <li><a href="#assistant">AI Assistant</a></li>
+  <li><a href="#start" class="nav-cta">Start Here</a></li>
+</ul>
+
+  </nav>
+
+  <!-- HERO -->
+
+  <section class="hero">
+    <div class="hero-grid-bg"></div>
+    <div class="hero-glow"></div>
+    <div class="hero-glow-2"></div>
+
+<div class="hero-content">
+  <p class="hero-eyebrow">therarestheart.io &nbsp;·&nbsp; Technology with a Heartbeat</p>
+
+  <h1 class="hero-headline">
+    IT explained<br />
+    for the <em>rest of us.</em>
+  </h1>
+
+  <p class="hero-sub">
+    There's a gap between 10 years of experience and day one. <strong>TRH exists to close it.</strong>
+    Real IT knowledge — Tier 1 to Tier 2 — explained without gatekeeping,
+    built for the people who were told to "just figure it out."
+  </p>
+
+  <div class="hero-actions">
+    <a href="#start" class="btn-primary">
+      <span>Start Learning</span>
+      <span>→</span>
+    </a>
+    <a href="#topics" class="btn-secondary">
+      <span>Browse Topics</span>
+    </a>
+  </div>
+</div>
+
+<div class="hero-heartbeat">
+  <svg viewBox="0 0 1200 40" fill="none" preserveAspectRatio="none">
+    <path class="heartbeat-line"
+      d="M0 20 L200 20 L240 20 L260 5 L280 35 L300 2 L320 38 L340 20 L380 20 L500 20 L540 20 L560 10 L575 30 L590 8 L605 32 L620 20 L660 20 L800 20 L840 20 L855 12 L870 28 L885 15 L900 25 L915 20 L960 20 L1200 20"
+      stroke="rgba(232,74,111,0.5)"
+      stroke-width="1.5"
+      fill="none"
+    />
+  </svg>
+</div>
+
+  </section>
+
+  <!-- THE GAP -->
+
+  <section class="gap-section">
+    <div class="section-inner">
+      <div class="gap-layout reveal">
+        <div>
+          <p class="section-label">// why TRH exists</p>
+          <h2 class="gap-quote">
+            The tech world stopped <span class="highlight">teaching</span> and started <span class="highlight">gatekeeping.</span>
+            We're changing that narrative.
+          </h2>
+          <p style="margin-top:1.5rem; color: var(--off-white); font-size:0.95rem; max-width:480px;">
+            Whether you're aiming for Help Desk, IT Support, In-Field Technician, or a future in cybersecurity —
+            TRH gives you the knowledge, the labs, and the language to walk in confident.
+          </p>
+        </div>
+        <div class="gap-stats">
+          <div class="stat-card">
+            <div class="stat-number">T1</div>
+            <div class="stat-label">Tier 1 Help Desk — the foundation of every IT career</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number">T2</div>
+            <div class="stat-label">Tier 2 Support — where technicians become problem-solvers</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number">0→</div>
+            <div class="stat-label">No experience required. Curiosity is the only prerequisite</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number">SOC</div>
+            <div class="stat-label">A clear path toward cybersecurity and beyond</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+
+  <section class="how-section" id="learn">
+    <div class="section-inner">
+      <div class="how-header reveal">
+        <p class="section-label">// the TRH method</p>
+        <h2 class="section-title">Every topic. Three ways in.</h2>
+        <p class="section-desc">Information Technology isn't just a label — it's the promise. We make IT make sense.</p>
+      </div>
+
+  <div class="how-grid reveal">
+    <div class="how-card how-card-1">
+      <div class="how-card-number">01 ——</div>
+      <div class="how-card-icon icon-learn">🧠</div>
+      <h3>Learn <span class="it">IT</span></h3>
+      <p>The concept, explained like a human being. No jargon walls. No assumed knowledge. We start with <em>why it exists</em> before we tell you how it works. Plain language, real analogies, and the context that makes everything click.</p>
+      <span class="how-card-tag tag-learn">CONCEPT + CONTEXT</span>
+    </div>
+
+    <div class="how-card how-card-2" id="do">
+      <div class="how-card-number">02 ——</div>
+      <div class="how-card-icon icon-do">🛠</div>
+      <h3>Do <span class="it">IT</span></h3>
+      <p>Hands-on. Step by step. Screenshots of what it actually looks like — including what happens when it goes wrong. Labs designed to be broken on purpose, because that's how real field technicians learn.</p>
+      <span class="how-card-tag tag-do">LAB + HANDS-ON</span>
+    </div>
+
+    <div class="how-card how-card-3" id="apply">
+      <div class="how-card-number">03 ——</div>
+      <div class="how-card-icon icon-apply">🎯</div>
+      <h3>Apply <span class="it">IT</span></h3>
+      <p>Turn what you did into how you talk about it. Resume bullets. Interview framing. The exact language hiring managers want to hear. Because knowing how to do the work and knowing how to communicate the work are both required.</p>
+      <span class="how-card-tag tag-apply">RESUME + INTERVIEW</span>
+    </div>
+  </div>
+</div>
+
+  </section>
+
+  <!-- TOPICS -->
+
+  <section class="tracks-section" id="topics">
+    <div class="section-inner">
+      <div class="tracks-header reveal">
+        <p class="section-label">// topic library</p>
+        <h2 class="section-title">What we cover</h2>
+        <p class="section-desc">Structured around real IT roles. Every topic links to an SOP, a lab, and a use case.</p>
+      </div>
+
+  <div class="tracks-grid reveal">
+    <a class="track-card" href="#">
+      <div class="track-icon">🔑</div>
+      <div class="track-info">
+        <h4>Password Resets & Account Lockouts</h4>
+        <p>Local accounts, Microsoft 365, Active Directory. The most common ticket — done right every time.</p>
+        <div class="track-badge badge-t1"><span class="badge-dot dot-t1"></span> TIER 1</div>
+      </div>
+    </a>
+
+    <a class="track-card" href="#">
+      <div class="track-icon">📶</div>
+      <div class="track-info">
+        <h4>Wi-Fi & Network Connectivity</h4>
+        <p>From "is it plugged in" to ipconfig, ping tests, and DHCP troubleshooting. The full picture.</p>
+        <div class="track-badge badge-t1"><span class="badge-dot dot-t1"></span> TIER 1</div>
+      </div>
+    </a>
+
+    <a class="track-card" href="#">
+      <div class="track-icon">💾</div>
+      <div class="track-info">
+        <h4>Software Installation & Errors</h4>
+        <p>Permissions, system requirements, licensing, and what to do when the installer fails.</p>
+        <div class="track-badge badge-t1"><span class="badge-dot dot-t1"></span> TIER 1</div>
+      </div>
+    </a>
+
+    <a class="track-card" href="#">
+      <div class="track-icon">🦠</div>
+      <div class="track-info">
+        <h4>Malware Detection & Removal</h4>
+        <p>Windows Defender, Malwarebytes, full scans, quarantine, and post-removal verification.</p>
+        <div class="track-badge badge-t2"><span class="badge-dot dot-t2"></span> TIER 2</div>
+      </div>
+    </a>
+
+    <a class="track-card" href="#">
+      <div class="track-icon">⚡</div>
+      <div class="track-info">
+        <h4>Windows Performance Diagnostics</h4>
+        <p>Task Manager, Event Viewer, sfc /scannow, DISM — reading what the system is telling you.</p>
+        <div class="track-badge badge-t2"><span class="badge-dot dot-t2"></span> TIER 2</div>
+      </div>
+    </a>
+
+    <a class="track-card" href="#">
+      <div class="track-icon">🏢</div>
+      <div class="track-info">
+        <h4>Active Directory User Support</h4>
+        <p>Account unlocks, password resets, OU placement, and Group Policy fundamentals for field techs.</p>
+        <div class="track-badge badge-t2"><span class="badge-dot dot-t2"></span> TIER 2</div>
+      </div>
+    </a>
+
+    <a class="track-card" href="#">
+      <div class="track-icon">🔌</div>
+      <div class="track-info">
+        <h4>Cabling & Physical Layer</h4>
+        <p>Cat6, RJ45, T568B, crimping, testing, and what "no link light" actually means.</p>
+        <div class="track-badge badge-t1"><span class="badge-dot dot-t1"></span> TIER 1</div>
+      </div>
+    </a>
+
+    <a class="track-card" href="#">
+      <div class="track-icon">🛡</div>
+      <div class="track-info">
+        <h4>Security Hardening Basics</h4>
+        <p>Firewall, Defender, least privilege, MFA — the foundation every technician needs before SOC.</p>
+        <div class="track-badge badge-t2"><span class="badge-dot dot-t2"></span> TIER 2</div>
+      </div>
+    </a>
+  </div>
+</div>
+
+  </section>
+
+  <!-- AI ASSISTANT -->
+
+  <section class="ai-section" id="assistant">
+    <div class="ai-glow"></div>
+    <div class="section-inner">
+      <div class="ai-layout reveal">
+        <div>
+          <p class="section-label">// TRH AI assistant</p>
+          <h2 class="section-title">Your IT knowledge base. On demand.</h2>
+          <p style="color: var(--off-white); font-size: 0.95rem; margin: 1.25rem 0 2rem; max-width: 460px; line-height: 1.8;">
+            A local AI assistant trained on TRH's SOPs, labs, and documentation.
+            Ask it a question, get a source-backed answer — no sending your data to a third party.
+            Built for people who need answers fast without feeling judged for not knowing.
+          </p>
+          <div style="display:flex; flex-direction:column; gap:0.75rem;">
+            <div style="display:flex; align-items:center; gap:0.75rem; font-size:0.875rem; color:var(--off-white);">
+              <span style="color:var(--accent); font-size:1rem;">✓</span> Answers pulled from your actual SOPs
+            </div>
+            <div style="display:flex; align-items:center; gap:0.75rem; font-size:0.875rem; color:var(--off-white);">
+              <span style="color:var(--accent); font-size:1rem;">✓</span> Runs locally — your data stays yours
+            </div>
+            <div style="display:flex; align-items:center; gap:0.75rem; font-size:0.875rem; color:var(--off-white);">
+              <span style="color:var(--accent); font-size:1rem;">✓</span> No one watching over your shoulder
+            </div>
+            <div style="display:flex; align-items:center; gap:0.75rem; font-size:0.875rem; color:var(--off-white);">
+              <span style="color:var(--accent); font-size:1rem;">✓</span> Coming in Phase 2
+            </div>
+          </div>
+        </div>
+
+    <div class="ai-terminal">
+      <div class="terminal-bar">
+        <div class="terminal-dot dot-red"></div>
+        <div class="terminal-dot dot-yellow"></div>
+        <div class="terminal-dot dot-green"></div>
+        <span class="terminal-title">TRH Assistant — Local Mode</span>
+      </div>
+      <div class="terminal-body">
+        <div><span class="t-prompt">user@trh:~$</span></div>
+        <div style="margin-top:0.5rem;">
+          <span class="t-dim">// asking the assistant</span>
+        </div>
+        <div style="margin-top:0.5rem;">
+          <span class="t-user">A user can't log in. Where do I start?</span>
+        </div>
+        <div style="margin-top:1rem;">
+          <span class="t-ai">TRH&gt;</span> <span style="color:var(--white);">Start with the obvious:</span>
+        </div>
+        <div style="padding-left:1.5rem; margin-top:0.25rem;">
+          <span class="t-ai">1.</span> <span style="color:var(--off-white);">Caps Lock, correct username</span>
+        </div>
+        <div style="padding-left:1.5rem;">
+          <span class="t-ai">2.</span> <span style="color:var(--off-white);">Check if account is locked in AD</span>
+        </div>
+        <div style="padding-left:1.5rem;">
+          <span class="t-ai">3.</span> <span style="color:var(--off-white);">Verify network/domain connection</span>
+        </div>
+        <div style="padding-left:1.5rem;">
+          <span class="t-ai">4.</span> <span style="color:var(--off-white);">Check system clock — time skew</span>
+        </div>
+        <div style="padding-left:1.5rem; margin-bottom:0.5rem;">
+          <span class="t-ai">↳</span> <span style="color:#7affb8; font-size:0.75rem;">Source: SOP-002 · Troubleshoot Login Problems</span>
+        </div>
+        <div>
+          <span class="t-prompt">user@trh:~$</span> <span class="cursor"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+  </section>
+
+  <!-- VALUES -->
+
+  <section class="values-section">
+    <div class="section-inner">
+      <div class="reveal" style="margin-bottom:2.5rem;">
+        <p class="section-label">// what we stand on</p>
+        <h2 class="section-title">Technology with care.</h2>
+      </div>
+      <div class="values-scroll reveal">
+        <div class="value-pill">
+          <div class="value-pill-icon">🤝</div>
+          <h4>Empathy First</h4>
+          <p>IT issues are stressful. We lead with patience, not judgment.</p>
+        </div>
+        <div class="value-pill">
+          <div class="value-pill-icon">🔐</div>
+          <h4>Security & Responsibility</h4>
+          <p>Security isn't an add-on. It's woven into everything we teach.</p>
+        </div>
+        <div class="value-pill">
+          <div class="value-pill-icon">🧪</div>
+          <h4>Education Through Experience</h4>
+          <p>Real systems. Real problems. Real solutions. Not just theory.</p>
+        </div>
+        <div class="value-pill">
+          <div class="value-pill-icon">📐</div>
+          <h4>Integrity in Craft</h4>
+          <p>Honest communication, clear documentation, built to last.</p>
+        </div>
+        <div class="value-pill">
+          <div class="value-pill-icon">🌱</div>
+          <h4>Growth & Opportunity</h4>
+          <p>For ourselves, our clients, and the community we serve.</p>
+        </div>
+        <div class="value-pill">
+          <div class="value-pill-icon">🌍</div>
+          <h4>Community Impact</h4>
+          <p>Technology should close gaps — not widen them.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+
+  <section class="cta-section" id="start">
+    <div class="cta-glow"></div>
+    <div class="section-inner">
+      <div class="cta-content reveal">
+        <h2>You belong in tech.<br />Start here.</h2>
+        <p>No gatekeeping. No shame. Just real IT knowledge explained by someone who remembers what it felt like not to know.</p>
+        <a href="#learn" class="btn-primary">Begin with Tier 1 →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+
+  <footer>
+    <div class="footer-left">
+      <span class="footer-copy">© 2026 The Rarest Heart · therarestheart.io</span>
+    </div>
+    <ul class="footer-links">
+      <li><a href="#">GitHub</a></li>
+      <li><a href="#">SOPs</a></li>
+      <li><a href="#">Labs</a></li>
+      <li><a href="#">Contact</a></li>
+    </ul>
+  </footer>
+
+  <script>
+    // Scroll reveal
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry, i) => {
+        if (entry.isIntersecting) {
+          setTimeout(() => entry.target.classList.add('visible'), i * 100);
+        }
+      });
+    }, { threshold: 0.1 });
+
+    reveals.forEach(el => observer.observe(el));
+
+    // Nav scroll effect
+    const nav = document.querySelector('nav');
+    window.addEventListener('scroll', () => {
+      nav.style.borderBottomColor = window.scrollY > 40
+        ? 'rgba(255,255,255,0.08)'
+        : 'rgba(255,255,255,0.04)';
+    });
+  </script>
+
+</body>
+</html>
