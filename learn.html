@@ -1,0 +1,1277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Learn IT | The Rarest Heart</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --navy: #07081a;
+      --navy-mid: #0d0f28;
+      --navy-light: #131535;
+      --white: #f4f4f0;
+      --off-white: #c8c8c4;
+      --accent: #4a6cf7;
+      --accent-glow: rgba(74, 108, 247, 0.25);
+      --pulse: #e84a6f;
+      --pulse-glow: rgba(232, 74, 111, 0.2);
+      --tier1: #4a6cf7;
+      --tier2: #7c4af7;
+      --tier3: #e84a6f;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background-color: var(--navy);
+      color: var(--white);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.4;
+    }
+
+    h1, h2, h3, h4 { font-family: 'Syne', sans-serif; line-height: 1.1; }
+    .mono { font-family: 'IBM Plex Mono', monospace; }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 1.25rem 4rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(7, 8, 26, 0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+    }
+
+    .nav-logo-heart { width: 96px; height: 96px; }
+
+    .nav-logo-text {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.3rem;
+      color: var(--white);
+      letter-spacing: -0.02em;
+    }
+
+    .nav-logo-text span { color: var(--pulse); }
+
+    .nav-links {
+      display: flex;
+      gap: 2.5rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--off-white);
+      text-decoration: none;
+      font-size: 0.875rem;
+      font-weight: 400;
+      letter-spacing: 0.02em;
+      transition: color 0.2s;
+      position: relative;
+    }
+
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -4px; left: 0;
+      width: 0; height: 1px;
+      background: var(--accent);
+      transition: width 0.3s;
+    }
+
+    .nav-links a:hover { color: var(--white); }
+    .nav-links a:hover::after { width: 100%; }
+    .nav-links a.active { color: var(--white); }
+    .nav-links a.active::after { width: 100%; background: var(--accent); }
+
+    .nav-cta {
+      background: var(--accent);
+      color: var(--white) !important;
+      padding: 0.5rem 1.25rem;
+      border-radius: 4px;
+      font-weight: 500 !important;
+      transition: background 0.2s, transform 0.2s !important;
+    }
+    .nav-cta::after { display: none !important; }
+    .nav-cta:hover { background: #3a5ce0 !important; transform: translateY(-1px); }
+
+    /* ── SHARED ── */
+    section { position: relative; z-index: 1; }
+
+    .section-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 4rem;
+    }
+
+    .section-label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 0.75rem;
+    }
+
+    .section-title {
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 1rem;
+    }
+
+    .section-desc {
+      font-size: 1.05rem;
+      color: var(--off-white);
+      max-width: 560px;
+      font-weight: 300;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: var(--white);
+      padding: 0.875rem 2rem;
+      border-radius: 4px;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 0.95rem;
+      letter-spacing: 0.01em;
+      transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .btn-primary:hover {
+      background: #3a5ce0;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px var(--accent-glow);
+    }
+
+    .btn-ghost {
+      border: 1px solid rgba(255,255,255,0.2);
+      color: var(--white);
+      padding: 0.875rem 2rem;
+      border-radius: 4px;
+      text-decoration: none;
+      font-weight: 400;
+      font-size: 0.95rem;
+      transition: border-color 0.2s, background 0.2s, transform 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: transparent;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .btn-ghost:hover {
+      border-color: rgba(255,255,255,0.5);
+      background: rgba(255,255,255,0.05);
+      transform: translateY(-2px);
+    }
+
+    /* ── PAGE HEADER ── */
+    .page-header {
+      padding: 9rem 0 5rem;
+      position: relative;
+      overflow: hidden;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .page-header-glow {
+      position: absolute;
+      width: 600px; height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+      top: -200px; right: -100px;
+      pointer-events: none;
+    }
+
+    .page-header-glow-2 {
+      position: absolute;
+      width: 400px; height: 400px;
+      border-radius: 50%;
+      background: radial-gradient(circle, var(--pulse-glow) 0%, transparent 70%);
+      bottom: -100px; left: 5%;
+      pointer-events: none;
+    }
+
+    .page-header-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(74,108,247,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(74,108,247,0.04) 1px, transparent 1px);
+      background-size: 60px 60px;
+      mask-image: radial-gradient(ellipse 80% 60% at 50% 50%, black, transparent);
+    }
+
+    .page-header-inner {
+      position: relative;
+      z-index: 1;
+    }
+
+    .page-eyebrow {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.75rem;
+      letter-spacing: 0.15em;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      opacity: 0;
+      animation: fadeUp 0.8s ease forwards 0.2s;
+    }
+
+    .page-eyebrow::before {
+      content: '';
+      display: inline-block;
+      width: 32px; height: 1px;
+      background: var(--accent);
+    }
+
+    .page-headline {
+      font-size: clamp(2.5rem, 6vw, 4.5rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.0;
+      margin-bottom: 1.25rem;
+      opacity: 0;
+      animation: fadeUp 0.8s ease forwards 0.4s;
+    }
+
+    .page-headline em {
+      font-style: normal;
+      color: var(--pulse);
+      position: relative;
+    }
+
+    .page-headline em::after {
+      content: '';
+      position: absolute;
+      bottom: 4px; left: 0; right: 0;
+      height: 3px;
+      background: var(--pulse);
+      opacity: 0.4;
+      border-radius: 2px;
+    }
+
+    .page-sub {
+      font-size: 1.1rem;
+      color: var(--off-white);
+      max-width: 520px;
+      margin-bottom: 2.5rem;
+      font-weight: 300;
+      opacity: 0;
+      animation: fadeUp 0.8s ease forwards 0.6s;
+    }
+
+    /* Progress bar strip */
+    .progress-strip {
+      display: flex;
+      gap: 1rem;
+      opacity: 0;
+      animation: fadeUp 0.8s ease forwards 0.8s;
+      flex-wrap: wrap;
+    }
+
+    .progress-chip {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      padding: 0.4rem 0.9rem;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .chip-t1 { background: rgba(74,108,247,0.12); color: #7a9eff; border: 1px solid rgba(74,108,247,0.25); }
+    .chip-t2 { background: rgba(124,74,247,0.12); color: #b07aff; border: 1px solid rgba(124,74,247,0.25); }
+    .chip-t3 { background: rgba(232,74,111,0.12); color: #ff7a9a; border: 1px solid rgba(232,74,111,0.25); }
+
+    .chip-dot {
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+    .chip-t1 .chip-dot { background: var(--tier1); }
+    .chip-t2 .chip-dot { background: var(--tier2); }
+    .chip-t3 .chip-dot { background: var(--tier3); }
+
+    /* ── PATH SELECTOR ── */
+    .path-section {
+      padding: 5rem 0 4rem;
+      background: var(--navy-mid);
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .path-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+      margin-top: 3rem;
+    }
+
+    .path-card {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 10px;
+      padding: 2rem;
+      cursor: pointer;
+      transition: border-color 0.3s, background 0.3s, transform 0.3s;
+      text-decoration: none;
+      color: inherit;
+      display: block;
+    }
+
+    .path-card:hover {
+      border-color: rgba(74,108,247,0.4);
+      background: rgba(74,108,247,0.05);
+      transform: translateY(-3px);
+    }
+
+    .path-card.active-path {
+      border-color: rgba(74,108,247,0.5);
+      background: rgba(74,108,247,0.08);
+    }
+
+    .path-icon {
+      font-size: 1.75rem;
+      width: 52px; height: 52px;
+      background: rgba(255,255,255,0.04);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1.25rem;
+    }
+
+    .path-card h4 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-bottom: 0.4rem;
+      letter-spacing: -0.01em;
+    }
+
+    .path-card p {
+      font-size: 0.85rem;
+      color: var(--off-white);
+      line-height: 1.6;
+    }
+
+    .path-arrow {
+      margin-top: 1.25rem;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--accent);
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .path-card:hover .path-arrow { opacity: 1; }
+
+    /* ── TIER TABS ── */
+    .curriculum-section { padding: 6rem 0; }
+
+    .tier-tabs {
+      display: flex;
+      gap: 0;
+      margin-bottom: 4rem;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 8px;
+      padding: 4px;
+      width: fit-content;
+    }
+
+    .tier-tab {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.75rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.6rem 1.5rem;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: all 0.2s;
+      color: var(--off-white);
+      border: none;
+      background: transparent;
+      font-weight: 500;
+    }
+
+    .tier-tab:hover { color: var(--white); }
+
+    .tier-tab.active-tab {
+      background: var(--navy-light);
+      color: var(--white);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+
+    .tier-tab.tab-t1.active-tab { color: var(--tier1); }
+    .tier-tab.tab-t2.active-tab { color: var(--tier2); }
+
+    /* ── MODULE CARDS ── */
+    .modules-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .module-card {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 10px;
+      overflow: hidden;
+      transition: border-color 0.3s, transform 0.3s;
+      cursor: pointer;
+    }
+
+    .module-card:hover {
+      border-color: rgba(74,108,247,0.35);
+      transform: translateY(-2px);
+    }
+
+    .module-card.locked {
+      opacity: 0.45;
+      cursor: default;
+      pointer-events: none;
+    }
+
+    .module-card-body {
+      padding: 2rem 2.5rem;
+      display: flex;
+      gap: 2rem;
+      align-items: flex-start;
+    }
+
+    .module-num {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      color: var(--accent);
+      opacity: 0.6;
+      width: 28px;
+      padding-top: 4px;
+      flex-shrink: 0;
+    }
+
+    .module-locked-num {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.9rem;
+      color: var(--off-white);
+      opacity: 0.4;
+      width: 28px;
+      padding-top: 2px;
+      flex-shrink: 0;
+    }
+
+    .module-content { flex: 1; }
+
+    .module-tags {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 0.6rem;
+      flex-wrap: wrap;
+    }
+
+    .m-tag {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.25rem 0.6rem;
+      border-radius: 20px;
+    }
+
+    .m-tag-t1 { background: rgba(74,108,247,0.12); color: #7a9eff; border: 1px solid rgba(74,108,247,0.2); }
+    .m-tag-t2 { background: rgba(124,74,247,0.12); color: #b07aff; border: 1px solid rgba(124,74,247,0.2); }
+    .m-tag-sop { background: rgba(255,255,255,0.05); color: var(--off-white); border: 1px solid rgba(255,255,255,0.1); }
+    .m-tag-new { background: rgba(232,74,111,0.12); color: #ff7a9a; border: 1px solid rgba(232,74,111,0.2); }
+
+    .module-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      margin-bottom: 0.4rem;
+    }
+
+    .module-desc {
+      font-size: 0.875rem;
+      color: var(--off-white);
+      line-height: 1.6;
+      max-width: 600px;
+    }
+
+    .module-meta {
+      display: flex;
+      gap: 1.5rem;
+      margin-top: 1rem;
+    }
+
+    .module-meta-item {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--off-white);
+      opacity: 0.6;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    /* Phase pills inside card */
+    .module-phases {
+      padding: 0 2.5rem 1.5rem 4.75rem;
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .phase-pill {
+      flex: 1;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 6px;
+      padding: 0.75rem 1rem;
+      text-align: center;
+    }
+
+    .phase-pill-icon { font-size: 1rem; margin-bottom: 0.25rem; }
+
+    .phase-pill-label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--off-white);
+      opacity: 0.6;
+      display: block;
+    }
+
+    .phase-pill-name {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--white);
+      opacity: 0.7;
+      display: block;
+      margin-top: 0.1rem;
+    }
+
+    /* Card footer */
+    .module-card-footer {
+      padding: 1rem 2.5rem;
+      border-top: 1px solid rgba(255,255,255,0.05);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .module-status {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--off-white);
+      opacity: 0.5;
+      letter-spacing: 0.1em;
+    }
+
+    .module-actions {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+    }
+
+    .btn-sop {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.08em;
+      color: var(--off-white);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 4px;
+      padding: 0.45rem 0.9rem;
+      text-decoration: none;
+      transition: all 0.2s;
+      opacity: 0.7;
+    }
+
+    .btn-sop:hover {
+      opacity: 1;
+      border-color: rgba(255,255,255,0.3);
+      color: var(--white);
+    }
+
+    .btn-start {
+      background: var(--accent);
+      color: var(--white);
+      font-size: 0.8rem;
+      font-weight: 500;
+      padding: 0.5rem 1.25rem;
+      border-radius: 4px;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .btn-start:hover {
+      background: #3a5ce0;
+      transform: translateY(-1px);
+    }
+
+    .lock-badge {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--off-white);
+      opacity: 0.4;
+      letter-spacing: 0.08em;
+    }
+
+    /* Tier 2 hover accent */
+    .module-card.tier2:hover { border-color: rgba(124,74,247,0.35); }
+    .module-card.tier2 .module-num { color: var(--tier2); }
+    .module-card.tier2 .btn-start { background: var(--tier2); }
+    .module-card.tier2 .btn-start:hover { background: #6a3ae0; }
+
+    /* ── HOW IT WORKS MINI ── */
+    .method-section {
+      padding: 5rem 0;
+      background: var(--navy-mid);
+      border-top: 1px solid rgba(255,255,255,0.05);
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .method-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2px;
+      background: rgba(255,255,255,0.04);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-top: 3rem;
+    }
+
+    .method-card {
+      background: var(--navy-mid);
+      padding: 2.5rem 2rem;
+      transition: background 0.3s;
+    }
+
+    .method-card:hover { background: var(--navy-light); }
+
+    .method-card-num {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      color: var(--off-white);
+      opacity: 0.4;
+      margin-bottom: 1.25rem;
+    }
+
+    .method-icon {
+      width: 48px; height: 48px;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .m-icon-learn { background: rgba(74,108,247,0.15); }
+    .m-icon-do    { background: rgba(124,74,247,0.15); }
+    .m-icon-apply { background: rgba(232,74,111,0.15); }
+
+    .method-card h3 {
+      font-size: 1.3rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.6rem;
+    }
+
+    .method-card h3 .it { font-style: italic; color: var(--accent); }
+    .method-card:nth-child(2) h3 .it { color: #7c4af7; }
+    .method-card:nth-child(3) h3 .it { color: var(--pulse); }
+
+    .method-card p {
+      font-size: 0.85rem;
+      color: var(--off-white);
+      line-height: 1.7;
+    }
+
+    .method-tag {
+      display: inline-block;
+      margin-top: 1.25rem;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.65rem;
+      padding: 0.25rem 0.6rem;
+      border-radius: 20px;
+      letter-spacing: 0.1em;
+    }
+
+    .tag-learn { background: rgba(74,108,247,0.15); color: #7a9eff; }
+    .tag-do    { background: rgba(124,74,247,0.15); color: #b07aff; }
+    .tag-apply { background: rgba(232,74,111,0.15); color: #ff7a9a; }
+
+    /* ── CTA ── */
+    .cta-section {
+      padding: 7rem 0;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cta-glow {
+      position: absolute;
+      width: 800px; height: 400px;
+      border-radius: 50%;
+      background: radial-gradient(ellipse, rgba(232,74,111,0.1) 0%, transparent 70%);
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+
+    .cta-content { position: relative; z-index: 1; }
+
+    .cta-content h2 {
+      font-size: clamp(2rem, 4vw, 3.5rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 1rem;
+    }
+
+    .cta-content p {
+      font-size: 1.1rem;
+      color: var(--off-white);
+      max-width: 480px;
+      margin: 0 auto 2.5rem;
+      font-weight: 300;
+    }
+
+    .cta-actions {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid rgba(255,255,255,0.06);
+      padding: 3rem 4rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .footer-copy {
+      font-size: 0.8rem;
+      color: var(--off-white);
+      opacity: 0.5;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+    }
+
+    .footer-links a {
+      font-size: 0.8rem;
+      color: var(--off-white);
+      opacity: 0.5;
+      text-decoration: none;
+      transition: opacity 0.2s;
+    }
+
+    .footer-links a:hover { opacity: 1; }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Tier panel show/hide */
+    .tier-panel { display: none; }
+    .tier-panel.active { display: block; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      nav { padding: 1rem 1.5rem; }
+      .nav-links { display: none; }
+      .page-header { padding: 7rem 0 3rem; }
+      .section-inner { padding: 0 1.5rem; }
+      .path-grid { grid-template-columns: 1fr; }
+      .method-grid { grid-template-columns: 1fr; gap: 2px; }
+      .module-card-body { flex-direction: column; gap: 1rem; }
+      .module-phases { padding: 0 1.5rem 1.5rem; }
+      footer { padding: 2rem 1.5rem; flex-direction: column; align-items: flex-start; }
+      .tier-tabs { width: 100%; }
+      .tier-tab { flex: 1; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a href="index.html" class="nav-logo">
+      <!-- Replace src with your actual logo path -->
+      <svg class="nav-logo-heart" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M50 80 C50 80 15 55 15 32 C15 20 24 12 35 12 C42 12 48 16 50 20 C52 16 58 12 65 12 C76 12 85 20 85 32 C85 55 50 80 50 80Z" fill="white" opacity="0.9"/>
+        <text x="27" y="52" font-family="'Syne', sans-serif" font-weight="800" font-size="22" fill="#07081a" letter-spacing="-1">TRH</text>
+      </svg>
+      <div>
+        <div class="nav-logo-text">The Rarest <span>Heart</span></div>
+      </div>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="learn.html" class="active">Learn</a></li>
+      <li><a href="sops.html">SOPs</a></li>
+      <li><a href="labs.html">Labs</a></li>
+      <li><a href="contact.html" class="nav-cta">Get Support</a></li>
+    </ul>
+  </nav>
+
+  <!-- PAGE HEADER -->
+  <section class="page-header">
+    <div class="page-header-grid"></div>
+    <div class="page-header-glow"></div>
+    <div class="page-header-glow-2"></div>
+    <div class="section-inner page-header-inner">
+      <p class="page-eyebrow">therarestheart.io · Learn IT</p>
+      <h1 class="page-headline">
+        Real IT knowledge.<br />
+        <em>No gatekeeping.</em>
+      </h1>
+      <p class="page-sub">
+        Every module follows the same structure: Learn It, Do It, Apply It.
+        Start at Tier 1. Go as far as you want.
+      </p>
+      <div class="progress-strip">
+        <span class="progress-chip chip-t1"><span class="chip-dot"></span> Tier 1 · Help Desk</span>
+        <span class="progress-chip chip-t2"><span class="chip-dot"></span> Tier 2 · IT Support</span>
+        <span class="progress-chip chip-t3"><span class="chip-dot"></span> Tier 3 · Security</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHO ARE YOU -->
+  <section class="path-section">
+    <div class="section-inner">
+      <div class="reveal">
+        <p class="section-label">// find your path</p>
+        <h2 class="section-title">Where are you starting from?</h2>
+        <p class="section-desc">Every path leads to the same curriculum — but knowing your starting point helps you know where to land first.</p>
+      </div>
+      <div class="path-grid reveal">
+        <a href="#tier1" class="path-card">
+          <div class="path-icon">👶</div>
+          <h4>New to tech</h4>
+          <p>No experience needed. Start at Module 1 and build from zero — real skills, real scenarios, no shame.</p>
+          <div class="path-arrow">→ Start at Module 01</div>
+        </a>
+        <a href="#tier1" class="path-card">
+          <div class="path-icon">🛠️</div>
+          <h4>Aspiring IT pro</h4>
+          <p>Building toward Help Desk, CompTIA certs, or cybersecurity? These modules map directly to real job tasks.</p>
+          <div class="path-arrow">→ Start at Tier 1</div>
+        </a>
+        <a href="#tier1" class="path-card">
+          <div class="path-icon">💼</div>
+          <h4>Small business owner</h4>
+          <p>Understand what's happening with your systems. Know enough to ask the right questions and spot bad advice.</p>
+          <div class="path-arrow">→ Recommended modules</div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- CURRICULUM -->
+  <section class="curriculum-section" id="tier1">
+    <div class="section-inner">
+      <div class="reveal" style="margin-bottom: 3rem;">
+        <p class="section-label">// curriculum</p>
+        <h2 class="section-title">The full curriculum.</h2>
+        <p class="section-desc">Structured around real IT roles. Every module links to an SOP, a scenario, and interview prep.</p>
+      </div>
+
+      <!-- TIER TABS -->
+      <div class="tier-tabs reveal">
+        <button class="tier-tab tab-t1 active-tab" onclick="switchTier('t1', this)">Tier 1 — Help Desk</button>
+        <button class="tier-tab tab-t2" onclick="switchTier('t2', this)">Tier 2 — IT Support</button>
+      </div>
+
+      <!-- TIER 1 PANEL -->
+      <div class="tier-panel active" id="panel-t1">
+        <div class="modules-grid">
+
+          <!-- MODULE 01 — AVAILABLE -->
+          <div class="module-card reveal">
+            <div class="module-card-body">
+              <div class="module-num">01 ——</div>
+              <div class="module-content">
+                <div class="module-tags">
+                  <span class="m-tag m-tag-t1">Tier 1</span>
+                  <span class="m-tag m-tag-sop">SOP-001</span>
+                  <span class="m-tag m-tag-new">Start Here</span>
+                </div>
+                <h3 class="module-title">Password Resets & Account Lockouts</h3>
+                <p class="module-desc">The single most common Tier 1 ticket. Learn why lockouts happen, how to verify identity securely, and the exact 7-step procedure used in real IT environments. Includes three real-world scenarios and interview prep.</p>
+                <div class="module-meta">
+                  <span class="module-meta-item">⏱ 5–10 min</span>
+                  <span class="module-meta-item">📄 3 scenarios</span>
+                  <span class="module-meta-item">🎤 3 interview questions</span>
+                  <span class="module-meta-item">🧠 Beginner</span>
+                </div>
+              </div>
+            </div>
+            <div class="module-phases">
+              <div class="phase-pill">
+                <div class="phase-pill-icon">📘</div>
+                <span class="phase-pill-label">Phase 1</span>
+                <span class="phase-pill-name">Learn It</span>
+              </div>
+              <div class="phase-pill">
+                <div class="phase-pill-icon">🛠️</div>
+                <span class="phase-pill-label">Phase 2</span>
+                <span class="phase-pill-name">Do It</span>
+              </div>
+              <div class="phase-pill">
+                <div class="phase-pill-icon">🎯</div>
+                <span class="phase-pill-label">Phase 3</span>
+                <span class="phase-pill-name">Apply It</span>
+              </div>
+            </div>
+            <div class="module-card-footer">
+              <span class="module-status">// not started</span>
+              <div class="module-actions">
+                <a href="sops.html#sop-001" class="btn-sop">📋 SOP-001</a>
+                <a href="modules/01-password-resets.html" class="btn-start">Begin Module →</a>
+              </div>
+            </div>
+          </div>
+
+          <!-- MODULE 02 — LOCKED -->
+          <div class="module-card locked">
+            <div class="module-card-body">
+              <div class="module-locked-num">🔒</div>
+              <div class="module-content">
+                <div class="module-tags">
+                  <span class="m-tag m-tag-t1">Tier 1</span>
+                  <span class="m-tag m-tag-sop">SOP-002</span>
+                </div>
+                <h3 class="module-title">Software Installation & Verification</h3>
+                <p class="module-desc">Installing programs correctly, checking system requirements, running as administrator, and confirming success. What to do when the installer fails.</p>
+                <div class="module-meta">
+                  <span class="module-meta-item">⏱ 10–20 min</span>
+                  <span class="module-meta-item">🧠 Beginner</span>
+                </div>
+              </div>
+            </div>
+            <div class="module-card-footer">
+              <span class="module-status">// complete module 01 to unlock</span>
+              <span class="lock-badge">LOCKED</span>
+            </div>
+          </div>
+
+          <!-- MODULE 03 — LOCKED -->
+          <div class="module-card locked">
+            <div class="module-card-body">
+              <div class="module-locked-num">🔒</div>
+              <div class="module-content">
+                <div class="module-tags">
+                  <span class="m-tag m-tag-t1">Tier 1</span>
+                  <span class="m-tag m-tag-sop">SOP-003</span>
+                </div>
+                <h3 class="module-title">Wi-Fi & Network Connectivity</h3>
+                <p class="module-desc">From "is it plugged in" to ipconfig, ping tests, DHCP troubleshooting, and when to escalate. The full picture for field techs.</p>
+                <div class="module-meta">
+                  <span class="module-meta-item">⏱ 15 min</span>
+                  <span class="module-meta-item">🧠 Beginner</span>
+                </div>
+              </div>
+            </div>
+            <div class="module-card-footer">
+              <span class="module-status">// complete module 02 to unlock</span>
+              <span class="lock-badge">LOCKED</span>
+            </div>
+          </div>
+
+          <!-- MODULE 04 — LOCKED -->
+          <div class="module-card locked">
+            <div class="module-card-body">
+              <div class="module-locked-num">🔒</div>
+              <div class="module-content">
+                <div class="module-tags">
+                  <span class="m-tag m-tag-t1">Tier 1</span>
+                  <span class="m-tag m-tag-sop">SOP-004</span>
+                </div>
+                <h3 class="module-title">Printer Troubleshooting</h3>
+                <p class="module-desc">Power, connection, driver removal and reinstall, setting default, and printing a test page. Network printer escalation criteria.</p>
+                <div class="module-meta">
+                  <span class="module-meta-item">⏱ 15 min</span>
+                  <span class="module-meta-item">🧠 Beginner</span>
+                </div>
+              </div>
+            </div>
+            <div class="module-card-footer">
+              <span class="module-status">// complete module 03 to unlock</span>
+              <span class="lock-badge">LOCKED</span>
+            </div>
+          </div>
+
+          <!-- MODULE 05 — LOCKED -->
+          <div class="module-card locked">
+            <div class="module-card-body">
+              <div class="module-locked-num">🔒</div>
+              <div class="module-content">
+                <div class="module-tags">
+                  <span class="m-tag m-tag-t1">Tier 1</span>
+                  <span class="m-tag m-tag-sop">SOP-005</span>
+                </div>
+                <h3 class="module-title">Cabling & Physical Layer</h3>
+                <p class="module-desc">Cat6, RJ45, T568B wiring standard, crimping technique, cable testing, and what "no link light" actually means in the field.</p>
+                <div class="module-meta">
+                  <span class="module-meta-item">⏱ 20 min</span>
+                  <span class="module-meta-item">🧠 Beginner</span>
+                </div>
+              </div>
+            </div>
+            <div class="module-card-footer">
+              <span class="module-status">// complete module 04 to unlock</span>
+              <span class="lock-badge">LOCKED</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- TIER 2 PANEL -->
+      <div class="tier-panel" id="panel-t2">
+        <div class="modules-grid">
+
+          <div class="module-card tier2 locked">
+            <div class="module-card-body">
+              <div class="module-locked-num">🔒</div>
+              <div class="module-content">
+                <div class="module-tags">
+                  <span class="m-tag m-tag-t2">Tier 2</span>
+                  <span class="m-tag m-tag-sop">SOP-006</span>
+                </div>
+                <h3 class="module-title">Malware Detection & Removal</h3>
+                <p class="module-desc">Windows Defender, Malwarebytes, full scans, quarantine, and post-removal verification. How to confirm a system is clean.</p>
+                <div class="module-meta">
+                  <span class="module-meta-item">⏱ 30–60 min</span>
+                  <span class="module-meta-item">🧠 Intermediate</span>
+                </div>
+              </div>
+            </div>
+            <div class="module-card-footer">
+              <span class="module-status">// complete tier 1 to unlock</span>
+              <span class="lock-badge">LOCKED</span>
+            </div>
+          </div>
+
+          <div class="module-card tier2 locked">
+            <div class="module-card-body">
+              <div class="module-locked-num">🔒</div>
+              <div class="module-content">
+                <div class="module-tags">
+                  <span class="m-tag m-tag-t2">Tier 2</span>
+                  <span class="m-tag m-tag-sop">SOP-007</span>
+                </div>
+                <h3 class="module-title">Windows Performance Diagnostics</h3>
+                <p class="module-desc">Task Manager, Event Viewer, sfc /scannow, DISM — reading what the system is telling you and fixing it the right way.</p>
+                <div class="module-meta">
+                  <span class="module-meta-item">⏱ 30 min</span>
+                  <span class="module-meta-item">🧠 Intermediate</span>
+                </div>
+              </div>
+            </div>
+            <div class="module-card-footer">
+              <span class="module-status">// complete tier 1 to unlock</span>
+              <span class="lock-badge">LOCKED</span>
+            </div>
+          </div>
+
+          <div class="module-card tier2 locked">
+            <div class="module-card-body">
+              <div class="module-locked-num">🔒</div>
+              <div class="module-content">
+                <div class="module-tags">
+                  <span class="m-tag m-tag-t2">Tier 2</span>
+                  <span class="m-tag m-tag-sop">SOP-008</span>
+                </div>
+                <h3 class="module-title">Active Directory User Support</h3>
+                <p class="module-desc">Account unlocks, password resets via AD, OU placement, Group Policy fundamentals, and authentication troubleshooting for field techs.</p>
+                <div class="module-meta">
+                  <span class="module-meta-item">⏱ 45 min</span>
+                  <span class="module-meta-item">🧠 Intermediate</span>
+                </div>
+              </div>
+            </div>
+            <div class="module-card-footer">
+              <span class="module-status">// complete tier 1 to unlock</span>
+              <span class="lock-badge">LOCKED</span>
+            </div>
+          </div>
+
+          <div class="module-card tier2 locked">
+            <div class="module-card-body">
+              <div class="module-locked-num">🔒</div>
+              <div class="module-content">
+                <div class="module-tags">
+                  <span class="m-tag m-tag-t2">Tier 2</span>
+                  <span class="m-tag m-tag-sop">SOP-009</span>
+                </div>
+                <h3 class="module-title">Security Hardening Basics</h3>
+                <p class="module-desc">Firewall, Defender real-time protection, removing admin rights, updates, and MFA. The foundation every technician needs before SOC.</p>
+                <div class="module-meta">
+                  <span class="module-meta-item">⏱ 30 min</span>
+                  <span class="module-meta-item">🧠 Intermediate</span>
+                </div>
+              </div>
+            </div>
+            <div class="module-card-footer">
+              <span class="module-status">// complete tier 1 to unlock</span>
+              <span class="lock-badge">LOCKED</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- METHOD REMINDER -->
+  <section class="method-section">
+    <div class="section-inner">
+      <div class="reveal" style="text-align:center; margin-bottom:1rem;">
+        <p class="section-label">// the TRH method</p>
+        <h2 class="section-title">How every module works.</h2>
+      </div>
+      <div class="method-grid reveal">
+        <div class="method-card">
+          <div class="method-card-num">01 ——</div>
+          <div class="method-icon m-icon-learn">🧠</div>
+          <h3>Learn <span class="it">IT</span></h3>
+          <p>The concept explained like a human being — why it exists, how it works, and what goes wrong. No jargon walls.</p>
+          <span class="method-tag tag-learn">CONCEPT + CONTEXT</span>
+        </div>
+        <div class="method-card">
+          <div class="method-card-num">02 ——</div>
+          <div class="method-icon m-icon-do">🛠️</div>
+          <h3>Do <span class="it">IT</span></h3>
+          <p>Step-by-step SOP procedure. What it actually looks like — including what happens when it goes wrong.</p>
+          <span class="method-tag tag-do">LAB + HANDS-ON</span>
+        </div>
+        <div class="method-card">
+          <div class="method-card-num">03 ——</div>
+          <div class="method-icon m-icon-apply">🎯</div>
+          <h3>Apply <span class="it">IT</span></h3>
+          <p>Real scenarios. Resume bullets. Interview framing. The exact language hiring managers want to hear.</p>
+          <span class="method-tag tag-apply">RESUME + INTERVIEW</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <div class="cta-glow"></div>
+    <div class="section-inner">
+      <div class="cta-content reveal">
+        <h2>You don't need permission<br />to start learning.</h2>
+        <p>Module 01 is open. No signup. No paywall. Just real IT knowledge — the way it should be.</p>
+        <div class="cta-actions">
+          <a href="modules/01-password-resets.html" class="btn-primary">Begin Module 01 →</a>
+          <a href="sops.html" class="btn-ghost">Browse SOPs</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div>
+      <span class="footer-copy">© 2026 The Rarest Heart · therarestheart.io</span>
+    </div>
+    <ul class="footer-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="labs.html">GitHub</a></li>
+      <li><a href="sops.html">SOPs</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+  </footer>
+
+  <script>
+    // Scroll reveal
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry, i) => {
+        if (entry.isIntersecting) {
+          setTimeout(() => entry.target.classList.add('visible'), i * 80);
+        }
+      });
+    }, { threshold: 0.08 });
+    reveals.forEach(el => observer.observe(el));
+
+    // Nav scroll
+    const nav = document.querySelector('nav');
+    window.addEventListener('scroll', () => {
+      nav.style.borderBottomColor = window.scrollY > 40
+        ? 'rgba(255,255,255,0.08)'
+        : 'rgba(255,255,255,0.04)';
+    });
+
+    // Tier tab switching
+    function switchTier(tier, btn) {
+      document.querySelectorAll('.tier-panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.tier-tab').forEach(t => t.classList.remove('active-tab'));
+      document.getElementById('panel-' + tier).classList.add('active');
+      btn.classList.add('active-tab');
+    }
+  </script>
+
+</body>
+</html>
