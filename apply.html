@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Apply IT — Career Application Hub | The Rarest Heart</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet" />
+  <style>
+    :root { --navy: #07081a; --navy-mid: #0d0f28; --navy-light: #131535; --white: #f4f4f0; --off-white: #c8c8c4; --accent: #4a6cf7; --accent-glow: rgba(74,108,247,0.25); --pulse: #e84a6f; --tier1: #4a6cf7; --tier2: #7c4af7; --green: #22c55e; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { background-color: var(--navy); color: var(--white); font-family: 'DM Sans', sans-serif; font-weight: 300; line-height: 1.7; overflow-x: hidden; }
+    body::before { content: ''; position: fixed; inset: 0; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E"); pointer-events: none; z-index: 0; opacity: 0.4; }
+    h1, h2, h3, h4 { font-family: 'Syne', sans-serif; line-height: 1.15; }
+    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; padding: 1.25rem 4rem; display: flex; align-items: center; justify-content: space-between; background: rgba(7,8,26,0.85); backdrop-filter: blur(16px); border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .nav-logo { display: flex; align-items: center; gap: 0.75rem; text-decoration: none; }
+    .nav-logo-heart { width: 96px; height: 96px; }
+    .nav-logo-text { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.3rem; color: var(--white); letter-spacing: -0.02em; }
+    .nav-logo-text span { color: var(--pulse); }
+    .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+    .nav-links a { color: var(--off-white); text-decoration: none; font-size: 0.875rem; font-weight: 400; letter-spacing: 0.02em; transition: color 0.2s; position: relative; }
+    .nav-links a::after { content: ''; position: absolute; bottom: -4px; left: 0; width: 0; height: 1px; background: var(--accent); transition: width 0.3s; }
+    .nav-links a:hover { color: var(--white); } .nav-links a:hover::after { width: 100%; }
+    .nav-links a.active { color: var(--white); } .nav-links a.active::after { width: 100%; }
+    .nav-cta { background: var(--accent); color: var(--white) !important; padding: 0.5rem 1.25rem; border-radius: 4px; font-weight: 500 !important; }
+    .nav-cta::after { display: none !important; } .nav-cta:hover { background: #3a5ce0 !important; }
+    section { position: relative; z-index: 1; }
+    .page-wrap { max-width: 960px; margin: 0 auto; padding: 0 2rem; }
+    .page-hero { padding: 8rem 0 4rem; border-bottom: 1px solid rgba(255,255,255,0.06); position: relative; overflow: hidden; }
+    .page-hero-glow { position: absolute; width: 600px; height: 600px; border-radius: 50%; background: radial-gradient(circle, rgba(232,74,111,0.12) 0%, transparent 70%); top: -200px; right: -150px; pointer-events: none; }
+    .page-hero-inner { position: relative; z-index: 1; }
+    .page-eyebrow { font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--pulse); margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.75rem; opacity: 0; animation: fadeUp 0.7s ease forwards 0.1s; }
+    .page-eyebrow::before { content: ''; display: inline-block; width: 24px; height: 1px; background: var(--pulse); }
+    .page-title { font-size: clamp(2.5rem, 6vw, 4rem); font-weight: 800; letter-spacing: -0.03em; margin-bottom: 1rem; opacity: 0; animation: fadeUp 0.7s ease forwards 0.25s; }
+    .page-title em { font-style: normal; color: var(--pulse); }
+    .page-desc { font-size: 1.05rem; color: var(--off-white); max-width: 560px; font-weight: 300; line-height: 1.7; opacity: 0; animation: fadeUp 0.7s ease forwards 0.4s; }
+    .content-section { padding: 4rem 0; border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .content-section:last-of-type { border-bottom: none; }
+    .section-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.5rem; }
+    .section-title { font-size: 1.6rem; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 1rem; }
+    .section-body { font-size: 0.95rem; color: var(--off-white); line-height: 1.8; max-width: 620px; margin-bottom: 2rem; }
+    .resume-table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; font-size: 0.875rem; }
+    .resume-table th { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--off-white); opacity: 0.6; padding: 0.75rem 1.25rem; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.02); }
+    .resume-table td { padding: 1rem 1.25rem; border-bottom: 1px solid rgba(255,255,255,0.05); color: var(--off-white); vertical-align: top; line-height: 1.65; }
+    .resume-table td:first-child { color: var(--white); font-weight: 500; width: 200px; font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; }
+    .resume-table tr:last-child td { border-bottom: none; }
+    .scenario-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; }
+    .scenario-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; padding: 1.5rem; text-decoration: none; color: inherit; transition: border-color 0.2s, transform 0.2s; display: block; }
+    .scenario-card:hover { border-color: rgba(232,74,111,0.3); transform: translateY(-2px); }
+    .scenario-card-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.6rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--pulse); margin-bottom: 0.5rem; }
+    .scenario-card h4 { font-size: 1rem; font-weight: 700; margin-bottom: 0.4rem; letter-spacing: -0.01em; }
+    .scenario-card p { font-size: 0.82rem; color: var(--off-white); line-height: 1.6; margin: 0; }
+    .interview-tips { display: flex; flex-direction: column; gap: 1rem; margin-top: 1.5rem; }
+    .tip-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.07); border-radius: 8px; padding: 1.25rem 1.5rem; display: flex; gap: 1rem; align-items: flex-start; }
+    .tip-num { font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; color: var(--pulse); font-weight: 700; flex-shrink: 0; width: 24px; }
+    .tip-body h4 { font-size: 0.95rem; font-weight: 700; margin-bottom: 0.3rem; }
+    .tip-body p { font-size: 0.875rem; color: var(--off-white); line-height: 1.65; margin: 0; }
+    footer { border-top: 1px solid rgba(255,255,255,0.06); padding: 3rem 4rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
+    .footer-copy { font-size: 0.8rem; color: var(--off-white); opacity: 0.5; }
+    .footer-links { display: flex; gap: 2rem; list-style: none; }
+    .footer-links a { font-size: 0.8rem; color: var(--off-white); opacity: 0.5; text-decoration: none; transition: opacity 0.2s; }
+    .footer-links a:hover { opacity: 1; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+    .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.6s ease, transform 0.6s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    @media (max-width: 900px) {
+      nav { padding: 1rem 1.5rem; } .nav-links { display: none; }
+      .page-wrap { padding: 0 1.25rem; } .page-hero { padding: 7rem 0 3rem; }
+      .resume-table td:first-child { width: 140px; }
+      .scenario-grid { grid-template-columns: 1fr; }
+      footer { padding: 2rem 1.5rem; flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="index.html" class="nav-logo">
+      <svg class="nav-logo-heart" viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M48 82C48 82 12 58 12 34C12 22.954 20.954 14 32 14C38.627 14 44.51 17.168 48 22.08C51.49 17.168 57.373 14 64 14C75.046 14 84 22.954 84 34C84 58 48 82 48 82Z" fill="#e84a6f" opacity="0.9"/>
+        <path d="M48 82C48 82 12 58 12 34C12 22.954 20.954 14 32 14C38.627 14 44.51 17.168 48 22.08" fill="#c73d5c"/>
+      </svg>
+      <span class="nav-logo-text">the rarest <span>heart</span></span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="learn.html">Learn IT</a></li>
+      <li><a href="do.html">Do IT</a></li>
+      <li><a href="apply.html" class="active">Apply IT</a></li>
+      <li><a href="topics.html">Topics</a></li>
+      <li><a href="members.html">My Progress</a></li>
+      <li><a href="contact.html" class="nav-cta">Contact</a></li>
+    </ul>
+  </nav>
+
+  <section class="page-hero">
+    <div class="page-hero-glow"></div>
+    <div class="page-wrap page-hero-inner">
+      <div class="page-eyebrow">Phase 03 · Career Application</div>
+      <h1 class="page-title">Apply <em>IT</em></h1>
+      <p class="page-desc">Turn your IT knowledge into resume bullets, interview answers, and real-world scenarios that show employers you're ready to work — not just study.</p>
+    </div>
+  </section>
+
+  <!-- Resume Language -->
+  <section class="content-section">
+    <div class="page-wrap">
+      <div class="section-label reveal">Resume Builder</div>
+      <h2 class="section-title reveal">Module-to-Resume Translation</h2>
+      <p class="section-body reveal">Each module maps directly to verifiable experience you can put on a resume. Use the language below — it's specific enough to be credible and broad enough to be relevant across employers.</p>
+
+      <table class="resume-table reveal">
+        <thead><tr><th>Module</th><th>Resume Bullet</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>SOP-001<br>Password Resets</td>
+            <td>Resolved account lockouts and password reset requests by verifying end-user identity and executing domain/local password procedures, maintaining full audit documentation per SOPs.</td>
+          </tr>
+          <tr>
+            <td>SOP-002<br>Software Install</td>
+            <td>Installed, configured, and verified business software in enterprise environments; navigated UAC prompts, managed MSI vs. EXE deployment, and resolved installation conflict errors.</td>
+          </tr>
+          <tr>
+            <td>SOP-003<br>Network</td>
+            <td>Diagnosed wired and wireless connectivity failures using layered troubleshooting (ipconfig, ping, nslookup); resolved DHCP, DNS, and driver issues across 50+ endpoints.</td>
+          </tr>
+          <tr>
+            <td>SOP-004<br>Printers</td>
+            <td>Cleared stuck print queues by managing the Windows Print Spooler service, reinstalled network printer drivers, and resolved offline printer issues via TCP/IP port configuration.</td>
+          </tr>
+          <tr>
+            <td>SOP-005<br>Cabling</td>
+            <td>Performed physical layer diagnostics including cable testing, switch port verification, and patch panel tracing; terminated RJ-45 connectors per T568B standard.</td>
+          </tr>
+          <tr>
+            <td>SOP-006<br>Malware</td>
+            <td>Detected, isolated, and remediated malware infections using Windows Defender and Malwarebytes; identified and removed persistence mechanisms; applied post-incident hardening and user education.</td>
+          </tr>
+          <tr>
+            <td>SOP-007<br>Performance</td>
+            <td>Diagnosed slow and unresponsive Windows systems using Task Manager, Resource Monitor, and Event Viewer; identified CPU, RAM, and disk bottlenecks; escalated hardware upgrade requirements.</td>
+          </tr>
+          <tr>
+            <td>SOP-008<br>Active Directory</td>
+            <td>Managed Active Directory user accounts including creation, group membership, password resets, and offboarding in ADUC; enforced identity verification protocols to prevent social engineering.</td>
+          </tr>
+          <tr>
+            <td>SOP-009<br>Security</td>
+            <td>Applied Windows endpoint security hardening: BitLocker encryption, SMBv1 deactivation, least-privilege account configuration, Firewall rule review, and audit policy configuration.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Apply IT Scenarios -->
+  <section class="content-section">
+    <div class="page-wrap">
+      <div class="section-label reveal">Scenario Practice</div>
+      <h2 class="section-title reveal">Phase 3 Scenarios by Module</h2>
+      <p class="section-body reveal">Each module's Apply IT phase contains 3 real-world practice scenarios. Return to any module to complete your scenario work — these are the stories you'll tell in interviews.</p>
+
+      <div class="scenario-grid">
+        <a href="modules/01-password-resets.html" class="scenario-card reveal">
+          <div class="scenario-card-label">Module 01 · Tier 1</div>
+          <h4>Password Resets</h4>
+          <p>3 scenarios: locked domain user, self-service reset failure, and the suspicious reset request</p>
+        </a>
+        <a href="modules/02-software-install.html" class="scenario-card reveal">
+          <div class="scenario-card-label">Module 02 · Tier 1</div>
+          <h4>Software Installation</h4>
+          <p>3 scenarios: UAC block, installer crashing, and verifying a silent deployment</p>
+        </a>
+        <a href="modules/03-wifi-connectivity.html" class="scenario-card reveal">
+          <div class="scenario-card-label">Module 03 · Tier 1</div>
+          <h4>Wi-Fi Connectivity</h4>
+          <p>3 scenarios: APIPA mystery, missing adapter, and the whole floor is down</p>
+        </a>
+        <a href="modules/04-printer-troubleshooting.html" class="scenario-card reveal">
+          <div class="scenario-card-label">Module 04 · Tier 1</div>
+          <h4>Printer Troubleshooting</h4>
+          <p>3 scenarios: stuck queue, offline network printer, and garbled output</p>
+        </a>
+        <a href="modules/05-cabling.html" class="scenario-card reveal">
+          <div class="scenario-card-label">Module 05 · Tier 1</div>
+          <h4>Cabling & Physical Layer</h4>
+          <p>3 scenarios: no link light, intermittent drops, and speed bottleneck</p>
+        </a>
+        <a href="modules/06-malware-removal.html" class="scenario-card reveal">
+          <div class="scenario-card-label">Module 06 · Tier 2</div>
+          <h4>Malware Removal</h4>
+          <p>3 scenarios: browser hijack, ransomware alert, and the persistent threat</p>
+        </a>
+        <a href="modules/07-performance.html" class="scenario-card reveal">
+          <div class="scenario-card-label">Module 07 · Tier 2</div>
+          <h4>Performance Diagnostics</h4>
+          <p>3 scenarios: slow bootup, freezing workstation, and mystery CPU spike</p>
+        </a>
+        <a href="modules/08-active-directory.html" class="scenario-card reveal">
+          <div class="scenario-card-label">Module 08 · Tier 2</div>
+          <h4>Active Directory</h4>
+          <p>3 scenarios: lockout loop, new hire onboarding, and the social engineer</p>
+        </a>
+        <a href="modules/09-security-hardening.html" class="scenario-card reveal">
+          <div class="scenario-card-label">Module 09 · Tier 2</div>
+          <h4>Security Hardening</h4>
+          <p>3 scenarios: traveling laptop, admin rights request, and audit finding</p>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Interview Tips -->
+  <section class="content-section">
+    <div class="page-wrap">
+      <div class="section-label reveal">Interview Strategy</div>
+      <h2 class="section-title reveal">How to Answer Technical Questions</h2>
+      <p class="section-body reveal">Technical interviews at the help desk and Tier 2 level test process, not just knowledge. They want to see how you think, not just what you know.</p>
+
+      <div class="interview-tips">
+        <div class="tip-card reveal">
+          <div class="tip-num">01</div>
+          <div class="tip-body">
+            <h4>Always State Your Process First</h4>
+            <p>Before giving an answer, say "My first step would be..." This shows methodical thinking. Interviewers don't want to hear you jump to a solution — they want to see the troubleshooting approach.</p>
+          </div>
+        </div>
+        <div class="tip-card reveal">
+          <div class="tip-num">02</div>
+          <div class="tip-body">
+            <h4>Scope the Problem Before Fixing It</h4>
+            <p>The best techs ask "who else is affected?" before touching anything. Mention this in your answers. It shows you're thinking about impact, not just the individual ticket.</p>
+          </div>
+        </div>
+        <div class="tip-card reveal">
+          <div class="tip-num">03</div>
+          <div class="tip-body">
+            <h4>Name Specific Tools and Commands</h4>
+            <p>Don't say "I'd check the network settings." Say "I'd run ipconfig /all to check for an APIPA address, then ping the gateway." Specificity is credibility.</p>
+          </div>
+        </div>
+        <div class="tip-card reveal">
+          <div class="tip-num">04</div>
+          <div class="tip-body">
+            <h4>Always End With Verification</h4>
+            <p>After explaining your fix, say "Then I'd verify the issue is resolved by [specific test] and document the resolution in the ticket." Every answer should close the loop.</p>
+          </div>
+        </div>
+        <div class="tip-card reveal">
+          <div class="tip-num">05</div>
+          <div class="tip-body">
+            <h4>Know When to Escalate</h4>
+            <p>When asked about a problem you can't fully solve, describe how far you'd go and exactly what information you'd hand off. Knowing your limits is a sign of maturity, not weakness.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <span class="footer-copy">© 2025 The Rarest Heart. Built for IT learners.</span>
+    <ul class="footer-links">
+      <li><a href="sops.html">SOPs</a></li>
+      <li><a href="labs.html">Labs</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+  </footer>
+
+  <script>
+    function triggerReveals() {
+      const reveals = document.querySelectorAll('.reveal');
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add('visible'); observer.unobserve(entry.target); } });
+      }, { threshold: 0.08 });
+      reveals.forEach(el => observer.observe(el));
+    }
+    document.addEventListener('DOMContentLoaded', triggerReveals);
+  </script>
+</body>
+</html>

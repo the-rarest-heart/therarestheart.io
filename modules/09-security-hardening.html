@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Module 09 — Security Hardening Basics | The Rarest Heart</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet" />
+  <style>
+    :root { --navy: #07081a; --navy-mid: #0d0f28; --navy-light: #131535; --white: #f4f4f0; --off-white: #c8c8c4; --accent: #4a6cf7; --accent-glow: rgba(74,108,247,0.25); --pulse: #e84a6f; --tier2: #7c4af7; --phase1: #4a6cf7; --phase2: #7c4af7; --phase3: #e84a6f; --green: #22c55e; --amber: #f59e0b; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { background-color: var(--navy); color: var(--white); font-family: 'DM Sans', sans-serif; font-weight: 300; line-height: 1.7; overflow-x: hidden; }
+    body::before { content: ''; position: fixed; inset: 0; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E"); pointer-events: none; z-index: 0; opacity: 0.4; }
+    h1, h2, h3, h4 { font-family: 'Syne', sans-serif; line-height: 1.15; }
+    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; padding: 1.25rem 4rem; display: flex; align-items: center; justify-content: space-between; background: rgba(7,8,26,0.85); backdrop-filter: blur(16px); border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .nav-logo { display: flex; align-items: center; gap: 0.75rem; text-decoration: none; }
+    .nav-logo-heart { width: 96px; height: 96px; }
+    .nav-logo-text { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.3rem; color: var(--white); letter-spacing: -0.02em; }
+    .nav-logo-text span { color: var(--pulse); }
+    .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+    .nav-links a { color: var(--off-white); text-decoration: none; font-size: 0.875rem; font-weight: 400; letter-spacing: 0.02em; transition: color 0.2s; position: relative; }
+    .nav-links a::after { content: ''; position: absolute; bottom: -4px; left: 0; width: 0; height: 1px; background: var(--accent); transition: width 0.3s; }
+    .nav-links a:hover { color: var(--white); } .nav-links a:hover::after { width: 100%; }
+    .nav-links a.active { color: var(--white); } .nav-links a.active::after { width: 100%; }
+    .nav-cta { background: var(--accent); color: var(--white) !important; padding: 0.5rem 1.25rem; border-radius: 4px; font-weight: 500 !important; }
+    .nav-cta::after { display: none !important; } .nav-cta:hover { background: #3a5ce0 !important; }
+    section { position: relative; z-index: 1; }
+    .page-wrap { max-width: 860px; margin: 0 auto; padding: 0 2rem; }
+    .module-header { padding: 8rem 0 3.5rem; border-bottom: 1px solid rgba(255,255,255,0.06); position: relative; overflow: hidden; }
+    .module-header-glow { position: absolute; width: 500px; height: 500px; border-radius: 50%; background: radial-gradient(circle, rgba(232,74,111,0.15) 0%, transparent 70%); top: -150px; right: -100px; pointer-events: none; }
+    .module-header-inner { position: relative; z-index: 1; }
+    .breadcrumb { display: flex; align-items: center; gap: 0.5rem; font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; letter-spacing: 0.1em; color: var(--off-white); opacity: 0.5; margin-bottom: 1.75rem; }
+    .breadcrumb a { color: var(--off-white); text-decoration: none; } .breadcrumb a:hover { color: var(--accent); opacity: 1; } .breadcrumb-sep { opacity: 0.4; }
+    .module-eyebrow { font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; color: #b07aff; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.75rem; opacity: 0; animation: fadeUp 0.7s ease forwards 0.1s; }
+    .module-eyebrow::before { content: ''; display: inline-block; width: 24px; height: 1px; background: #b07aff; }
+    .module-title { font-size: clamp(2.2rem, 5vw, 3.5rem); font-weight: 800; letter-spacing: -0.03em; margin-bottom: 1rem; opacity: 0; animation: fadeUp 0.7s ease forwards 0.25s; }
+    .module-title em { font-style: normal; color: var(--pulse); position: relative; }
+    .module-title em::after { content: ''; position: absolute; bottom: 3px; left: 0; right: 0; height: 3px; background: var(--pulse); opacity: 0.4; border-radius: 2px; }
+    .module-desc { font-size: 1.05rem; color: var(--off-white); max-width: 560px; font-weight: 300; line-height: 1.7; margin-bottom: 2rem; opacity: 0; animation: fadeUp 0.7s ease forwards 0.4s; }
+    .module-chips { display: flex; gap: 0.6rem; flex-wrap: wrap; opacity: 0; animation: fadeUp 0.7s ease forwards 0.55s; }
+    .chip { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.3rem 0.75rem; border-radius: 20px; }
+    .chip-purple { background: rgba(124,74,247,0.12); color: #b07aff; border: 1px solid rgba(124,74,247,0.25); }
+    .chip-gray { background: rgba(255,255,255,0.05); color: var(--off-white); border: 1px solid rgba(255,255,255,0.1); }
+    .phase-nav { display: flex; gap: 0; margin-top: 2.5rem; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 8px; padding: 4px; width: fit-content; opacity: 0; animation: fadeUp 0.7s ease forwards 0.7s; }
+    .phase-tab { font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.6rem 1.4rem; border-radius: 5px; cursor: pointer; transition: all 0.2s; color: var(--off-white); border: none; background: transparent; font-weight: 500; }
+    .phase-tab:hover { color: var(--white); }
+    .phase-tab.p1.active { background: var(--navy-light); color: #7a9eff; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+    .phase-tab.p2.active { background: var(--navy-light); color: #b07aff; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+    .phase-tab.p3.active { background: var(--navy-light); color: #ff7a9a; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+    .phase-panel { display: none; padding: 4rem 0 6rem; } .phase-panel.active { display: block; }
+    .phase-banner { border-radius: 10px; padding: 1.75rem 2rem; margin-bottom: 3rem; display: flex; align-items: center; gap: 1.25rem; }
+    .phase-banner.p1 { background: rgba(74,108,247,0.08); border: 1px solid rgba(74,108,247,0.2); }
+    .phase-banner.p2 { background: rgba(124,74,247,0.08); border: 1px solid rgba(124,74,247,0.2); }
+    .phase-banner.p3 { background: rgba(232,74,111,0.08); border: 1px solid rgba(232,74,111,0.2); }
+    .phase-banner-icon { font-size: 1.75rem; width: 52px; height: 52px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .p1 .phase-banner-icon { background: rgba(74,108,247,0.15); } .p2 .phase-banner-icon { background: rgba(124,74,247,0.15); } .p3 .phase-banner-icon { background: rgba(232,74,111,0.15); }
+    .phase-banner-text h3 { font-size: 1.15rem; font-weight: 800; letter-spacing: -0.01em; margin-bottom: 0.2rem; }
+    .p1 .phase-banner-text h3 { color: #7a9eff; } .p2 .phase-banner-text h3 { color: #b07aff; } .p3 .phase-banner-text h3 { color: #ff7a9a; }
+    .phase-banner-text p { font-size: 0.875rem; color: var(--off-white); font-style: italic; }
+    .content-block { margin-bottom: 3rem; }
+    .content-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.6rem; }
+    .content-block h2 { font-size: 1.5rem; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 0.75rem; }
+    .content-block p { font-size: 0.95rem; color: var(--off-white); line-height: 1.8; margin-bottom: 0.75rem; }
+    .content-block p strong { color: var(--white); font-weight: 600; }
+    .trh-table { width: 100%; border-collapse: collapse; margin: 1.25rem 0; font-size: 0.875rem; }
+    .trh-table th { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--off-white); opacity: 0.7; padding: 0.75rem 1.25rem; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.02); }
+    .trh-table td { padding: 0.9rem 1.25rem; border-bottom: 1px solid rgba(255,255,255,0.05); color: var(--off-white); vertical-align: top; line-height: 1.6; }
+    .trh-table td:first-child { color: var(--white); font-weight: 500; } .trh-table tr:last-child td { border-bottom: none; } .trh-table tr:hover td { background: rgba(255,255,255,0.02); }
+    .callout-info { background: rgba(74,108,247,0.07); border: 1px solid rgba(74,108,247,0.2); border-left: 3px solid var(--accent); border-radius: 8px; padding: 1.5rem 1.75rem; margin: 1.5rem 0; display: flex; gap: 1rem; align-items: flex-start; }
+    .callout-info-icon { font-size: 1.25rem; flex-shrink: 0; margin-top: 1px; }
+    .callout-info-body h4 { font-size: 0.95rem; font-weight: 700; color: #7a9eff; margin-bottom: 0.4rem; }
+    .callout-info-body p { font-size: 0.875rem; color: var(--off-white); line-height: 1.7; margin: 0; }
+    .callout-warning { background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.3); border-left: 3px solid #f59e0b; border-radius: 8px; padding: 1.5rem 1.75rem; margin: 1.5rem 0; display: flex; gap: 1rem; align-items: flex-start; }
+    .callout-warning-icon { font-size: 1.25rem; flex-shrink: 0; margin-top: 1px; }
+    .callout-warning-body h4 { font-size: 0.95rem; font-weight: 700; color: #fbbf24; margin-bottom: 0.4rem; }
+    .callout-warning-body p { font-size: 0.875rem; color: var(--off-white); line-height: 1.7; margin: 0; }
+    .glossary-grid { display: flex; flex-direction: column; gap: 0; border: 1px solid rgba(255,255,255,0.07); border-radius: 8px; overflow: hidden; margin-top: 1.25rem; }
+    .glossary-row { display: grid; grid-template-columns: 200px 1fr; gap: 0; border-bottom: 1px solid rgba(255,255,255,0.05); transition: background 0.2s; }
+    .glossary-row:last-child { border-bottom: none; } .glossary-row:hover { background: rgba(255,255,255,0.02); }
+    .glossary-term { font-family: 'IBM Plex Mono', monospace; font-size: 0.78rem; font-weight: 500; color: var(--accent); padding: 1rem 1.25rem; border-right: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; }
+    .glossary-def { font-size: 0.875rem; color: var(--off-white); padding: 1rem 1.25rem; line-height: 1.6; }
+    .sop-header { background: rgba(124,74,247,0.07); border: 1px solid rgba(124,74,247,0.2); border-radius: 8px; padding: 1.5rem 1.75rem; margin-bottom: 2rem; }
+    .sop-id { font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; color: #b07aff; letter-spacing: 0.15em; margin-bottom: 0.3rem; }
+    .sop-header h3 { font-size: 1.1rem; font-weight: 700; color: var(--white); margin-bottom: 0.4rem; }
+    .sop-header p { font-size: 0.85rem; color: var(--off-white); line-height: 1.6; margin: 0; }
+    .steps-list { display: flex; flex-direction: column; gap: 0.75rem; margin: 1.5rem 0; }
+    .step-card { display: flex; gap: 1.25rem; align-items: flex-start; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 1.25rem 1.5rem; transition: border-color 0.2s; }
+    .step-card:hover { border-color: rgba(124,74,247,0.3); background: rgba(124,74,247,0.03); }
+    .step-num { font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: #b07aff; font-weight: 700; min-width: 28px; margin-top: 2px; }
+    .step-body h4 { font-size: 0.95rem; font-weight: 700; margin-bottom: 0.3rem; color: var(--white); }
+    .step-body p { font-size: 0.875rem; color: var(--off-white); line-height: 1.65; margin: 0; }
+    .step-body p strong { color: var(--white); }
+    .step-body code { font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; background: rgba(255,255,255,0.06); padding: 0.1rem 0.4rem; border-radius: 3px; color: #7a9eff; }
+    .escalation-box { background: rgba(232,74,111,0.06); border: 1px solid rgba(232,74,111,0.2); border-radius: 8px; padding: 1.5rem 1.75rem; margin: 2rem 0; }
+    .escalation-box h4 { font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; color: #ff7a9a; margin-bottom: 0.75rem; }
+    .escalation-box ul { list-style: none; display: flex; flex-direction: column; gap: 0.4rem; }
+    .escalation-box ul li { font-size: 0.875rem; color: var(--off-white); padding-left: 1.25rem; position: relative; line-height: 1.6; }
+    .escalation-box ul li::before { content: '→'; position: absolute; left: 0; color: #ff7a9a; font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; }
+    .quick-ref-table { width: 100%; border-collapse: collapse; border: 1px solid rgba(255,255,255,0.07); border-radius: 8px; overflow: hidden; margin-top: 1.5rem; font-size: 0.875rem; }
+    .quick-ref-table th { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--off-white); opacity: 0.7; padding: 0.75rem 1.25rem; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.02); }
+    .quick-ref-table td { padding: 0.9rem 1.25rem; border-bottom: 1px solid rgba(255,255,255,0.05); color: var(--off-white); vertical-align: top; line-height: 1.6; }
+    .quick-ref-table td:first-child { color: var(--white); font-weight: 500; } .quick-ref-table tr:last-child td { border-bottom: none; }
+    .scenario-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; overflow: hidden; margin-bottom: 1.5rem; }
+    .scenario-header { padding: 1.25rem 1.75rem; border-bottom: 1px solid rgba(255,255,255,0.06); display: flex; align-items: center; gap: 1rem; }
+    .scenario-num { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; letter-spacing: 0.15em; color: #ff7a9a; background: rgba(232,74,111,0.1); border: 1px solid rgba(232,74,111,0.2); padding: 0.25rem 0.6rem; border-radius: 20px; flex-shrink: 0; }
+    .scenario-header h4 { font-size: 1rem; font-weight: 700; letter-spacing: -0.01em; }
+    .scenario-body { padding: 1.5rem 1.75rem; }
+    .scenario-situation { font-size: 0.925rem; color: var(--off-white); line-height: 1.75; font-style: italic; margin-bottom: 1.25rem; padding-bottom: 1.25rem; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .scenario-tasks h5 { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.75rem; }
+    .task-list { list-style: none; display: flex; flex-direction: column; gap: 0.6rem; }
+    .task-list li { display: flex; gap: 0.75rem; font-size: 0.875rem; color: var(--off-white); line-height: 1.6; }
+    .task-list li .task-num { font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; color: #ff7a9a; font-weight: 700; flex-shrink: 0; margin-top: 2px; width: 18px; }
+    .doc-table { width: 100%; border-collapse: collapse; margin: 1.25rem 0; font-size: 0.875rem; }
+    .doc-table th { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--off-white); opacity: 0.6; padding: 0.75rem 1.25rem; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.02); }
+    .doc-table td { padding: 0.9rem 1.25rem; border-bottom: 1px solid rgba(255,255,255,0.05); color: var(--off-white); vertical-align: top; }
+    .doc-table td:first-child { color: var(--white); font-weight: 500; width: 180px; } .doc-table tr:last-child td { border-bottom: none; }
+    .doc-input-line { display: block; width: 100%; border: none; border-bottom: 1px dashed rgba(255,255,255,0.15); background: transparent; color: var(--white); font-family: 'DM Sans', sans-serif; font-size: 0.875rem; padding: 0.3rem 0; outline: none; transition: border-color 0.2s; }
+    .doc-input-line:focus { border-bottom-color: var(--accent); }
+    .doc-input-line::placeholder { color: rgba(255,255,255,0.15); font-style: italic; }
+    .interview-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; overflow: hidden; margin-bottom: 1.25rem; }
+    .interview-q { padding: 1.25rem 1.75rem; border-bottom: 1px solid rgba(255,255,255,0.06); background: rgba(255,255,255,0.02); }
+    .interview-q-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.4rem; }
+    .interview-q p { font-size: 0.95rem; font-weight: 600; color: var(--white); font-style: italic; margin: 0; line-height: 1.5; }
+    .interview-a { padding: 1.25rem 1.75rem; }
+    .interview-a-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; color: #ff7a9a; margin-bottom: 0.5rem; }
+    .interview-a p { font-size: 0.875rem; color: var(--off-white); line-height: 1.75; margin: 0; }
+    .interview-a strong { color: var(--white); }
+    .checklist { display: flex; flex-direction: column; gap: 0.6rem; margin-top: 1.25rem; }
+    .check-item { display: flex; align-items: flex-start; gap: 0.75rem; font-size: 0.9rem; color: var(--off-white); line-height: 1.6; }
+    .check-box { width: 20px; height: 20px; border: 1.5px solid rgba(255,255,255,0.2); border-radius: 4px; flex-shrink: 0; margin-top: 2px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; }
+    .check-box.checked { background: var(--green); border-color: var(--green); color: white; }
+    .next-modules { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-top: 1.5rem; }
+    .next-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.07); border-radius: 8px; padding: 1.5rem; text-decoration: none; color: inherit; transition: all 0.2s; display: block; }
+    .next-card:hover { border-color: rgba(74,108,247,0.3); background: rgba(74,108,247,0.05); transform: translateY(-2px); }
+    .next-card .next-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; letter-spacing: 0.15em; color: var(--accent); margin-bottom: 0.4rem; }
+    .next-card h4 { font-size: 0.95rem; font-weight: 700; margin-bottom: 0.3rem; }
+    .next-card p { font-size: 0.8rem; color: var(--off-white); margin: 0; }
+    .completion-hero { background: linear-gradient(135deg, rgba(232,74,111,0.1) 0%, rgba(124,74,247,0.1) 100%); border: 1px solid rgba(232,74,111,0.3); border-radius: 12px; padding: 2.5rem; text-align: center; margin: 2rem 0; }
+    .completion-hero h3 { font-size: 1.75rem; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 0.75rem; background: linear-gradient(135deg, #ff7a9a, #b07aff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .completion-hero p { font-size: 0.95rem; color: var(--off-white); max-width: 480px; margin: 0 auto; line-height: 1.75; }
+    .page-nav { padding: 3rem 0 5rem; border-top: 1px solid rgba(255,255,255,0.06); display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+    .page-nav-back { font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; letter-spacing: 0.08em; color: var(--off-white); text-decoration: none; transition: color 0.2s; }
+    .page-nav-back:hover { color: var(--accent); }
+    .page-nav-next { background: var(--pulse); color: var(--white); padding: 0.75rem 1.75rem; border-radius: 4px; text-decoration: none; font-weight: 500; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 0.5rem; transition: background 0.2s, transform 0.2s; }
+    .page-nav-next:hover { background: #c73d5c; transform: translateY(-1px); }
+    .section-divider { height: 1px; background: rgba(255,255,255,0.06); margin: 2.5rem 0; }
+    footer { border-top: 1px solid rgba(255,255,255,0.06); padding: 3rem 4rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
+    .footer-copy { font-size: 0.8rem; color: var(--off-white); opacity: 0.5; }
+    .footer-links { display: flex; gap: 2rem; list-style: none; }
+    .footer-links a { font-size: 0.8rem; color: var(--off-white); opacity: 0.5; text-decoration: none; transition: opacity 0.2s; }
+    .footer-links a:hover { opacity: 1; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+    .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.6s ease, transform 0.6s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    @media (max-width: 900px) {
+      nav { padding: 1rem 1.5rem; } .nav-links { display: none; }
+      .page-wrap { padding: 0 1.25rem; } .module-header { padding: 7rem 0 2.5rem; }
+      .next-modules { grid-template-columns: 1fr; }
+      .glossary-row { grid-template-columns: 1fr; } .glossary-term { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.05); }
+      footer { padding: 2rem 1.5rem; flex-direction: column; align-items: flex-start; }
+      .phase-nav { width: 100%; } .phase-tab { flex: 1; text-align: center; font-size: 0.65rem; padding: 0.6rem 0.75rem; }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="../index.html" class="nav-logo">
+      <svg class="nav-logo-heart" viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M48 82C48 82 12 58 12 34C12 22.954 20.954 14 32 14C38.627 14 44.51 17.168 48 22.08C51.49 17.168 57.373 14 64 14C75.046 14 84 22.954 84 34C84 58 48 82 48 82Z" fill="#e84a6f" opacity="0.9"/>
+        <path d="M48 82C48 82 12 58 12 34C12 22.954 20.954 14 32 14C38.627 14 44.51 17.168 48 22.08" fill="#c73d5c"/>
+      </svg>
+      <span class="nav-logo-text">the rarest <span>heart</span></span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../learn.html" class="active">Learn IT</a></li>
+      <li><a href="../do.html">Do IT</a></li>
+      <li><a href="../apply.html">Apply IT</a></li>
+      <li><a href="../topics.html">Topics</a></li>
+      <li><a href="../members.html">My Progress</a></li>
+      <li><a href="../contact.html" class="nav-cta">Contact</a></li>
+    </ul>
+  </nav>
+
+  <section class="module-header">
+    <div class="module-header-glow"></div>
+    <div class="page-wrap module-header-inner">
+      <div class="breadcrumb">
+        <a href="../index.html">Home</a><span class="breadcrumb-sep">/</span>
+        <a href="../learn.html">Learn IT</a><span class="breadcrumb-sep">/</span>
+        <span>Module 09</span>
+      </div>
+      <div class="module-eyebrow">Tier 2 · SOP-009 · Module 09 of 09 · Final</div>
+      <h1 class="module-title">Security <em>Hardening</em> Basics</h1>
+      <p class="module-desc">Apply foundational security controls: disable unnecessary services, configure Windows Firewall, enforce least privilege, and audit system access. Security isn't a feature — it's a posture.</p>
+      <div class="module-chips">
+        <span class="chip chip-purple">Tier 2 — IT Support</span>
+        <span class="chip chip-gray">SOP-009</span>
+        <span class="chip chip-gray">Intermediate</span>
+        <span class="chip chip-gray">Security</span>
+      </div>
+      <div class="phase-nav">
+        <button class="phase-tab p1 active" onclick="switchPhase('p1', this)">01 · Learn IT</button>
+        <button class="phase-tab p2" onclick="switchPhase('p2', this)">02 · Do IT</button>
+        <button class="phase-tab p3" onclick="switchPhase('p3', this)">03 · Apply IT</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- PHASE 1 -->
+  <div id="panel-p1" class="phase-panel active">
+    <div class="page-wrap">
+      <div class="phase-banner p1">
+        <div class="phase-banner-icon">🔒</div>
+        <div class="phase-banner-text">
+          <h3>Phase 1 — Learn IT</h3>
+          <p>Understand the core security hardening principles that form the foundation of every enterprise security posture.</p>
+        </div>
+      </div>
+
+      <div class="content-block reveal">
+        <div class="content-label">Foundation</div>
+        <h2>What Is Security Hardening?</h2>
+        <p>Security hardening is the process of <strong>reducing the attack surface</strong> of a system by eliminating unnecessary access, services, and vulnerabilities. Every default Windows installation has features enabled that most users don't need — each one is a potential entry point for attackers.</p>
+        <p>Hardening doesn't mean locking everything down until the system is unusable. It means applying the <strong>principle of least privilege</strong>: users and systems should have exactly the access they need to do their job, and nothing more.</p>
+
+        <table class="trh-table">
+          <thead><tr><th>Hardening Category</th><th>What It Covers</th><th>Why It Matters</th></tr></thead>
+          <tbody>
+            <tr><td>Account Security</td><td>Password policies, admin rights, MFA</td><td>Compromised credentials are the #1 attack vector</td></tr>
+            <tr><td>Service Reduction</td><td>Disable unused services and features</td><td>Every running service is a potential exploit target</td></tr>
+            <tr><td>Firewall Configuration</td><td>Block unnecessary inbound/outbound ports</td><td>Limits lateral movement and data exfiltration</td></tr>
+            <tr><td>Patch Management</td><td>Keep OS and applications updated</td><td>Most exploits target known, unpatched vulnerabilities</td></tr>
+            <tr><td>Audit &amp; Logging</td><td>Enable event logging for key actions</td><td>Logs are required for incident investigation</td></tr>
+            <tr><td>Encryption</td><td>BitLocker, HTTPS, encrypted credentials</td><td>Renders stolen data unreadable</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="content-block reveal">
+        <div class="content-label">Principle of Least Privilege</div>
+        <h2>Give Only What Is Needed</h2>
+        <p>The principle of least privilege (PoLP) is the most important security concept in IT. Every account should have the <strong>minimum access required to perform its function</strong>. No more. A user who only needs to read files should not have write access. An application service account should not have admin rights.</p>
+
+        <table class="trh-table">
+          <thead><tr><th>Violation</th><th>Risk</th><th>Correct Approach</th></tr></thead>
+          <tbody>
+            <tr><td>User running as local admin daily</td><td>Malware gets admin rights automatically</td><td>Standard user account; separate admin account for admin tasks</td></tr>
+            <tr><td>Service accounts with Domain Admin</td><td>One compromised service = full domain compromise</td><td>Grant only the specific permissions the service needs</td></tr>
+            <tr><td>Everyone has write access to a shared drive</td><td>Ransomware encrypts all files instantly</td><td>Read-only for those who don't need to write</td></tr>
+            <tr><td>No account expiry on contractor accounts</td><td>Former contractors retain access indefinitely</td><td>Set expiry dates on all temporary accounts</td></tr>
+          </tbody>
+        </table>
+
+        <div class="callout-warning">
+          <div class="callout-warning-icon">⚠️</div>
+          <div class="callout-warning-body">
+            <h4>The Admin Account Trap</h4>
+            <p>Many organizations let users run as local administrators "because it's easier." This is one of the most dangerous practices in IT. When a user clicks a malicious email link, the malware inherits the user's admin rights and can install anything, modify the registry, disable antivirus, and create new accounts. Standard user accounts limit the blast radius of every infection.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="content-block reveal">
+        <div class="content-label">Windows Security Controls</div>
+        <h2>Core Controls Every Tech Should Know</h2>
+
+        <table class="trh-table">
+          <thead><tr><th>Control</th><th>What It Does</th><th>Where to Configure</th></tr></thead>
+          <tbody>
+            <tr><td>Windows Firewall</td><td>Blocks unauthorized inbound/outbound connections</td><td>Windows Security → Firewall &amp; network protection</td></tr>
+            <tr><td>BitLocker</td><td>Full-disk encryption; renders stolen drives unreadable</td><td>Control Panel → BitLocker Drive Encryption</td></tr>
+            <tr><td>UAC</td><td>Prompts for elevation before admin actions</td><td>Control Panel → User Account Control Settings</td></tr>
+            <tr><td>Windows Update</td><td>Patches known vulnerabilities</td><td>Settings → Windows Update</td></tr>
+            <tr><td>Audit Policies</td><td>Logs account logins, privilege use, file access</td><td>secpol.msc → Local Policies → Audit Policy</td></tr>
+            <tr><td>AppLocker / Software Restriction</td><td>Controls which applications can run</td><td>Group Policy → Application Control Policies</td></tr>
+            <tr><td>Disable SMBv1</td><td>Removes legacy file-sharing protocol used by WannaCry</td><td>PowerShell: <code>Disable-WindowsOptionalFeature -Online -FeatureName SMB1Protocol</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="content-block reveal">
+        <div class="content-label">Glossary</div>
+        <h2>Key Terms</h2>
+        <div class="glossary-grid">
+          <div class="glossary-row"><div class="glossary-term">Attack Surface</div><div class="glossary-def">The sum of all the different points where an attacker could try to enter or extract data from an environment. Hardening reduces the attack surface.</div></div>
+          <div class="glossary-row"><div class="glossary-term">BitLocker</div><div class="glossary-def">Windows full-disk encryption. When enabled, the drive's contents are encrypted with AES. If a laptop is stolen, the data is unreadable without the BitLocker recovery key.</div></div>
+          <div class="glossary-row"><div class="glossary-term">MFA</div><div class="glossary-def">Multi-Factor Authentication. Requires two or more verification factors (password + phone code). Makes stolen passwords insufficient to compromise an account.</div></div>
+          <div class="glossary-row"><div class="glossary-term">SMBv1</div><div class="glossary-def">An old version of the Server Message Block protocol. Used by the WannaCry and NotPetya ransomware worms to spread. Should be disabled on all modern systems.</div></div>
+          <div class="glossary-row"><div class="glossary-term">Defense in Depth</div><div class="glossary-def">Security strategy using multiple layers of controls so that if one layer fails, others still protect the system. No single control is relied upon exclusively.</div></div>
+          <div class="glossary-row"><div class="glossary-term">CIS Benchmark</div><div class="glossary-def">Center for Internet Security configuration benchmarks. Industry-standard hardening guides for Windows, Linux, and major applications. Used as baseline for enterprise hardening.</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 2 -->
+  <div id="panel-p2" class="phase-panel">
+    <div class="page-wrap">
+      <div class="phase-banner p2">
+        <div class="phase-banner-icon">📋</div>
+        <div class="phase-banner-text">
+          <h3>Phase 2 — Do IT</h3>
+          <p>Execute SOP-009. Document every change. Never harden a production system without a tested rollback plan.</p>
+        </div>
+      </div>
+
+      <div class="sop-header">
+        <div class="sop-id">SOP-009 · SECURITY HARDENING BASICS · REV 1.0</div>
+        <h3>Windows Endpoint Security Hardening</h3>
+        <p>Use this procedure when deploying or auditing a Windows workstation or server for baseline security compliance. Test in a non-production environment before applying to live systems. Document all changes with before/after states.</p>
+      </div>
+
+      <div class="steps-list">
+        <div class="step-card">
+          <div class="step-num">01</div>
+          <div class="step-body">
+            <h4>Verify All Windows Updates Are Applied</h4>
+            <p>Open <strong>Settings → Windows Update → Check for updates</strong>. Apply all pending updates including optional and driver updates. Reboot as required. Confirm the OS version and patch level meets your organization's minimum requirement. Unpatched systems negate all other hardening controls.</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">02</div>
+          <div class="step-body">
+            <h4>Audit Local User Accounts and Remove Unnecessary Ones</h4>
+            <p>Open <strong>Computer Management → Local Users and Groups → Users</strong>. Disable or delete any accounts not actively used. Ensure the built-in <strong>Guest account is disabled</strong> (it is by default but verify). Rename or disable the built-in Administrator account if your policy requires it. Document all accounts that exist and their purpose.</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">03</div>
+          <div class="step-body">
+            <h4>Verify Standard User Configuration</h4>
+            <p>Confirm the user's daily account is a <strong>Standard User, not Administrator</strong>. In Computer Management → Local Users and Groups → Groups → Administrators — the daily user account should NOT be listed. If it is, remove it and create a separate admin account for administrative tasks. This is critical for limiting malware blast radius.</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">04</div>
+          <div class="step-body">
+            <h4>Confirm Windows Defender Is Active and Updated</h4>
+            <p>Open <strong>Windows Security</strong>. Verify: Real-time protection is On, Definition updates are current (within 24 hours), Cloud-delivered protection is On, and no threats are currently detected. If Defender is disabled by policy (third-party AV is in use), verify the third-party AV is active and reporting to a management console.</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">05</div>
+          <div class="step-body">
+            <h4>Configure Windows Firewall</h4>
+            <p>Verify the <strong>Windows Firewall is enabled</strong> for Domain, Private, and Public network profiles (Windows Security → Firewall &amp; network protection). For workstations, all three should show as On. Review any custom inbound rules added by software and remove rules for programs no longer installed. Never disable the firewall entirely — create specific rules instead.</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">06</div>
+          <div class="step-body">
+            <h4>Enable BitLocker on System Drive</h4>
+            <p>Open <strong>Control Panel → BitLocker Drive Encryption</strong>. Enable BitLocker on the C: drive. Choose the encryption method (TPM-only for workstations that never leave the office; TPM+PIN for laptops). <strong>Save the recovery key to Active Directory or a secure location</strong> before completing encryption — losing the recovery key means losing the data. Allow encryption to complete before rebooting.</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">07</div>
+          <div class="step-body">
+            <h4>Disable SMBv1 and Unused Services</h4>
+            <p>Open PowerShell as Administrator and run: <code>Disable-WindowsOptionalFeature -Online -FeatureName SMB1Protocol</code>. Also open <strong>Services.msc</strong> and set the following to Disabled if not required: Remote Registry, Telnet Client, FTP Server (if installed), and SNMP Service. Each disabled service removes a potential attack vector.</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">08</div>
+          <div class="step-body">
+            <h4>Enable Audit Policies for Account Logon Events</h4>
+            <p>Open <strong>secpol.msc → Local Policies → Audit Policy</strong>. Enable <strong>Audit account logon events</strong> (Success and Failure) and <strong>Audit logon events</strong> (Success and Failure). This creates Event Log entries for every login attempt — critical for detecting brute-force attacks and unauthorized access. Verify logs appear in Event Viewer → Windows Logs → Security after a test login.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="escalation-box">
+        <h4>Escalate / Defer When</h4>
+        <ul>
+          <li>BitLocker recovery key cannot be backed up to AD — do not encrypt without a secure key backup</li>
+          <li>Removing admin rights from a user breaks a critical business application — document and escalate to find an alternative</li>
+          <li>A CIS Benchmark requirement conflicts with a business requirement — needs security team review</li>
+          <li>Disabling a service causes unexpected issues — restore and document before escalating</li>
+          <li>System is part of a PCI, HIPAA, or SOC2 compliance scope — specialized hardening baseline applies</li>
+        </ul>
+      </div>
+
+      <div class="content-block">
+        <div class="content-label">Quick Reference</div>
+        <h2>Hardening Checklist</h2>
+        <table class="quick-ref-table">
+          <thead><tr><th>Control</th><th>Status Check</th></tr></thead>
+          <tbody>
+            <tr><td>Windows Updates</td><td>All updates applied; no pending critical patches</td></tr>
+            <tr><td>User Accounts</td><td>Guest disabled; daily user is Standard (not Admin)</td></tr>
+            <tr><td>Windows Defender</td><td>Real-time protection on; definitions current</td></tr>
+            <tr><td>Windows Firewall</td><td>Enabled on all three profiles; no unnecessary inbound rules</td></tr>
+            <tr><td>BitLocker</td><td>Enabled on C:; recovery key saved securely</td></tr>
+            <tr><td>SMBv1</td><td>Disabled via PowerShell</td></tr>
+            <tr><td>Audit Logging</td><td>Account logon events: Success and Failure enabled</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 3 -->
+  <div id="panel-p3" class="phase-panel">
+    <div class="page-wrap">
+      <div class="phase-banner p3">
+        <div class="phase-banner-icon">🎯</div>
+        <div class="phase-banner-text">
+          <h3>Phase 3 — Apply IT</h3>
+          <p>Apply hardening knowledge to real scenarios. This is the final module — show what you know.</p>
+        </div>
+      </div>
+
+      <div class="content-block reveal">
+        <div class="content-label">Scenarios</div>
+        <h2>Practice Tickets</h2>
+
+        <div class="scenario-card">
+          <div class="scenario-header"><span class="scenario-num">SCENARIO 01</span><h4>The Unprotected Laptop</h4></div>
+          <div class="scenario-body">
+            <div class="scenario-situation">"We need to harden a new sales rep's laptop before she travels internationally next week. She'll be connecting to hotel Wi-Fi and handling customer data."</div>
+            <div class="scenario-tasks">
+              <h5>Your Tasks</h5>
+              <ul class="task-list">
+                <li><span class="task-num">1.</span>What is the most critical control for a traveling laptop and why?</li>
+                <li><span class="task-num">2.</span>Why is public Wi-Fi (hotel networks) a specific risk and what controls address it?</li>
+                <li><span class="task-num">3.</span>Walk through the top 4 hardening steps in priority order for this use case.</li>
+                <li><span class="task-num">4.</span>What do you document before the laptop leaves your hands?</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="scenario-card">
+          <div class="scenario-header"><span class="scenario-num">SCENARIO 02</span><h4>The Admin Rights Request</h4></div>
+          <div class="scenario-body">
+            <div class="scenario-situation">"A developer says they need local admin rights on their workstation to do their job. They said the previous IT team always gave this out automatically."</div>
+            <div class="scenario-tasks">
+              <h5>Your Tasks</h5>
+              <ul class="task-list">
+                <li><span class="task-num">1.</span>What security principle does granting blanket admin rights violate?</li>
+                <li><span class="task-num">2.</span>What question do you ask to find out if admin rights are truly necessary?</li>
+                <li><span class="task-num">3.</span>What is a safer alternative to giving the user full admin rights for legitimate tasks?</li>
+                <li><span class="task-num">4.</span>How do you document this request and your decision?</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="scenario-card">
+          <div class="scenario-header"><span class="scenario-num">SCENARIO 03</span><h4>The Audit Finding</h4></div>
+          <div class="scenario-body">
+            <div class="scenario-situation">"Our security team ran a vulnerability scan and found that 15 workstations have SMBv1 enabled and Guest accounts active. You've been tasked with remediating this."</div>
+            <div class="scenario-tasks">
+              <h5>Your Tasks</h5>
+              <ul class="task-list">
+                <li><span class="task-num">1.</span>Why is SMBv1 specifically dangerous — what real-world attack exploited it?</li>
+                <li><span class="task-num">2.</span>What PowerShell command disables SMBv1 and how do you run it?</li>
+                <li><span class="task-num">3.</span>For 15 machines, would you manually run the command on each one? What is the scalable approach?</li>
+                <li><span class="task-num">4.</span>How do you verify the remediation was successful after applying it?</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="content-block reveal">
+        <div class="content-label">Ticket Practice</div>
+        <h2>Document Your Hardening Work</h2>
+        <table class="doc-table">
+          <thead><tr><th>Field</th><th>Your Entry</th></tr></thead>
+          <tbody>
+            <tr><td>System Hardened</td><td><input class="doc-input-line" placeholder="Hostname, OS version, user..." /></td></tr>
+            <tr><td>Controls Applied</td><td><input class="doc-input-line" placeholder="List each control applied..." /></td></tr>
+            <tr><td>Exceptions Noted</td><td><input class="doc-input-line" placeholder="Any controls not applied and why..." /></td></tr>
+            <tr><td>Recovery Key Location</td><td><input class="doc-input-line" placeholder="Where BitLocker key was saved..." /></td></tr>
+            <tr><td>Verified By</td><td><input class="doc-input-line" placeholder="How you confirmed each control is active..." /></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="content-block reveal">
+        <div class="content-label">Interview Prep</div>
+        <h2>Questions You'll Face</h2>
+
+        <div class="interview-card">
+          <div class="interview-q"><div class="interview-q-label">Interview Question 01</div><p>"What is the principle of least privilege and can you give an example of why it matters?"</p></div>
+          <div class="interview-a">
+            <div class="interview-a-label">Strong Answer Framework</div>
+            <p>The principle of least privilege means <strong>giving users and systems only the access they need to perform their function — and nothing more</strong>. A real example: if a standard user runs as a local administrator and clicks a phishing link, the malware they download automatically inherits admin rights. It can install drivers, disable antivirus, modify the registry, and persist across reboots. The same user running as a standard account — the malware is constrained to that user's limited permissions, making removal far easier and limiting damage. PoLP applies to users, service accounts, applications, and network access. It's the foundation of every secure architecture.</p>
+          </div>
+        </div>
+
+        <div class="interview-card">
+          <div class="interview-q"><div class="interview-q-label">Interview Question 02</div><p>"Why would you enable BitLocker on a workstation and what do you need to do before enabling it?"</p></div>
+          <div class="interview-a">
+            <div class="interview-a-label">Strong Answer Framework</div>
+            <p>BitLocker encrypts the entire system drive so that if a laptop is physically stolen, the data on the drive is completely unreadable without the recovery key. This is especially critical for laptops that travel. <strong>Before enabling BitLocker</strong>, the most important step is <strong>saving the recovery key to a secure location</strong> — typically Active Directory (where IT can retrieve it) or a printed copy in a secure safe. If you enable BitLocker without backing up the recovery key, a motherboard replacement or BIOS update can trigger a BitLocker recovery screen, and without the key, the data is permanently inaccessible. Never encrypt without a verified recovery key backup.</p>
+          </div>
+        </div>
+
+        <div class="interview-card">
+          <div class="interview-q"><div class="interview-q-label">Interview Question 03</div><p>"What is SMBv1 and why should it be disabled?"</p></div>
+          <div class="interview-a">
+            <div class="interview-a-label">Strong Answer Framework</div>
+            <p>SMBv1 is an <strong>outdated version of the Server Message Block protocol</strong> used for file sharing in Windows networks. It has critical vulnerabilities that were exploited by the <strong>WannaCry and NotPetya ransomware attacks in 2017</strong> — they used an NSA exploit called EternalBlue to spread automatically through networks via SMBv1, infecting hundreds of thousands of machines. SMBv1 has been replaced by SMBv2 and SMBv3, which are significantly more secure. Modern Windows versions don't need SMBv1, and Microsoft recommends disabling it. I disable it using <code>Disable-WindowsOptionalFeature -Online -FeatureName SMB1Protocol</code> in an elevated PowerShell session. It's one of the fastest, most impactful hardening steps you can take.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="content-block reveal">
+        <div class="content-label">Module Completion</div>
+        <h2>Completion Checklist</h2>
+        <div class="checklist">
+          <div class="check-item"><div class="check-box" onclick="this.classList.toggle('checked'); this.textContent = this.classList.contains('checked') ? '✓' : ''"></div><span>I understand the principle of least privilege and can explain it with an example</span></div>
+          <div class="check-item"><div class="check-box" onclick="this.classList.toggle('checked'); this.textContent = this.classList.contains('checked') ? '✓' : ''"></div><span>I can enable BitLocker and know what to do with the recovery key before encrypting</span></div>
+          <div class="check-item"><div class="check-box" onclick="this.classList.toggle('checked'); this.textContent = this.classList.contains('checked') ? '✓' : ''"></div><span>I know what SMBv1 is, why it's dangerous, and the command to disable it</span></div>
+          <div class="check-item"><div class="check-box" onclick="this.classList.toggle('checked'); this.textContent = this.classList.contains('checked') ? '✓' : ''"></div><span>I can verify Windows Defender, Firewall, and audit logging are correctly configured</span></div>
+          <div class="check-item"><div class="check-box" onclick="this.classList.toggle('checked'); this.textContent = this.classList.contains('checked') ? '✓' : ''"></div><span>I understand defense in depth and why no single control is sufficient</span></div>
+          <div class="check-item"><div class="check-box" onclick="this.classList.toggle('checked'); this.textContent = this.classList.contains('checked') ? '✓' : ''"></div><span>I completed all three scenarios and the final module documentation practice</span></div>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <div class="completion-hero">
+          <h3>Curriculum Complete</h3>
+          <p>You've completed all 9 modules across Tier 1 Help Desk and Tier 2 IT Support. You have the foundational knowledge, SOPs, and applied skills to walk into a help desk interview with confidence. Now it's time to build — go to Apply IT and start turning this into resume language.</p>
+        </div>
+
+        <div class="content-label">What's Next</div>
+        <h2>Continue Your Journey</h2>
+        <div class="next-modules">
+          <a href="08-active-directory.html" class="next-card">
+            <div class="next-label">← Previous Module</div>
+            <h4>Module 08 — Active Directory</h4>
+            <p>User support, ADUC, and SOP-008</p>
+          </a>
+          <a href="../apply.html" class="next-card">
+            <div class="next-label">Apply IT →</div>
+            <h4>Turn Knowledge Into Career</h4>
+            <p>Resume language, portfolio scenarios, and interview prep</p>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-wrap">
+    <div class="page-nav">
+      <a href="../learn.html" class="page-nav-back">← Back to Learn IT</a>
+      <a href="../apply.html" class="page-nav-next">Apply IT →</a>
+    </div>
+  </div>
+
+  <div class="page-wrap" style="padding-bottom:1.5rem;">
+    <div id="complete-block" style="padding:1.5rem;background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.2);border-radius:10px;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;">
+      <div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:#4ade80;margin-bottom:0.3rem;">Module 09 · SOP-009</div>
+        <div style="font-weight:600;font-size:0.95rem;" id="complete-msg">Finished all three phases? Mark this module complete.</div>
+      </div>
+      <button id="btn-complete" onclick="markThisComplete()" style="font-family:'IBM Plex Mono',monospace;font-size:0.7rem;letter-spacing:0.08em;padding:0.6rem 1.25rem;border-radius:6px;background:#22c55e;color:#07081a;border:none;cursor:pointer;font-weight:500;">Mark Complete ✓</button>
+    </div>
+  </div>
+
+  <footer>
+    <span class="footer-copy">© 2025 The Rarest Heart. Built for IT learners.</span>
+    <ul class="footer-links">
+      <li><a href="../sops.html">SOPs</a></li>
+      <li><a href="../labs.html">Labs</a></li>
+      <li><a href="../contact.html">Contact</a></li>
+    </ul>
+  </footer>
+
+  <script src="../js/progress.js"></script>
+  <script>
+    const MODULE_ID = 'm09';
+    function initProgress() { if (typeof trhMarkInProgress==='function') { trhMarkInProgress(MODULE_ID); if (trhGetStatus(MODULE_ID)==='complete') showCompleted(); } }
+    function markThisComplete() { if (typeof trhMarkComplete==='function') trhMarkComplete(MODULE_ID); showCompleted(); }
+    function showCompleted() { document.getElementById('complete-msg').textContent='✓ Module 09 marked complete. Great work.'; const b=document.getElementById('btn-complete'); b.textContent='✓ Complete'; b.style.background='rgba(34,197,94,0.15)'; b.style.color='#4ade80'; b.style.border='1px solid rgba(34,197,94,0.3)'; b.disabled=true; }
+    document.addEventListener('DOMContentLoaded', initProgress);
+    function switchPhase(phase, btn) {
+      document.querySelectorAll('.phase-panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.phase-tab').forEach(t => t.classList.remove('active'));
+      document.getElementById('panel-' + phase).classList.add('active');
+      btn.classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      setTimeout(triggerReveals, 100);
+    }
+    function triggerReveals() {
+      const reveals = document.querySelectorAll('.reveal');
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add('visible'); observer.unobserve(entry.target); } });
+      }, { threshold: 0.1 });
+      reveals.forEach(el => { if (!el.classList.contains('visible')) observer.observe(el); });
+    }
+    document.addEventListener('DOMContentLoaded', triggerReveals);
+  </script>
+</body>
+</html>

@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Module 07 — Windows Performance Diagnostics | The Rarest Heart</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet" />
+  <style>
+    :root { --navy: #07081a; --navy-mid: #0d0f28; --navy-light: #131535; --white: #f4f4f0; --off-white: #c8c8c4; --accent: #4a6cf7; --accent-glow: rgba(74,108,247,0.25); --pulse: #e84a6f; --pulse-glow: rgba(232,74,111,0.2); --tier2: #7c4af7; --phase1: #4a6cf7; --phase2: #7c4af7; --phase3: #e84a6f; --green: #22c55e; --amber: #f59e0b; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { background-color: var(--navy); color: var(--white); font-family: 'DM Sans', sans-serif; font-weight: 300; line-height: 1.7; overflow-x: hidden; }
+    body::before { content: ''; position: fixed; inset: 0; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E"); pointer-events: none; z-index: 0; opacity: 0.4; }
+    h1, h2, h3, h4 { font-family: 'Syne', sans-serif; line-height: 1.15; }
+    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; padding: 1.25rem 4rem; display: flex; align-items: center; justify-content: space-between; background: rgba(7,8,26,0.85); backdrop-filter: blur(16px); border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .nav-logo { display: flex; align-items: center; gap: 0.75rem; text-decoration: none; }
+    .nav-logo-heart { width: 96px; height: 96px; }
+    .nav-logo-text { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.3rem; color: var(--white); letter-spacing: -0.02em; }
+    .nav-logo-text span { color: var(--pulse); }
+    .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+    .nav-links a { color: var(--off-white); text-decoration: none; font-size: 0.875rem; font-weight: 400; letter-spacing: 0.02em; transition: color 0.2s; position: relative; }
+    .nav-links a::after { content: ''; position: absolute; bottom: -4px; left: 0; width: 0; height: 1px; background: var(--accent); transition: width 0.3s; }
+    .nav-links a:hover { color: var(--white); } .nav-links a:hover::after { width: 100%; }
+    .nav-links a.active { color: var(--white); } .nav-links a.active::after { width: 100%; }
+    .nav-cta { background: var(--accent); color: var(--white) !important; padding: 0.5rem 1.25rem; border-radius: 4px; font-weight: 500 !important; }
+    .nav-cta::after { display: none !important; } .nav-cta:hover { background: #3a5ce0 !important; }
+    section { position: relative; z-index: 1; }
+    .page-wrap { max-width: 860px; margin: 0 auto; padding: 0 2rem; }
+    .module-header { padding: 8rem 0 3.5rem; border-bottom: 1px solid rgba(255,255,255,0.06); position: relative; overflow: hidden; }
+    .module-header-glow { position: absolute; width: 500px; height: 500px; border-radius: 50%; background: radial-gradient(circle, rgba(124,74,247,0.2) 0%, transparent 70%); top: -150px; right: -100px; pointer-events: none; }
+    .module-header-inner { position: relative; z-index: 1; }
+    .breadcrumb { display: flex; align-items: center; gap: 0.5rem; font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; letter-spacing: 0.1em; color: var(--off-white); opacity: 0.5; margin-bottom: 1.75rem; }
+    .breadcrumb a { color: var(--off-white); text-decoration: none; transition: color 0.2s; } .breadcrumb a:hover { color: var(--accent); opacity: 1; } .breadcrumb-sep { opacity: 0.4; }
+    .module-eyebrow { font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; color: #b07aff; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.75rem; opacity: 0; animation: fadeUp 0.7s ease forwards 0.1s; }
+    .module-eyebrow::before { content: ''; display: inline-block; width: 24px; height: 1px; background: #b07aff; }
+    .module-title { font-size: clamp(2.2rem, 5vw, 3.5rem); font-weight: 800; letter-spacing: -0.03em; margin-bottom: 1rem; opacity: 0; animation: fadeUp 0.7s ease forwards 0.25s; }
+    .module-title em { font-style: normal; color: var(--pulse); position: relative; }
+    .module-title em::after { content: ''; position: absolute; bottom: 3px; left: 0; right: 0; height: 3px; background: var(--pulse); opacity: 0.4; border-radius: 2px; }
+    .module-desc { font-size: 1.05rem; color: var(--off-white); max-width: 560px; font-weight: 300; line-height: 1.7; margin-bottom: 2rem; opacity: 0; animation: fadeUp 0.7s ease forwards 0.4s; }
+    .module-chips { display: flex; gap: 0.6rem; flex-wrap: wrap; opacity: 0; animation: fadeUp 0.7s ease forwards 0.55s; }
+    .chip { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.3rem 0.75rem; border-radius: 20px; }
+    .chip-purple { background: rgba(124,74,247,0.12); color: #b07aff; border: 1px solid rgba(124,74,247,0.25); }
+    .chip-gray { background: rgba(255,255,255,0.05); color: var(--off-white); border: 1px solid rgba(255,255,255,0.1); }
+    .phase-nav { display: flex; gap: 0; margin-top: 2.5rem; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 8px; padding: 4px; width: fit-content; opacity: 0; animation: fadeUp 0.7s ease forwards 0.7s; }
+    .phase-tab { font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.6rem 1.4rem; border-radius: 5px; cursor: pointer; transition: all 0.2s; color: var(--off-white); border: none; background: transparent; font-weight: 500; }
+    .phase-tab:hover { color: var(--white); }
+    .phase-tab.p1.active { background: var(--navy-light); color: #7a9eff; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+    .phase-tab.p2.active { background: var(--navy-light); color: #b07aff; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+    .phase-tab.p3.active { background: var(--navy-light); color: #ff7a9a; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+    .phase-panel { display: none; padding: 4rem 0 6rem; } .phase-panel.active { display: block; }
+    .phase-banner { border-radius: 10px; padding: 1.75rem 2rem; margin-bottom: 3rem; display: flex; align-items: center; gap: 1.25rem; }
+    .phase-banner.p1 { background: rgba(74,108,247,0.08); border: 1px solid rgba(74,108,247,0.2); }
+    .phase-banner.p2 { background: rgba(124,74,247,0.08); border: 1px solid rgba(124,74,247,0.2); }
+    .phase-banner.p3 { background: rgba(232,74,111,0.08); border: 1px solid rgba(232,74,111,0.2); }
+    .phase-banner-icon { font-size: 1.75rem; width: 52px; height: 52px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .p1 .phase-banner-icon { background: rgba(74,108,247,0.15); } .p2 .phase-banner-icon { background: rgba(124,74,247,0.15); } .p3 .phase-banner-icon { background: rgba(232,74,111,0.15); }
+    .phase-banner-text h3 { font-size: 1.15rem; font-weight: 800; letter-spacing: -0.01em; margin-bottom: 0.2rem; }
+    .p1 .phase-banner-text h3 { color: #7a9eff; } .p2 .phase-banner-text h3 { color: #b07aff; } .p3 .phase-banner-text h3 { color: #ff7a9a; }
+    .phase-banner-text p { font-size: 0.875rem; color: var(--off-white); font-style: italic; }
+    .content-block { margin-bottom: 3rem; }
+    .content-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.6rem; }
+    .content-block h2 { font-size: 1.5rem; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 0.75rem; }
+    .content-block p { font-size: 0.95rem; color: var(--off-white); line-height: 1.8; margin-bottom: 0.75rem; }
+    .content-block p strong { color: var(--white); font-weight: 600; }
+    .trh-table { width: 100%; border-collapse: collapse; margin: 1.25rem 0; font-size: 0.875rem; }
+    .trh-table th { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--off-white); opacity: 0.7; padding: 0.75rem 1.25rem; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.02); }
+    .trh-table td { padding: 0.9rem 1.25rem; border-bottom: 1px solid rgba(255,255,255,0.05); color: var(--off-white); vertical-align: top; line-height: 1.6; }
+    .trh-table td:first-child { color: var(--white); font-weight: 500; } .trh-table tr:last-child td { border-bottom: none; } .trh-table tr:hover td { background: rgba(255,255,255,0.02); }
+    .callout-info { background: rgba(74,108,247,0.07); border: 1px solid rgba(74,108,247,0.2); border-left: 3px solid var(--accent); border-radius: 8px; padding: 1.5rem 1.75rem; margin: 1.5rem 0; display: flex; gap: 1rem; align-items: flex-start; }
+    .callout-info-icon { font-size: 1.25rem; flex-shrink: 0; margin-top: 1px; }
+    .callout-info-body h4 { font-size: 0.95rem; font-weight: 700; color: #7a9eff; margin-bottom: 0.4rem; }
+    .callout-info-body p { font-size: 0.875rem; color: var(--off-white); line-height: 1.7; margin: 0; }
+    .callout-warning { background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.3); border-left: 3px solid #f59e0b; border-radius: 8px; padding: 1.5rem 1.75rem; margin: 1.5rem 0; display: flex; gap: 1rem; align-items: flex-start; }
+    .callout-warning-icon { font-size: 1.25rem; flex-shrink: 0; margin-top: 1px; }
+    .callout-warning-body h4 { font-size: 0.95rem; font-weight: 700; color: #fbbf24; margin-bottom: 0.4rem; }
+    .callout-warning-body p { font-size: 0.875rem; color: var(--off-white); line-height: 1.7; margin: 0; }
+    .glossary-grid { display: flex; flex-direction: column; gap: 0; border: 1px solid rgba(255,255,255,0.07); border-radius: 8px; overflow: hidden; margin-top: 1.25rem; }
+    .glossary-row { display: grid; grid-template-columns: 200px 1fr; gap: 0; border-bottom: 1px solid rgba(255,255,255,0.05); transition: background 0.2s; }
+    .glossary-row:last-child { border-bottom: none; } .glossary-row:hover { background: rgba(255,255,255,0.02); }
+    .glossary-term { font-family: 'IBM Plex Mono', monospace; font-size: 0.78rem; font-weight: 500; color: var(--accent); padding: 1rem 1.25rem; border-right: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; }
+    .glossary-def { font-size: 0.875rem; color: var(--off-white); padding: 1rem 1.25rem; line-height: 1.6; }
+    .sop-header { background: rgba(124,74,247,0.07); border: 1px solid rgba(124,74,247,0.2); border-radius: 8px; padding: 1.5rem 1.75rem; margin-bottom: 2rem; }
+    .sop-id { font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; color: #b07aff; letter-spacing: 0.15em; margin-bottom: 0.3rem; }
+    .sop-header h3 { font-size: 1.1rem; font-weight: 700; color: var(--white); margin-bottom: 0.4rem; }
+    .sop-header p { font-size: 0.85rem; color: var(--off-white); line-height: 1.6; margin: 0; }
+    .steps-list { display: flex; flex-direction: column; gap: 0.75rem; margin: 1.5rem 0; }
+    .step-card { display: flex; gap: 1.25rem; align-items: flex-start; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 1.25rem 1.5rem; transition: border-color 0.2s; }
+    .step-card:hover { border-color: rgba(124,74,247,0.3); background: rgba(124,74,247,0.03); }
+    .step-num { font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: #b07aff; font-weight: 700; min-width: 28px; margin-top: 2px; }
+    .step-body h4 { font-size: 0.95rem; font-weight: 700; margin-bottom: 0.3rem; color: var(--white); }
+    .step-body p { font-size: 0.875rem; color: var(--off-white); line-height: 1.65; margin: 0; }
+    .step-body p strong { color: var(--white); }
+    .step-body code { font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; background: rgba(255,255,255,0.06); padding: 0.1rem 0.4rem; border-radius: 3px; color: #7a9eff; }
+    .escalation-box { background: rgba(232,74,111,0.06); border: 1px solid rgba(232,74,111,0.2); border-radius: 8px; padding: 1.5rem 1.75rem; margin: 2rem 0; }
+    .escalation-box h4 { font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; color: #ff7a9a; margin-bottom: 0.75rem; }
+    .escalation-box ul { list-style: none; display: flex; flex-direction: column; gap: 0.4rem; }
+    .escalation-box ul li { font-size: 0.875rem; color: var(--off-white); padding-left: 1.25rem; position: relative; line-height: 1.6; }
+    .escalation-box ul li::before { content: '→'; position: absolute; left: 0; color: #ff7a9a; font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; }
+    .quick-ref-table { width: 100%; border-collapse: collapse; border: 1px solid rgba(255,255,255,0.07); border-radius: 8px; overflow: hidden; margin-top: 1.5rem; font-size: 0.875rem; }
+    .quick-ref-table th { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--off-white); opacity: 0.7; padding: 0.75rem 1.25rem; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.02); }
+    .quick-ref-table td { padding: 0.9rem 1.25rem; border-bottom: 1px solid rgba(255,255,255,0.05); color: var(--off-white); vertical-align: top; line-height: 1.6; }
+    .quick-ref-table td:first-child { color: var(--white); font-weight: 500; } .quick-ref-table tr:last-child td { border-bottom: none; }
+    .quick-ref-table code { font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; background: rgba(255,255,255,0.06); padding: 0.1rem 0.4rem; border-radius: 3px; color: #7a9eff; }
+    .scenario-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; overflow: hidden; margin-bottom: 1.5rem; }
+    .scenario-header { padding: 1.25rem 1.75rem; border-bottom: 1px solid rgba(255,255,255,0.06); display: flex; align-items: center; gap: 1rem; }
+    .scenario-num { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; letter-spacing: 0.15em; color: #ff7a9a; background: rgba(232,74,111,0.1); border: 1px solid rgba(232,74,111,0.2); padding: 0.25rem 0.6rem; border-radius: 20px; flex-shrink: 0; }
+    .scenario-header h4 { font-size: 1rem; font-weight: 700; letter-spacing: -0.01em; }
+    .scenario-body { padding: 1.5rem 1.75rem; }
+    .scenario-situation { font-size: 0.925rem; color: var(--off-white); line-height: 1.75; font-style: italic; margin-bottom: 1.25rem; padding-bottom: 1.25rem; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .scenario-tasks h5 { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.75rem; }
+    .task-list { list-style: none; display: flex; flex-direction: column; gap: 0.6rem; }
+    .task-list li { display: flex; gap: 0.75rem; font-size: 0.875rem; color: var(--off-white); line-height: 1.6; }
+    .task-list li .task-num { font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; color: #ff7a9a; font-weight: 700; flex-shrink: 0; margin-top: 2px; width: 18px; }
+    .doc-table { width: 100%; border-collapse: collapse; margin: 1.25rem 0; font-size: 0.875rem; }
+    .doc-table th { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--off-white); opacity: 0.6; padding: 0.75rem 1.25rem; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.02); }
+    .doc-table td { padding: 0.9rem 1.25rem; border-bottom: 1px solid rgba(255,255,255,0.05); color: var(--off-white); vertical-align: top; }
+    .doc-table td:first-child { color: var(--white); font-weight: 500; width: 180px; } .doc-table tr:last-child td { border-bottom: none; }
+    .doc-input-line { display: block; width: 100%; border: none; border-bottom: 1px dashed rgba(255,255,255,0.15); background: transparent; color: var(--white); font-family: 'DM Sans', sans-serif; font-size: 0.875rem; padding: 0.3rem 0; outline: none; transition: border-color 0.2s; }
+    .doc-input-line:focus { border-bottom-color: var(--accent); }
+    .doc-input-line::placeholder { color: rgba(255,255,255,0.15); font-style: italic; }
+    .interview-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; overflow: hidden; margin-bottom: 1.25rem; }
+    .interview-q { padding: 1.25rem 1.75rem; border-bottom: 1px solid rgba(255,255,255,0.06); background: rgba(255,255,255,0.02); }
+    .interview-q-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.4rem; }
+    .interview-q p { font-size: 0.95rem; font-weight: 600; color: var(--white); font-style: italic; margin: 0; line-height: 1.5; }
+    .interview-a { padding: 1.25rem 1.75rem; }
+    .interview-a-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; color: #ff7a9a; margin-bottom: 0.5rem; }
+    .interview-a p { font-size: 0.875rem; color: var(--off-white); line-height: 1.75; margin: 0; }
+    .interview-a strong { color: var(--white); }
+    .checklist { display: flex; flex-direction: column; gap: 0.6rem; margin-top: 1.25rem; }
+    .check-item { display: flex; align-items: flex-start; gap: 0.75rem; font-size: 0.9rem; color: var(--off-white); line-height: 1.6; }
+    .check-box { width: 20px; height: 20px; border: 1.5px solid rgba(255,255,255,0.2); border-radius: 4px; flex-shrink: 0; margin-top: 2px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; }
+    .check-box.checked { background: var(--green); border-color: var(--green); color: white; }
+    .next-modules { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-top: 1.5rem; }
+    .next-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.07); border-radius: 8px; padding: 1.5rem; text-decoration: none; color: inherit; transition: all 0.2s; display: block; }
+    .next-card:hover { border-color: rgba(74,108,247,0.3); background: rgba(74,108,247,0.05); transform: translateY(-2px); }
+    .next-card .next-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; letter-spacing: 0.15em; color: var(--accent); margin-bottom: 0.4rem; }
+    .next-card h4 { font-size: 0.95rem; font-weight: 700; margin-bottom: 0.3rem; }
+    .next-card p { font-size: 0.8rem; color: var(--off-white); margin: 0; }
+    .page-nav { padding: 3rem 0 5rem; border-top: 1px solid rgba(255,255,255,0.06); display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+    .page-nav-back { font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; letter-spacing: 0.08em; color: var(--off-white); text-decoration: none; transition: color 0.2s; }
+    .page-nav-back:hover { color: var(--accent); }
+    .page-nav-next { background: var(--accent); color: var(--white); padding: 0.75rem 1.75rem; border-radius: 4px; text-decoration: none; font-weight: 500; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 0.5rem; transition: background 0.2s, transform 0.2s; }
+    .page-nav-next:hover { background: #3a5ce0; transform: translateY(-1px); }
+    .section-divider { height: 1px; background: rgba(255,255,255,0.06); margin: 2.5rem 0; }
+    footer { border-top: 1px solid rgba(255,255,255,0.06); padding: 3rem 4rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
+    .footer-copy { font-size: 0.8rem; color: var(--off-white); opacity: 0.5; }
+    .footer-links { display: flex; gap: 2rem; list-style: none; }
+    .footer-links a { font-size: 0.8rem; color: var(--off-white); opacity: 0.5; text-decoration: none; transition: opacity 0.2s; }
+    .footer-links a:hover { opacity: 1; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+    .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.6s ease, transform 0.6s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    @media (max-width: 900px) {
+      nav { padding: 1rem 1.5rem; } .nav-links { display: none; }
+      .page-wrap { padding: 0 1.25rem; } .module-header { padding: 7rem 0 2.5rem; }
+      .next-modules { grid-template-columns: 1fr; }
+      .glossary-row { grid-template-columns: 1fr; } .glossary-term { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.05); }
+      footer { padding: 2rem 1.5rem; flex-direction: column; align-items: flex-start; }
+      .phase-nav { width: 100%; } .phase-tab { flex: 1; text-align: center; font-size: 0.65rem; padding: 0.6rem 0.75rem; }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="../index.html" class="nav-logo">
+      <svg class="nav-logo-heart" viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M48 82C48 82 12 58 12 34C12 22.954 20.954 14 32 14C38.627 14 44.51 17.168 48 22.08C51.49 17.168 57.373 14 64 14C75.046 14 84 22.954 84 34C84 58 48 82 48 82Z" fill="#e84a6f" opacity="0.9"/>
+        <path d="M48 82C48 82 12 58 12 34C12 22.954 20.954 14 32 14C38.627 14 44.51 17.168 48 22.08" fill="#c73d5c"/>
+      </svg>
+      <span class="nav-logo-text">the rarest <span>heart</span></span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../learn.html" class="active">Learn IT</a></li>
+      <li><a href="../do.html">Do IT</a></li>
+      <li><a href="../apply.html">Apply IT</a></li>
+      <li><a href="../topics.html">Topics</a></li>
+      <li><a href="../members.html">My Progress</a></li>
+      <li><a href="../contact.html" class="nav-cta">Contact</a></li>
+    </ul>
+  </nav>
+
+  <section class="module-header">
+    <div class="module-header-glow"></div>
+    <div class="page-wrap module-header-inner">
+      <div class="breadcrumb">
+        <a href="../index.html">Home</a><span class="breadcrumb-sep">/</span>
+        <a href="../learn.html">Learn IT</a><span class="breadcrumb-sep">/</span>
+        <span>Module 07</span>
+      </div>
+      <div class="module-eyebrow">Tier 2 · SOP-007 · Module 07 of 09</div>
+      <h1 class="module-title">Windows <em>Performance</em> Diagnostics</h1>
+      <p class="module-desc">Diagnose slow, unresponsive, and high-resource machines using Task Manager, Resource Monitor, and Event Viewer. Read the data, find the bottleneck, fix it.</p>
+      <div class="module-chips">
+        <span class="chip chip-purple">Tier 2 — IT Support</span>
+        <span class="chip chip-gray">SOP-007</span>
+        <span class="chip chip-gray">Intermediate</span>
+        <span class="chip chip-gray">Diagnostics</span>
+      </div>
+      <div class="phase-nav">
+        <button class="phase-tab p1 active" onclick="switchPhase('p1', this)">01 · Learn IT</button>
+        <button class="phase-tab p2" onclick="switchPhase('p2', this)">02 · Do IT</button>
+        <button class="phase-tab p3" onclick="switchPhase('p3', this)">03 · Apply IT</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- PHASE 1 -->
+  <div id="panel-p1" class="phase-panel active">
+    <div class="page-wrap">
+      <div class="phase-banner p1">
+        <div class="phase-banner-icon">📊</div>
+        <div class="phase-banner-text">
+          <h3>Phase 1 — Learn IT</h3>
+          <p>Understand the four performance bottleneck categories and the tools that measure each one.</p>
+        </div>
+      </div>
+
+      <div class="content-block reveal">
+        <div class="content-label">Foundation</div>
+        <h2>The Four Performance Bottlenecks</h2>
+        <p>Every slow computer complaint falls into one of four categories: <strong>CPU</strong>, <strong>Memory (RAM)</strong>, <strong>Disk (Storage)</strong>, or <strong>Network</strong>. Your job is to identify which resource is the bottleneck — then either fix it or escalate for a hardware upgrade.</p>
+        <p>Randomly disabling things or doing disk cleanups without checking metrics first is guesswork. Read the numbers, then act.</p>
+
+        <table class="trh-table">
+          <thead><tr><th>Resource</th><th>Symptom</th><th>Tool to Check</th><th>Critical Threshold</th></tr></thead>
+          <tbody>
+            <tr><td>CPU</td><td>System unresponsive, apps freeze during tasks</td><td>Task Manager → Performance → CPU</td><td>Sustained &gt;85% usage</td></tr>
+            <tr><td>RAM</td><td>Constant freezing, very slow app switching</td><td>Task Manager → Performance → Memory</td><td>&gt;90% in use; lots of disk paging</td></tr>
+            <tr><td>Disk</td><td>Extremely slow boot, apps take forever to open</td><td>Task Manager → Performance → Disk</td><td>100% active time (disk bottleneck)</td></tr>
+            <tr><td>Network</td><td>Slow web browsing, file transfers, video calls</td><td>Task Manager → Performance → Network / Resource Monitor</td><td>Consistently near bandwidth cap</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="content-block reveal">
+        <div class="content-label">Diagnostic Tools</div>
+        <h2>Your Performance Toolkit</h2>
+
+        <table class="trh-table">
+          <thead><tr><th>Tool</th><th>How to Open</th><th>What It Shows</th></tr></thead>
+          <tbody>
+            <tr><td>Task Manager</td><td>Ctrl+Shift+Esc or right-click taskbar</td><td>Per-process CPU/RAM/Disk/Network usage; Startup tab; Performance graphs</td></tr>
+            <tr><td>Resource Monitor</td><td>Task Manager → Performance → Open Resource Monitor</td><td>Detailed per-process and per-disk-drive breakdown; network connections by process</td></tr>
+            <tr><td>Performance Monitor</td><td>Run → perfmon</td><td>Configurable real-time performance counters and data collector sets</td></tr>
+            <tr><td>Event Viewer</td><td>Run → eventvwr</td><td>System/Application error logs; critical events and crash analysis</td></tr>
+            <tr><td>Reliability Monitor</td><td>Control Panel → Security → View Reliability History</td><td>Timeline of software installs, crashes, and errors; identifies when problems started</td></tr>
+            <tr><td>msinfo32</td><td>Run → msinfo32</td><td>Complete hardware inventory: CPU, RAM amount/speed, installed software, drivers</td></tr>
+          </tbody>
+        </table>
+
+        <div class="callout-info">
+          <div class="callout-info-icon">💡</div>
+          <div class="callout-info-body">
+            <h4>Reliability Monitor Is Underused</h4>
+            <p>Most techs skip Reliability Monitor, but it's incredibly useful for timeline diagnosis. It shows a calendar view of crashes, errors, warnings, and software installs. When a user says "it started being slow last Tuesday," open Reliability Monitor to see exactly what happened on that date — often a bad update or new software install will be right there.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="content-block reveal">
+        <div class="content-label">Common Causes</div>
+        <h2>What's Actually Slowing the Machine</h2>
+        <table class="trh-table">
+          <thead><tr><th>Cause</th><th>Bottleneck Type</th><th>Fix</th></tr></thead>
+          <tbody>
+            <tr><td>Too many startup programs</td><td>CPU &amp; RAM</td><td>Task Manager → Startup → disable unnecessary items</td></tr>
+            <tr><td>Insufficient RAM for workload</td><td>RAM → Disk (paging)</td><td>Close apps; recommend RAM upgrade if chronic</td></tr>
+            <tr><td>Spinning HDD (vs. SSD)</td><td>Disk</td><td>SSD upgrade dramatically improves boot/load times</td></tr>
+            <tr><td>HDD near capacity (&lt;10% free)</td><td>Disk</td><td>Disk Cleanup + offload files; paging file needs space</td></tr>
+            <tr><td>Malware / cryptominer</td><td>CPU / Disk</td><td>Identify process in Task Manager; run malware scan (SOP-006)</td></tr>
+            <tr><td>Windows Update running in background</td><td>CPU / Disk / Network</td><td>Check Windows Update status; let it complete or schedule</td></tr>
+            <tr><td>Corrupt or fragmented disk (HDD)</td><td>Disk</td><td>Run chkdsk /f; optimize drive (Defragment &amp; Optimize)</td></tr>
+            <tr><td>Thermal throttling (overheating)</td><td>CPU</td><td>Check temps with HWMonitor; clean dust from vents/fans</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="content-block reveal">
+        <div class="content-label">Glossary</div>
+        <h2>Key Terms</h2>
+        <div class="glossary-grid">
+          <div class="glossary-row"><div class="glossary-term">Paging File</div><div class="glossary-def">A file on disk (pagefile.sys) Windows uses as overflow memory when RAM is full. Heavy paging causes severe slowdowns because disk is 100x slower than RAM.</div></div>
+          <div class="glossary-row"><div class="glossary-term">Thermal Throttling</div><div class="glossary-def">CPU automatically reduces speed to prevent overheating. Causes slowdowns that look like software issues. Clean dust from vents as first physical check.</div></div>
+          <div class="glossary-row"><div class="glossary-term">Disk I/O</div><div class="glossary-def">Input/Output operations on storage. When disk I/O is at 100%, nothing can read or write — system appears frozen waiting for disk access.</div></div>
+          <div class="glossary-row"><div class="glossary-term">Event ID</div><div class="glossary-def">Numeric codes in Event Viewer that identify specific events. Event ID 41 = unexpected shutdown/crash. Event ID 1001 = Windows Error Reporting (crash dump).</div></div>
+          <div class="glossary-row"><div class="glossary-term">Handle / Thread</div><div class="glossary-def">Handles are references to system resources (files, registry keys) held by a process. A process with thousands of handles may have a resource leak — look for it in Resource Monitor.</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 2 -->
+  <div id="panel-p2" class="phase-panel">
+    <div class="page-wrap">
+      <div class="phase-banner p2">
+        <div class="phase-banner-icon">📋</div>
+        <div class="phase-banner-text">
+          <h3>Phase 2 — Do IT</h3>
+          <p>Execute SOP-007. Measure first, fix second. Never skip the verification step.</p>
+        </div>
+      </div>
+
+      <div class="sop-header">
+        <div class="sop-id">SOP-007 · WINDOWS PERFORMANCE DIAGNOSTICS · REV 1.0</div>
+        <h3>Slow / Unresponsive Windows System Diagnosis</h3>
+        <p>Use this procedure for any ticket where a user reports the system is "slow," "freezing," or "taking forever." Always collect data first before making any changes.</p>
+      </div>
+
+      <div class="steps-list">
+        <div class="step-card">
+          <div class="step-num">01</div>
+          <div class="step-body">
+            <h4>Open Task Manager and Read the Performance Tab</h4>
+            <p>Press <strong>Ctrl+Shift+Esc</strong> and click the <strong>Performance</strong> tab. Look at all four: CPU %, Memory used/available, Disk active time %, and Network throughput. Identify which resource is at or near 100%. This tells you your bottleneck category before you touch anything.</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">02</div>
+          <div class="step-body">
+            <h4>Identify the Top Consuming Processes</h4>
+            <p>In Task Manager's <strong>Processes tab</strong>, click the column header for the bottleneck resource (CPU, Memory, or Disk) to sort by usage. Identify the top processes consuming that resource. Right-click a suspicious process → <strong>Open file location</strong> to see if it's a legitimate Windows process or something unknown.</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">03</div>
+          <div class="step-body">
+            <h4>Check Startup Programs</h4>
+            <p>Click the <strong>Startup</strong> tab in Task Manager. Sort by "Startup impact." Disable any unnecessary programs that launch at boot — especially anything with "High" impact that the user doesn't recognize. This alone often resolves boot slowness significantly. Requires a reboot to take effect.</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">04</div>
+          <div class="step-body">
+            <h4>Check Available Disk Space</h4>
+            <p>Open File Explorer → This PC. Check each drive's free space. If the system drive (C:) has less than 10% free, disk operations suffer and the paging file has limited room. Run <strong>Disk Cleanup</strong> (search for it) and clean Windows Update files, temporary files, and Recycle Bin. If still critically low, escalate for storage expansion.</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">05</div>
+          <div class="step-body">
+            <h4>Check Event Viewer for Critical Errors</h4>
+            <p>Open <strong>Event Viewer → Windows Logs → System</strong>. Filter by Error and Critical. Look for recurring errors or errors that coincide with the slowness. Specifically look for <strong>Event ID 41</strong> (unexpected shutdown) and <strong>Disk errors</strong> from the source "Disk" — these can indicate impending drive failure.</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">06</div>
+          <div class="step-body">
+            <h4>Run Disk Health Check</h4>
+            <p>Open Command Prompt as Administrator and run <code>chkdsk C: /f /r</code>. If the drive is in use, schedule it for next reboot when prompted. For SSDs or HDDs, also check SMART data using a tool like <strong>CrystalDiskInfo</strong> (free) — look for "Caution" or "Bad" status, which indicates drive failure is imminent.</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">07</div>
+          <div class="step-body">
+            <h4>Check Windows Update and Ensure System Is Patched</h4>
+            <p>Sometimes Windows Update runs silently in the background consuming resources. Open <strong>Settings → Windows Update</strong> and check if an update is actively downloading or installing. Let it finish, then reboot. After updating, run <code>sfc /scannow</code> in an elevated Command Prompt to repair any corrupted system files that may be causing instability.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="escalation-box">
+        <h4>Escalate / Recommend Hardware When</h4>
+        <ul>
+          <li>RAM consistently at &gt;90% during normal workload — user needs a RAM upgrade</li>
+          <li>System drive is a spinning HDD and all software fixes have been tried — recommend SSD upgrade</li>
+          <li>SMART data shows imminent drive failure — replace drive immediately, escalate urgently</li>
+          <li>Event Viewer shows recurring CPU or memory hardware errors (not software-related)</li>
+          <li>CPU is sustained at 100% with no user processes visible — possible hardware fault or malware (SOP-006)</li>
+        </ul>
+      </div>
+
+      <div class="content-block">
+        <div class="content-label">Quick Reference</div>
+        <h2>Performance Cheat Sheet</h2>
+        <table class="quick-ref-table">
+          <thead><tr><th>Bottleneck</th><th>First Check</th><th>Common Fix</th></tr></thead>
+          <tbody>
+            <tr><td>CPU 100%</td><td>Task Manager → Processes sorted by CPU</td><td>End rogue process; check for malware; check cooling</td></tr>
+            <tr><td>RAM 90%+</td><td>Task Manager → Memory; paging activity</td><td>Disable startup items; close apps; recommend RAM upgrade</td></tr>
+            <tr><td>Disk 100%</td><td>Task Manager → Disk; identify top I/O process</td><td>Free disk space; <code>chkdsk</code>; SSD upgrade for HDD</td></tr>
+            <tr><td>Slow boot</td><td>Startup tab in Task Manager</td><td>Disable high-impact startup items</td></tr>
+            <tr><td>Slow after update</td><td>Reliability Monitor; Event Viewer</td><td>Roll back update or run <code>sfc /scannow</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 3 -->
+  <div id="panel-p3" class="phase-panel">
+    <div class="page-wrap">
+      <div class="phase-banner p3">
+        <div class="phase-banner-icon">🎯</div>
+        <div class="phase-banner-text">
+          <h3>Phase 3 — Apply IT</h3>
+          <p>Diagnose performance tickets from data, not guesswork. Show your methodology clearly.</p>
+        </div>
+      </div>
+
+      <div class="content-block reveal">
+        <div class="content-label">Scenarios</div>
+        <h2>Practice Tickets</h2>
+
+        <div class="scenario-card">
+          <div class="scenario-header"><span class="scenario-num">SCENARIO 01</span><h4>The Slow Bootup</h4></div>
+          <div class="scenario-body">
+            <div class="scenario-situation">"My computer takes about 10 minutes to fully boot up. Once it's on it's fine, but startup is unbearable. It's been getting worse over the past few months."</div>
+            <div class="scenario-tasks">
+              <h5>Your Tasks</h5>
+              <ul class="task-list">
+                <li><span class="task-num">1.</span>What is the first diagnostic tab you open and what are you looking for?</li>
+                <li><span class="task-num">2.</span>You see 12 startup items — 6 have "High" impact including four third-party apps. What do you do?</li>
+                <li><span class="task-num">3.</span>After disabling startup items and rebooting, it still takes 5 minutes. Task Manager shows Disk at 100% during boot. What is the likely hardware cause and recommendation?</li>
+                <li><span class="task-num">4.</span>How do you check if the drive is failing vs. just being slow because it's a spinning HDD?</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="scenario-card">
+          <div class="scenario-header"><span class="scenario-num">SCENARIO 02</span><h4>The Freezing Workstation</h4></div>
+          <div class="scenario-body">
+            <div class="scenario-situation">"My computer freezes for 10–15 seconds multiple times a day. When it unfreezes, everything goes back to normal. It doesn't crash, just locks up temporarily."</div>
+            <div class="scenario-tasks">
+              <h5>Your Tasks</h5>
+              <ul class="task-list">
+                <li><span class="task-num">1.</span>Task Manager shows Memory at 95% during the freeze. What is happening physically and what are the two options?</li>
+                <li><span class="task-num">2.</span>The machine has 8GB RAM. What question do you ask about the user's workload to determine if an upgrade is warranted?</li>
+                <li><span class="task-num">3.</span>You check Event Viewer and find several Disk errors from the past week. What do you investigate next?</li>
+                <li><span class="task-num">4.</span>Write a ticket note explaining what you found and your recommendation.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="scenario-card">
+          <div class="scenario-header"><span class="scenario-num">SCENARIO 03</span><h4>The Mystery CPU Spike</h4></div>
+          <div class="scenario-body">
+            <div class="scenario-situation">"My fan is running at full speed constantly and the computer is very slow even when I'm not doing anything. I haven't installed anything recently."</div>
+            <div class="scenario-tasks">
+              <h5>Your Tasks</h5>
+              <ul class="task-list">
+                <li><span class="task-num">1.</span>High fan speed + high idle CPU — what are the two most likely causes?</li>
+                <li><span class="task-num">2.</span>Task Manager shows a process called "Service Host: SysMain" at 40% CPU. Is this malware or a Windows process? What does it do?</li>
+                <li><span class="task-num">3.</span>You check and Windows Update is in the middle of a large feature update. How does this change your approach?</li>
+                <li><span class="task-num">4.</span>After the update completes and CPU returns to normal, what do you check before closing the ticket?</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="content-block reveal">
+        <div class="content-label">Ticket Practice</div>
+        <h2>Document Your Resolution</h2>
+        <table class="doc-table">
+          <thead><tr><th>Field</th><th>Your Entry</th></tr></thead>
+          <tbody>
+            <tr><td>Bottleneck Found</td><td><input class="doc-input-line" placeholder="CPU / RAM / Disk / Network" /></td></tr>
+            <tr><td>Metrics Observed</td><td><input class="doc-input-line" placeholder="CPU at X%, Memory at Y%, Disk at Z%..." /></td></tr>
+            <tr><td>Root Cause</td><td><input class="doc-input-line" placeholder="Specific process, setting, or hardware issue..." /></td></tr>
+            <tr><td>Steps Taken</td><td><input class="doc-input-line" placeholder="What you changed and why..." /></td></tr>
+            <tr><td>Resolution / Recommendation</td><td><input class="doc-input-line" placeholder="Fixed / escalated / hardware upgrade needed..." /></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="content-block reveal">
+        <div class="content-label">Interview Prep</div>
+        <h2>Questions You'll Face</h2>
+
+        <div class="interview-card">
+          <div class="interview-q"><div class="interview-q-label">Interview Question 01</div><p>"A user says their computer is running slowly. Walk me through how you diagnose it."</p></div>
+          <div class="interview-a">
+            <div class="interview-a-label">Strong Answer Framework</div>
+            <p>I start by opening <strong>Task Manager and checking the Performance tab</strong> — CPU, Memory, Disk, and Network — to identify which resource is the bottleneck. Once I know the bottleneck, I sort the Processes tab by that metric to find the top consumer. If it's a startup issue, I check the Startup tab for high-impact programs. If disk is at 100%, I check free space and run a disk health check. If RAM is maxed, I look at whether the workload genuinely exceeds the machine's capacity. I also check <strong>Reliability Monitor</strong> to see if any events coincide with when the slowness started.</p>
+          </div>
+        </div>
+
+        <div class="interview-card">
+          <div class="interview-q"><div class="interview-q-label">Interview Question 02</div><p>"What does it mean when the disk is at 100% utilization and how do you fix it?"</p></div>
+          <div class="interview-a">
+            <div class="interview-a-label">Strong Answer Framework</div>
+            <p>100% disk utilization means <strong>the drive is at capacity for read/write operations</strong> — everything waiting to read or write is queued, which causes the system to appear frozen. Common causes are: the paging file growing because RAM is full, Windows Update downloading in the background, a failing drive with bad sectors, a malware process, or just the inherent limitation of a spinning HDD which is mechanically slow. I check the Disk column in Task Manager Processes to find what's generating the I/O. If it's Windows Update, I wait. If it's the system paging heavily, RAM may need an upgrade. If the drive shows high response times (&gt;50ms average) or SMART errors, a hardware replacement is needed.</p>
+          </div>
+        </div>
+
+        <div class="interview-card">
+          <div class="interview-q"><div class="interview-q-label">Interview Question 03</div><p>"What is the difference between Task Manager and Resource Monitor, and when do you use each?"</p></div>
+          <div class="interview-a">
+            <div class="interview-a-label">Strong Answer Framework</div>
+            <p><strong>Task Manager</strong> gives you a high-level real-time view — which processes are using the most CPU, RAM, disk, and network, plus startup items and performance graphs. I use it as the first tool to identify the bottleneck category and the suspect process. <strong>Resource Monitor</strong> is deeper — launched from Task Manager's Performance tab, it shows per-process breakdown by specific disk file access, per-connection network activity, and memory commit details. I use Resource Monitor when Task Manager shows an issue but I need to know exactly which files a process is accessing, or which process is holding a specific network connection open. It's the difference between "something is using the disk" and "here is the exact file and operation."</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="content-block reveal">
+        <div class="content-label">Module Completion</div>
+        <h2>Completion Checklist</h2>
+        <div class="checklist">
+          <div class="check-item"><div class="check-box" onclick="this.classList.toggle('checked'); this.textContent = this.classList.contains('checked') ? '✓' : ''"></div><span>I can identify the four bottleneck types (CPU/RAM/Disk/Network) using Task Manager</span></div>
+          <div class="check-item"><div class="check-box" onclick="this.classList.toggle('checked'); this.textContent = this.classList.contains('checked') ? '✓' : ''"></div><span>I know when to use Task Manager vs. Resource Monitor vs. Event Viewer</span></div>
+          <div class="check-item"><div class="check-box" onclick="this.classList.toggle('checked'); this.textContent = this.classList.contains('checked') ? '✓' : ''"></div><span>I can disable startup items and explain why that improves boot time</span></div>
+          <div class="check-item"><div class="check-box" onclick="this.classList.toggle('checked'); this.textContent = this.classList.contains('checked') ? '✓' : ''"></div><span>I understand paging and why 100% disk usage is often a RAM problem</span></div>
+          <div class="check-item"><div class="check-box" onclick="this.classList.toggle('checked'); this.textContent = this.classList.contains('checked') ? '✓' : ''"></div><span>I know how to check SMART data for drive health and what the results mean</span></div>
+          <div class="check-item"><div class="check-box" onclick="this.classList.toggle('checked'); this.textContent = this.classList.contains('checked') ? '✓' : ''"></div><span>I completed all three scenarios and documented at least one with metrics</span></div>
+        </div>
+
+        <div class="section-divider"></div>
+        <div class="content-label">Up Next</div>
+        <h2>Continue Your Training</h2>
+        <div class="next-modules">
+          <a href="06-malware-removal.html" class="next-card">
+            <div class="next-label">← Previous Module</div>
+            <h4>Module 06 — Malware Removal</h4>
+            <p>Detection, removal, and SOP-006</p>
+          </a>
+          <a href="08-active-directory.html" class="next-card">
+            <div class="next-label">Next Module →</div>
+            <h4>Module 08 — Active Directory</h4>
+            <p>User accounts, groups, and SOP-008</p>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-wrap">
+    <div class="page-nav">
+      <a href="../learn.html" class="page-nav-back">← Back to Learn IT</a>
+      <a href="08-active-directory.html" class="page-nav-next">Next Module →</a>
+    </div>
+  </div>
+
+  <div class="page-wrap" style="padding-bottom:1.5rem;">
+    <div id="complete-block" style="padding:1.5rem;background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.2);border-radius:10px;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;">
+      <div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:#4ade80;margin-bottom:0.3rem;">Module 07 · SOP-007</div>
+        <div style="font-weight:600;font-size:0.95rem;" id="complete-msg">Finished all three phases? Mark this module complete.</div>
+      </div>
+      <button id="btn-complete" onclick="markThisComplete()" style="font-family:'IBM Plex Mono',monospace;font-size:0.7rem;letter-spacing:0.08em;padding:0.6rem 1.25rem;border-radius:6px;background:#22c55e;color:#07081a;border:none;cursor:pointer;font-weight:500;">Mark Complete ✓</button>
+    </div>
+  </div>
+
+  <footer>
+    <span class="footer-copy">© 2025 The Rarest Heart. Built for IT learners.</span>
+    <ul class="footer-links">
+      <li><a href="../sops.html">SOPs</a></li>
+      <li><a href="../labs.html">Labs</a></li>
+      <li><a href="../contact.html">Contact</a></li>
+    </ul>
+  </footer>
+
+  <script src="../js/progress.js"></script>
+  <script>
+    const MODULE_ID = 'm07';
+    function initProgress() { if (typeof trhMarkInProgress==='function') { trhMarkInProgress(MODULE_ID); if (trhGetStatus(MODULE_ID)==='complete') showCompleted(); } }
+    function markThisComplete() { if (typeof trhMarkComplete==='function') trhMarkComplete(MODULE_ID); showCompleted(); }
+    function showCompleted() { document.getElementById('complete-msg').textContent='✓ Module 07 marked complete. Great work.'; const b=document.getElementById('btn-complete'); b.textContent='✓ Complete'; b.style.background='rgba(34,197,94,0.15)'; b.style.color='#4ade80'; b.style.border='1px solid rgba(34,197,94,0.3)'; b.disabled=true; }
+    document.addEventListener('DOMContentLoaded', initProgress);
+    function switchPhase(phase, btn) {
+      document.querySelectorAll('.phase-panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.phase-tab').forEach(t => t.classList.remove('active'));
+      document.getElementById('panel-' + phase).classList.add('active');
+      btn.classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      setTimeout(triggerReveals, 100);
+    }
+    function triggerReveals() {
+      const reveals = document.querySelectorAll('.reveal');
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add('visible'); observer.unobserve(entry.target); } });
+      }, { threshold: 0.1 });
+      reveals.forEach(el => { if (!el.classList.contains('visible')) observer.observe(el); });
+    }
+    document.addEventListener('DOMContentLoaded', triggerReveals);
+  </script>
+</body>
+</html>

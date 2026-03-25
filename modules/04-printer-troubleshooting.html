@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Module 04 — Printer Troubleshooting | The Rarest Heart</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet" />
+  <style>
+    :root { --navy: #07081a; --navy-mid: #0d0f28; --navy-light: #131535; --white: #f4f4f0; --off-white: #c8c8c4; --accent: #4a6cf7; --accent-glow: rgba(74,108,247,0.25); --pulse: #e84a6f; --pulse-glow: rgba(232,74,111,0.2); --tier1: #4a6cf7; --tier2: #7c4af7; --phase1: #4a6cf7; --phase2: #7c4af7; --phase3: #e84a6f; --green: #22c55e; --amber: #f59e0b; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { background-color: var(--navy); color: var(--white); font-family: 'DM Sans', sans-serif; font-weight: 300; line-height: 1.7; overflow-x: hidden; }
+    body::before { content: ''; position: fixed; inset: 0; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E"); pointer-events: none; z-index: 0; opacity: 0.4; }
+    h1, h2, h3, h4 { font-family: 'Syne', sans-serif; line-height: 1.15; }
+    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; padding: 1.25rem 4rem; display: flex; align-items: center; justify-content: space-between; background: rgba(7,8,26,0.85); backdrop-filter: blur(16px); border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .nav-logo { display: flex; align-items: center; gap: 0.75rem; text-decoration: none; }
+    .nav-logo-heart { width: 96px; height: 96px; }
+    .nav-logo-text { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.3rem; color: var(--white); letter-spacing: -0.02em; }
+    .nav-logo-text span { color: var(--pulse); }
+    .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+    .nav-links a { color: var(--off-white); text-decoration: none; font-size: 0.875rem; font-weight: 400; letter-spacing: 0.02em; transition: color 0.2s; position: relative; }
+    .nav-links a::after { content: ''; position: absolute; bottom: -4px; left: 0; width: 0; height: 1px; background: var(--accent); transition: width 0.3s; }
+    .nav-links a:hover { color: var(--white); } .nav-links a:hover::after { width: 100%; }
+    .nav-links a.active { color: var(--white); } .nav-links a.active::after { width: 100%; }
+    .nav-cta { background: var(--accent); color: var(--white) !important; padding: 0.5rem 1.25rem; border-radius: 4px; font-weight: 500 !important; }
+    .nav-cta::after { display: none !important; } .nav-cta:hover { background: #3a5ce0 !important; }
+    section { position: relative; z-index: 1; }
+    .page-wrap { max-width: 860px; margin: 0 auto; padding: 0 2rem; }
+    .module-header { padding: 8rem 0 3.5rem; border-bottom: 1px solid rgba(255,255,255,0.06); position: relative; overflow: hidden; }
+    .module-header-glow { position: absolute; width: 500px; height: 500px; border-radius: 50%; background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%); top: -150px; right: -100px; pointer-events: none; }
+    .module-header-inner { position: relative; z-index: 1; }
+    .breadcrumb { display: flex; align-items: center; gap: 0.5rem; font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; letter-spacing: 0.1em; color: var(--off-white); opacity: 0.5; margin-bottom: 1.75rem; }
+    .breadcrumb a { color: var(--off-white); text-decoration: none; transition: color 0.2s; } .breadcrumb a:hover { color: var(--accent); opacity: 1; } .breadcrumb-sep { opacity: 0.4; }
+    .module-eyebrow { font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.75rem; opacity: 0; animation: fadeUp 0.7s ease forwards 0.1s; }
+    .module-eyebrow::before { content: ''; display: inline-block; width: 24px; height: 1px; background: var(--accent); }
+    .module-title { font-size: clamp(2.2rem, 5vw, 3.5rem); font-weight: 800; letter-spacing: -0.03em; margin-bottom: 1rem; opacity: 0; animation: fadeUp 0.7s ease forwards 0.25s; }
+    .module-title em { font-style: normal; color: var(--pulse); position: relative; }
+    .module-title em::after { content: ''; position: absolute; bottom: 3px; left: 0; right: 0; height: 3px; background: var(--pulse); opacity: 0.4; border-radius: 2px; }
+    .module-desc { font-size: 1.05rem; color: var(--off-white); max-width: 560px; font-weight: 300; line-height: 1.7; margin-bottom: 2rem; opacity: 0; animation: fadeUp 0.7s ease forwards 0.4s; }
+    .module-chips { display: flex; gap: 0.6rem; flex-wrap: wrap; opacity: 0; animation: fadeUp 0.7s ease forwards 0.55s; }
+    .chip { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.3rem 0.75rem; border-radius: 20px; }
+    .chip-blue { background: rgba(74,108,247,0.12); color: #7a9eff; border: 1px solid rgba(74,108,247,0.25); }
+    .chip-gray { background: rgba(255,255,255,0.05); color: var(--off-white); border: 1px solid rgba(255,255,255,0.1); }
+    .chip-green { background: rgba(34,197,94,0.1); color: #4ade80; border: 1px solid rgba(34,197,94,0.2); }
+    .phase-nav { display: flex; gap: 0; margin-top: 2.5rem; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 8px; padding: 4px; width: fit-content; opacity: 0; animation: fadeUp 0.7s ease forwards 0.7s; }
+    .phase-tab { font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.6rem 1.4rem; border-radius: 5px; cursor: pointer; transition: all 0.2s; color: var(--off-white); border: none; background: transparent; font-weight: 500; }
+    .phase-tab:hover { color: var(--white); }
+    .phase-tab.p1.active { background: var(--navy-light); color: #7a9eff; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+    .phase-tab.p2.active { background: var(--navy-light); color: #b07aff; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+    .phase-tab.p3.active { background: var(--navy-light); color: #ff7a9a; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+    .phase-panel { display: none; padding: 4rem 0 6rem; } .phase-panel.active { display: block; }
+    .phase-banner { border-radius: 10px; padding: 1.75rem 2rem; margin-bottom: 3rem; display: flex; align-items: center; gap: 1.25rem; }
+    .phase-banner.p1 { background: rgba(74,108,247,0.08); border: 1px solid rgba(74,108,247,0.2); }
+    .phase-banner.p2 { background: rgba(124,74,247,0.08); border: 1px solid rgba(124,74,247,0.2); }
+    .phase-banner.p3 { background: rgba(232,74,111,0.08); border: 1px solid rgba(232,74,111,0.2); }
+    .phase-banner-icon { font-size: 1.75rem; width: 52px; height: 52px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .p1 .phase-banner-icon { background: rgba(74,108,247,0.15); } .p2 .phase-banner-icon { background: rgba(124,74,247,0.15); } .p3 .phase-banner-icon { background: rgba(232,74,111,0.15); }
+    .phase-banner-text h3 { font-size: 1.15rem; font-weight: 800; letter-spacing: -0.01em; margin-bottom: 0.2rem; }
+    .p1 .phase-banner-text h3 { color: #7a9eff; } .p2 .phase-banner-text h3 { color: #b07aff; } .p3 .phase-banner-text h3 { color: #ff7a9a; }
+    .phase-banner-text p { font-size: 0.875rem; color: var(--off-white); font-style: italic; }
+    .content-block { margin-bottom: 3rem; }
+    .content-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.6rem; }
+    .content-block h2 { font-size: 1.5rem; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 0.75rem; }
+    .content-block p { font-size: 0.95rem; color: var(--off-white); line-height: 1.8; margin-bottom: 0.75rem; }
+    .content-block p strong { color: var(--white); font-weight: 600; }
+    .trh-table { width: 100%; border-collapse: collapse; margin: 1.25rem 0; font-size: 0.875rem; }
+    .trh-table th { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--off-white); opacity: 0.7; padding: 0.75rem 1.25rem; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.02); }
+    .trh-table td { padding: 0.9rem 1.25rem; border-bottom: 1px solid rgba(255,255,255,0.05); color: var(--off-white); vertical-align: top; line-height: 1.6; }
+    .trh-table td:first-child { color: var(--white); font-weight: 500; } .trh-table tr:last-child td { border-bottom: none; } .trh-table tr:hover td { background: rgba(255,255,255,0.02); }
+    .callout-warning { background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.3); border-left: 3px solid #f59e0b; border-radius: 8px; padding: 1.5rem 1.75rem; margin: 1.5rem 0; display: flex; gap: 1rem; align-items: flex-start; }
+    .callout-warning-icon { font-size: 1.25rem; flex-shrink: 0; margin-top: 1px; }
+    .callout-warning-body h4 { font-size: 0.95rem; font-weight: 700; color: #fbbf24; margin-bottom: 0.4rem; }
+    .callout-warning-body p { font-size: 0.875rem; color: var(--off-white); line-height: 1.7; margin: 0; }
+    .callout-info { background: rgba(74,108,247,0.07); border: 1px solid rgba(74,108,247,0.2); border-left: 3px solid var(--accent); border-radius: 8px; padding: 1.5rem 1.75rem; margin: 1.5rem 0; display: flex; gap: 1rem; align-items: flex-start; }
+    .callout-info-icon { font-size: 1.25rem; flex-shrink: 0; margin-top: 1px; }
+    .callout-info-body h4 { font-size: 0.95rem; font-weight: 700; color: #7a9eff; margin-bottom: 0.4rem; }
+    .callout-info-body p { font-size: 0.875rem; color: var(--off-white); line-height: 1.7; margin: 0; }
+    .trh-list { list-style: none; margin: 0.75rem 0 1.25rem; display: flex; flex-direction: column; gap: 0.5rem; }
+    .trh-list li { font-size: 0.9rem; color: var(--off-white); padding-left: 1.25rem; position: relative; line-height: 1.6; }
+    .trh-list li::before { content: '—'; position: absolute; left: 0; color: var(--accent); font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; }
+    .glossary-grid { display: flex; flex-direction: column; gap: 0; border: 1px solid rgba(255,255,255,0.07); border-radius: 8px; overflow: hidden; margin-top: 1.25rem; }
+    .glossary-row { display: grid; grid-template-columns: 200px 1fr; gap: 0; border-bottom: 1px solid rgba(255,255,255,0.05); transition: background 0.2s; }
+    .glossary-row:last-child { border-bottom: none; } .glossary-row:hover { background: rgba(255,255,255,0.02); }
+    .glossary-term { font-family: 'IBM Plex Mono', monospace; font-size: 0.78rem; font-weight: 500; color: var(--accent); padding: 1rem 1.25rem; border-right: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; }
+    .glossary-def { font-size: 0.875rem; color: var(--off-white); padding: 1rem 1.25rem; line-height: 1.6; }
+    .sop-header { background: rgba(124,74,247,0.07); border: 1px solid rgba(124,74,247,0.2); border-radius: 8px; padding: 1.5rem 1.75rem; margin-bottom: 2rem; }
+    .sop-id { font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; color: #b07aff; letter-spacing: 0.15em; margin-bottom: 0.3rem; }
+    .sop-header h3 { font-size: 1.1rem; font-weight: 700; color: var(--white); margin-bottom: 0.4rem; }
+    .sop-header p { font-size: 0.85rem; color: var(--off-white); line-height: 1.6; margin: 0; }
+    .steps-list { display: flex; flex-direction: column; gap: 0.75rem; margin: 1.5rem 0; }
+    .step-card { display: flex; gap: 1.25rem; align-items: flex-start; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 1.25rem 1.5rem; transition: border-color 0.2s; }
+    .step-card:hover { border-color: rgba(124,74,247,0.3); background: rgba(124,74,247,0.03); }
+    .step-num { font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: #b07aff; font-weight: 700; min-width: 28px; margin-top: 2px; }
+    .step-body h4 { font-size: 0.95rem; font-weight: 700; margin-bottom: 0.3rem; color: var(--white); }
+    .step-body p { font-size: 0.875rem; color: var(--off-white); line-height: 1.65; margin: 0; }
+    .step-body p strong { color: var(--white); }
+    .step-body code { font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; background: rgba(255,255,255,0.06); padding: 0.1rem 0.4rem; border-radius: 3px; color: #7a9eff; }
+    .escalation-box { background: rgba(232,74,111,0.06); border: 1px solid rgba(232,74,111,0.2); border-radius: 8px; padding: 1.5rem 1.75rem; margin: 2rem 0; }
+    .escalation-box h4 { font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; color: #ff7a9a; margin-bottom: 0.75rem; }
+    .escalation-box ul { list-style: none; display: flex; flex-direction: column; gap: 0.4rem; }
+    .escalation-box ul li { font-size: 0.875rem; color: var(--off-white); padding-left: 1.25rem; position: relative; line-height: 1.6; }
+    .escalation-box ul li::before { content: '→'; position: absolute; left: 0; color: #ff7a9a; font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; }
+    .quick-ref-table { width: 100%; border-collapse: collapse; border: 1px solid rgba(255,255,255,0.07); border-radius: 8px; overflow: hidden; margin-top: 1.5rem; font-size: 0.875rem; }
+    .quick-ref-table th { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--off-white); opacity: 0.7; padding: 0.75rem 1.25rem; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.02); }
+    .quick-ref-table td { padding: 0.9rem 1.25rem; border-bottom: 1px solid rgba(255,255,255,0.05); color: var(--off-white); vertical-align: top; line-height: 1.6; }
+    .quick-ref-table td:first-child { color: var(--white); font-weight: 500; } .quick-ref-table tr:last-child td { border-bottom: none; }
+    .quick-ref-table code { font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; background: rgba(255,255,255,0.06); padding: 0.1rem 0.4rem; border-radius: 3px; color: #7a9eff; }
+    .scenario-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; overflow: hidden; margin-bottom: 1.5rem; }
+    .scenario-header { padding: 1.25rem 1.75rem; border-bottom: 1px solid rgba(255,255,255,0.06); display: flex; align-items: center; gap: 1rem; }
+    .scenario-num { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; letter-spacing: 0.15em; color: #ff7a9a; background: rgba(232,74,111,0.1); border: 1px solid rgba(232,74,111,0.2); padding: 0.25rem 0.6rem; border-radius: 20px; flex-shrink: 0; }
+    .scenario-header h4 { font-size: 1rem; font-weight: 700; letter-spacing: -0.01em; }
+    .scenario-body { padding: 1.5rem 1.75rem; }
+    .scenario-situation { font-size: 0.925rem; color: var(--off-white); line-height: 1.75; font-style: italic; margin-bottom: 1.25rem; padding-bottom: 1.25rem; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .scenario-tasks h5 { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.75rem; }
+    .task-list { list-style: none; display: flex; flex-direction: column; gap: 0.6rem; }
+    .task-list li { display: flex; gap: 0.75rem; font-size: 0.875rem; color: var(--off-white); line-height: 1.6; }
+    .task-list li .task-num { font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; color: #ff7a9a; font-weight: 700; flex-shrink: 0; margin-top: 2px; width: 18px; }
+    .doc-table { width: 100%; border-collapse: collapse; margin: 1.25rem 0; font-size: 0.875rem; }
+    .doc-table th { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--off-white); opacity: 0.6; padding: 0.75rem 1.25rem; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.02); }
+    .doc-table td { padding: 0.9rem 1.25rem; border-bottom: 1px solid rgba(255,255,255,0.05); color: var(--off-white); vertical-align: top; }
+    .doc-table td:first-child { color: var(--white); font-weight: 500; width: 180px; } .doc-table tr:last-child td { border-bottom: none; }
+    .doc-input-line { display: block; width: 100%; border: none; border-bottom: 1px dashed rgba(255,255,255,0.15); background: transparent; color: var(--white); font-family: 'DM Sans', sans-serif; font-size: 0.875rem; padding: 0.3rem 0; outline: none; transition: border-color 0.2s; }
+    .doc-input-line:focus { border-bottom-color: var(--accent); }
+    .doc-input-line::placeholder { color: rgba(255,255,255,0.15); font-style: italic; }
+    .interview-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; overflow: hidden; margin-bottom: 1.25rem; }
+    .interview-q { padding: 1.25rem 1.75rem; border-bottom: 1px solid rgba(255,255,255,0.06); background: rgba(255,255,255,0.02); }
+    .interview-q-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.4rem; }
+    .interview-q p { font-size: 0.95rem; font-weight: 600; color: var(--white); font-style: italic; margin: 0; line-height: 1.5; }
+    .interview-a { padding: 1.25rem 1.75rem; }
+    .interview-a-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; color: #ff7a9a; margin-bottom: 0.5rem; }
+    .interview-a p { font-size: 0.875rem; color: var(--off-white); line-height: 1.75; margin: 0; }
+    .interview-a strong { color: var(--white); }
+    .checklist { display: flex; flex-direction: column; gap: 0.6rem; margin-top: 1.25rem; }
+    .check-item { display: flex; align-items: flex-start; gap: 0.75rem; font-size: 0.9rem; color: var(--off-white); line-height: 1.6; }
+    .check-box { width: 20px; height: 20px; border: 1.5px solid rgba(255,255,255,0.2); border-radius: 4px; flex-shrink: 0; margin-top: 2px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; }
+    .check-box.checked { background: var(--green); border-color: var(--green); color: white; }
+    .next-modules { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-top: 1.5rem; }
+    .next-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.07); border-radius: 8px; padding: 1.5rem; text-decoration: none; color: inherit; transition: all 0.2s; display: block; }
+    .next-card:hover { border-color: rgba(74,108,247,0.3); background: rgba(74,108,247,0.05); transform: translateY(-2px); }
+    .next-card .next-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; letter-spacing: 0.15em; color: var(--accent); margin-bottom: 0.4rem; }
+    .next-card h4 { font-size: 0.95rem; font-weight: 700; margin-bottom: 0.3rem; }
+    .next-card p { font-size: 0.8rem; color: var(--off-white); margin: 0; }
+    .page-nav { padding: 3rem 0 5rem; border-top: 1px solid rgba(255,255,255,0.06); display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+    .page-nav-back { font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; letter-spacing: 0.08em; color: var(--off-white); text-decoration: none; transition: color 0.2s; }
+    .page-nav-back:hover { color: var(--accent); }
+    .page-nav-next { background: var(--accent); color: var(--white); padding: 0.75rem 1.75rem; border-radius: 4px; text-decoration: none; font-weight: 500; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 0.5rem; transition: background 0.2s, transform 0.2s; border: none; cursor: pointer; }
+    .page-nav-next:hover { background: #3a5ce0; transform: translateY(-1px); }
+    .section-divider { height: 1px; background: rgba(255,255,255,0.06); margin: 2.5rem 0; }
+    footer { border-top: 1px solid rgba(255,255,255,0.06); padding: 3rem 4rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
+    .footer-copy { font-size: 0.8rem; color: var(--off-white); opacity: 0.5; }
+    .footer-links { display: flex; gap: 2rem; list-style: none; }
+    .footer-links a { font-size: 0.8rem; color: var(--off-white); opacity: 0.5; text-decoration: none; transition: opacity 0.2s; }
+    .footer-links a:hover { opacity: 1; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+    .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.6s ease, transform 0.6s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    @media (max-width: 900px) {
+      nav { padding: 1rem 1.5rem; } .nav-links { display: none; }
+      .page-wrap { padding: 0 1.25rem; } .module-header { padding: 7rem 0 2.5rem; }
+      .next-modules { grid-template-columns: 1fr; }
+      .glossary-row { grid-template-columns: 1fr; } .glossary-term { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.05); }
+      footer { padding: 2rem 1.5rem; flex-direction: column; align-items: flex-start; }
+      .phase-nav { width: 100%; } .phase-tab { flex: 1; text-align: center; font-size: 0.65rem; padding: 0.6rem 0.75rem; }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="../index.html" class="nav-logo">
+      <svg class="nav-logo-heart" viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M48 82C48 82 12 58 12 34C12 22.954 20.954 14 32 14C38.627 14 44.51 17.168 48 22.08C51.49 17.168 57.373 14 64 14C75.046 14 84 22.954 84 34C84 58 48 82 48 82Z" fill="#e84a6f" opacity="0.9"/>
+        <path d="M48 82C48 82 12 58 12 34C12 22.954 20.954 14 32 14C38.627 14 44.51 17.168 48 22.08" fill="#c73d5c"/>
+      </svg>
+      <span class="nav-logo-text">the rarest <span>heart</span></span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../learn.html" class="active">Learn IT</a></li>
+      <li><a href="../do.html">Do IT</a></li>
+      <li><a href="../apply.html">Apply IT</a></li>
+      <li><a href="../topics.html">Topics</a></li>
+      <li><a href="../members.html">My Progress</a></li>
+      <li><a href="../contact.html" class="nav-cta">Contact</a></li>
+    </ul>
+  </nav>
+
+  <section class="module-header">
+    <div class="module-header-glow"></div>
+    <div class="page-wrap module-header-inner">
+      <div class="breadcrumb">
+        <a href="../index.html">Home</a><span class="breadcrumb-sep">/</span>
+        <a href="../learn.html">Learn IT</a><span class="breadcrumb-sep">/</span>
+        <span>Module 04</span>
+      </div>
+      <div class="module-eyebrow">Tier 1 · SOP-004 · Module 04 of 09</div>
+      <h1 class="module-title">Printer <em>Troubleshooting</em></h1>
+      <p class="module-desc">Resolve print queue jams, driver conflicts, and connectivity failures. Printers are one of the most common help desk tickets — learn the system that clears them fast.</p>
+      <div class="module-chips">
+        <span class="chip chip-blue">Tier 1 — Help Desk</span>
+        <span class="chip chip-gray">SOP-004</span>
+        <span class="chip chip-green">Beginner</span>
+        <span class="chip chip-gray">Print Management</span>
+      </div>
+      <div class="phase-nav">
+        <button class="phase-tab p1 active" onclick="switchPhase('p1', this)">01 · Learn IT</button>
+        <button class="phase-tab p2" onclick="switchPhase('p2', this)">02 · Do IT</button>
+        <button class="phase-tab p3" onclick="switchPhase('p3', this)">03 · Apply IT</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- PHASE 1 -->
+  <div id="panel-p1" class="phase-panel active">
+    <div class="page-wrap">
+      <div class="phase-banner p1">
+        <div class="phase-banner-icon">🖨️</div>
+        <div class="phase-banner-text">
+          <h3>Phase 1 — Learn IT</h3>
+          <p>Understand how printing works end-to-end so you can isolate failures instead of guessing.</p>
+        </div>
+      </div>
+
+      <div class="content-block reveal">
+        <div class="content-label">Foundation</div>
+        <h2>How Printing Actually Works</h2>
+        <p>When a user prints a document, it travels through a specific chain: application → print driver → print spooler → network/USB → printer. Problems can occur at any link. Most Tier 1 printer issues are caused by a <strong>stuck print queue</strong>, a <strong>missing or wrong driver</strong>, or a <strong>connectivity problem</strong>.</p>
+        <p>The print spooler is a Windows service that queues print jobs and manages communication with printers. When it crashes or a job gets stuck, nothing can print until you clear it manually.</p>
+
+        <table class="trh-table">
+          <thead><tr><th>Component</th><th>What It Does</th><th>Failure Symptom</th></tr></thead>
+          <tbody>
+            <tr><td>Print Driver</td><td>Translates document data into printer language (PCL/PostScript)</td><td>Garbled output, missing driver error</td></tr>
+            <tr><td>Print Spooler</td><td>Queues jobs and sends them to the printer in order</td><td>Jobs stuck in queue, nothing prints</td></tr>
+            <tr><td>Print Queue</td><td>Holds jobs waiting to be processed</td><td>Jobs show as "Error" or "Deleting"</td></tr>
+            <tr><td>Network Connection</td><td>Path from PC to network printer (TCP/IP port)</td><td>"Printer offline", cannot ping printer IP</td></tr>
+            <tr><td>Printer Hardware</td><td>Physical printing mechanism, paper handling</td><td>Paper jams, low ink/toner, hardware error lights</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="content-block reveal">
+        <div class="content-label">Common Issues</div>
+        <h2>Most Frequent Printer Problems</h2>
+        <table class="trh-table">
+          <thead><tr><th>Problem</th><th>Likely Cause</th><th>First Step</th></tr></thead>
+          <tbody>
+            <tr><td>Printer shows offline</td><td>Network issue or spooler stuck</td><td>Check IP, ping printer, restart spooler</td></tr>
+            <tr><td>Job stuck in queue</td><td>Corrupt print job or crashed spooler</td><td>Stop spooler, delete queue files, restart</td></tr>
+            <tr><td>Prints garbled/garbage characters</td><td>Wrong or corrupt driver</td><td>Remove and reinstall correct driver</td></tr>
+            <tr><td>Can't find printer on network</td><td>IP changed or printer not mapped</td><td>Add printer by IP address manually</td></tr>
+            <tr><td>Printer not in "Devices"</td><td>Not installed on this PC</td><td>Add printer via Settings or by IP/hostname</td></tr>
+            <tr><td>Only prints half the page</td><td>Driver mismatch, memory issue</td><td>Reinstall driver; check print settings</td></tr>
+            <tr><td>Paper jam reported but no paper visible</td><td>Small torn piece lodged inside</td><td>Open all access panels, use light to inspect rollers</td></tr>
+          </tbody>
+        </table>
+
+        <div class="callout-warning">
+          <div class="callout-warning-icon">⚠️</div>
+          <div class="callout-warning-body">
+            <h4>Never Delete a Stuck Job From the UI Alone</h4>
+            <p>Right-clicking and selecting "Cancel" or "Delete" in the print queue often doesn't work for stuck jobs. The spooler service must be stopped first, the queue files deleted from the filesystem, then the spooler restarted. Skipping the service stop leaves the file locked and the job stays.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="content-block reveal">
+        <div class="content-label">Key Knowledge</div>
+        <h2>The Print Spooler Service</h2>
+        <p>The Print Spooler (<code>spoolsv.exe</code>) is a Windows service that must be running for any printing to occur. Stuck jobs live in <code>C:\Windows\System32\spool\PRINTERS\</code> as .SHD and .SPL files. Deleting these files while the spooler is stopped clears the queue completely.</p>
+
+        <div class="callout-info">
+          <div class="callout-info-icon">💡</div>
+          <div class="callout-info-body">
+            <h4>The Nuclear Option: Clear the Spooler</h4>
+            <p>1. Open Services (services.msc) → Stop "Print Spooler" · 2. Navigate to C:\Windows\System32\spool\PRINTERS\ · 3. Delete all files inside (not the folder itself) · 4. Return to Services → Start "Print Spooler" · 5. Test print. This resolves virtually every stuck queue issue.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="content-block reveal">
+        <div class="content-label">Glossary</div>
+        <h2>Key Terms</h2>
+        <div class="glossary-grid">
+          <div class="glossary-row"><div class="glossary-term">Print Spooler</div><div class="glossary-def">Windows service (spoolsv.exe) that manages the print queue and sends jobs to the printer. Must be running for any printing to work.</div></div>
+          <div class="glossary-row"><div class="glossary-term">PCL</div><div class="glossary-def">Printer Command Language — HP's page description language used by most laser printers. Drivers that use PCL translate documents into printer-readable code.</div></div>
+          <div class="glossary-row"><div class="glossary-term">PostScript</div><div class="glossary-def">Adobe's page description language. Used heavily in graphic design and publishing workflows. More accurate for complex graphics than PCL.</div></div>
+          <div class="glossary-row"><div class="glossary-term">TCP/IP Port</div><div class="glossary-def">The network address assigned to a printer for communication. You create a TCP/IP port when adding a printer by IP address manually.</div></div>
+          <div class="glossary-row"><div class="glossary-term">UNC Path</div><div class="glossary-def">Universal Naming Convention path to a shared printer (e.g., \\servername\printername). Used to map network printers from a print server.</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 2 -->
+  <div id="panel-p2" class="phase-panel">
+    <div class="page-wrap">
+      <div class="phase-banner p2">
+        <div class="phase-banner-icon">📋</div>
+        <div class="phase-banner-text">
+          <h3>Phase 2 — Do IT</h3>
+          <p>Execute SOP-004. Follow the procedure exactly. Document all steps in your ticket.</p>
+        </div>
+      </div>
+
+      <div class="sop-header">
+        <div class="sop-id">SOP-004 · PRINTER TROUBLESHOOTING · REV 1.0</div>
+        <h3>Printer Issue Resolution</h3>
+        <p>Use this procedure for any ticket where a user cannot print, the printer shows offline, or jobs are stuck in the queue. Always verify the physical printer status before touching software.</p>
+      </div>
+
+      <div class="steps-list">
+        <div class="step-card">
+          <div class="step-num">01</div>
+          <div class="step-body">
+            <h4>Check Physical Printer Status</h4>
+            <p>Walk to the printer (or ask the user remotely). Is it powered on? Do any error lights appear on the control panel? Is there a paper jam? Check the paper tray and all access panels. Clear any jam before proceeding — software troubleshooting won't fix a hardware jam.</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">02</div>
+          <div class="step-body">
+            <h4>Verify Printer Connectivity</h4>
+            <p>For <strong>network printers</strong>: find the printer's IP (print a configuration page from the printer's control panel). Open Command Prompt and run <code>ping [printer IP]</code>. If no response, the printer is offline on the network — check its cable or wireless connection. For <strong>USB printers</strong>: check both ends of the USB cable and try a different USB port.</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">03</div>
+          <div class="step-body">
+            <h4>Check the Print Queue for Stuck Jobs</h4>
+            <p>Go to <strong>Settings → Bluetooth &amp; devices → Printers &amp; scanners</strong>. Select the printer → <strong>Open print queue</strong>. If any jobs show status "Error", "Deleting", or have been stuck for more than a minute, the queue needs to be cleared manually (see Step 4).</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">04</div>
+          <div class="step-body">
+            <h4>Clear the Print Spooler</h4>
+            <p>Press <strong>Win+R</strong> → type <code>services.msc</code> → find <strong>Print Spooler</strong> → right-click → <strong>Stop</strong>. Open File Explorer and navigate to <code>C:\Windows\System32\spool\PRINTERS\</code>. Delete all files inside this folder (do not delete the folder). Return to services.msc → right-click Print Spooler → <strong>Start</strong>. Open the print queue and confirm it is empty.</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">05</div>
+          <div class="step-body">
+            <h4>Test Print and Verify Printer Status</h4>
+            <p>After clearing the queue, send a test print. Go to printer settings → <strong>Print a test page</strong>. Confirm the printer status shows "Ready" (not "Offline"). If the printer still shows offline, right-click the printer in settings → <strong>See what's printing</strong> → Printer menu → uncheck <strong>Use Printer Offline</strong>.</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">06</div>
+          <div class="step-body">
+            <h4>Remove and Reinstall Printer Driver</h4>
+            <p>If test print produces garbled output or driver errors persist: go to <strong>Settings → Printers &amp; scanners</strong> → select printer → <strong>Remove device</strong>. Open <strong>Print Management</strong> (printmanagement.msc) → <strong>Drivers</strong> → remove the old driver. Re-add the printer by IP or UNC path and let Windows install the correct driver, or download from the OEM website.</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">07</div>
+          <div class="step-body">
+            <h4>Add Printer Manually by IP if Not Found</h4>
+            <p>Go to <strong>Settings → Printers &amp; scanners → Add a printer or scanner</strong>. If the printer doesn't appear: click <strong>"The printer that I want isn't listed"</strong> → <strong>Add a printer using a TCP/IP address or hostname</strong> → enter the printer's IP address. Windows will detect the model and install the driver automatically if connected to the internet.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="escalation-box">
+        <h4>Escalate to Tier 2 When</h4>
+        <ul>
+          <li>Printer hardware shows mechanical error or error codes not cleared by power cycle</li>
+          <li>Driver reinstall does not resolve garbled or blank output</li>
+          <li>Network printer unreachable despite confirmed network access (may need static IP or DHCP reservation)</li>
+          <li>Print server issues affecting all users mapped to that server</li>
+          <li>User requires changes to shared printer permissions</li>
+        </ul>
+      </div>
+
+      <div class="content-block">
+        <div class="content-label">Quick Reference</div>
+        <h2>Printer Troubleshooting Cheat Sheet</h2>
+        <table class="quick-ref-table">
+          <thead><tr><th>Problem</th><th>Fix</th></tr></thead>
+          <tbody>
+            <tr><td>Job stuck in queue</td><td>Stop spooler → delete PRINTERS folder contents → start spooler</td></tr>
+            <tr><td>Printer shows "Offline"</td><td>Uncheck "Use Printer Offline" in Printer menu; ping the IP</td></tr>
+            <tr><td>Garbled/garbage output</td><td>Remove printer, delete driver, reinstall correct driver</td></tr>
+            <tr><td>Can't find printer on network</td><td>Add by TCP/IP address manually</td></tr>
+            <tr><td>Paper jam cleared but still errors</td><td>Open all panels, check for torn paper scraps near rollers</td></tr>
+            <tr><td>Spooler won't start</td><td>Run <code>sfc /scannow</code> as admin; check Event Viewer for spooler errors</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 3 -->
+  <div id="panel-p3" class="phase-panel">
+    <div class="page-wrap">
+      <div class="phase-banner p3">
+        <div class="phase-banner-icon">🎯</div>
+        <div class="phase-banner-text">
+          <h3>Phase 3 — Apply IT</h3>
+          <p>Work through real help desk scenarios and prepare your interview answers.</p>
+        </div>
+      </div>
+
+      <div class="content-block reveal">
+        <div class="content-label">Scenarios</div>
+        <h2>Practice Tickets</h2>
+
+        <div class="scenario-card">
+          <div class="scenario-header"><span class="scenario-num">SCENARIO 01</span><h4>The Stuck Queue</h4></div>
+          <div class="scenario-body">
+            <div class="scenario-situation">"My print job has been 'deleting' for 20 minutes. I've tried cancelling it but it won't go away. Nothing else can print either."</div>
+            <div class="scenario-tasks">
+              <h5>Your Tasks</h5>
+              <ul class="task-list">
+                <li><span class="task-num">1.</span>Why does the cancel button not work for stuck jobs?</li>
+                <li><span class="task-num">2.</span>What service do you stop first and how do you get there?</li>
+                <li><span class="task-num">3.</span>What exact path do you navigate to and what do you delete?</li>
+                <li><span class="task-num">4.</span>After clearing the queue, how do you verify the fix worked before the user tries again?</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="scenario-card">
+          <div class="scenario-header"><span class="scenario-num">SCENARIO 02</span><h4>Offline Network Printer</h4></div>
+          <div class="scenario-body">
+            <div class="scenario-situation">"The HP LaserJet on the 2nd floor is showing as offline on my computer. My colleague on the same floor can print fine."</div>
+            <div class="scenario-tasks">
+              <h5>Your Tasks</h5>
+              <ul class="task-list">
+                <li><span class="task-num">1.</span>The fact that your colleague can print means what about the printer itself?</li>
+                <li><span class="task-num">2.</span>What Windows setting do you check first on the affected machine?</li>
+                <li><span class="task-num">3.</span>You confirm "Use Printer Offline" was checked. You uncheck it, but after a minute it goes offline again. What do you check next?</li>
+                <li><span class="task-num">4.</span>The printer's IP recently changed. How do you remove the old port and add the correct IP?</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="scenario-card">
+          <div class="scenario-header"><span class="scenario-num">SCENARIO 03</span><h4>Garbled Print Output</h4></div>
+          <div class="scenario-body">
+            <div class="scenario-situation">"Every time I print, it comes out as a page full of random symbols and characters. It was working yesterday. I haven't installed anything new."</div>
+            <div class="scenario-tasks">
+              <h5>Your Tasks</h5>
+              <ul class="task-list">
+                <li><span class="task-num">1.</span>What does garbled/random character output tell you about the problem layer?</li>
+                <li><span class="task-num">2.</span>Walk through the steps to completely remove and reinstall the printer driver.</li>
+                <li><span class="task-num">3.</span>Where do you find the correct driver if Windows can't auto-install it?</li>
+                <li><span class="task-num">4.</span>After reinstalling, the output is still garbled. What do you escalate and what information do you include?</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="content-block reveal">
+        <div class="content-label">Ticket Practice</div>
+        <h2>Document Your Resolution</h2>
+        <table class="doc-table">
+          <thead><tr><th>Field</th><th>Your Entry</th></tr></thead>
+          <tbody>
+            <tr><td>User Reported</td><td><input class="doc-input-line" placeholder="Describe the complaint..." /></td></tr>
+            <tr><td>Initial Findings</td><td><input class="doc-input-line" placeholder="What did you observe?" /></td></tr>
+            <tr><td>Root Cause</td><td><input class="doc-input-line" placeholder="Stuck spooler / driver issue / etc." /></td></tr>
+            <tr><td>Steps Taken</td><td><input class="doc-input-line" placeholder="Steps you executed in order..." /></td></tr>
+            <tr><td>Resolution</td><td><input class="doc-input-line" placeholder="What fixed it?" /></td></tr>
+            <tr><td>Verification</td><td><input class="doc-input-line" placeholder="How did you confirm resolution?" /></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="content-block reveal">
+        <div class="content-label">Interview Prep</div>
+        <h2>Questions You'll Face</h2>
+
+        <div class="interview-card">
+          <div class="interview-q"><div class="interview-q-label">Interview Question 01</div><p>"A user says their print job is stuck and won't delete. How do you fix it?"</p></div>
+          <div class="interview-a">
+            <div class="interview-a-label">Strong Answer Framework</div>
+            <p>Stuck print jobs can't be deleted through the UI because <strong>the Print Spooler service holds the file lock</strong>. I open services.msc and stop the Print Spooler service first. Then I navigate to <code>C:\Windows\System32\spool\PRINTERS\</code> and delete all the .SHD and .SPL files inside — those are the queued job files. I leave the folder itself intact, then restart the Print Spooler service. The queue is now empty and printing should resume normally. I confirm with a test page.</p>
+          </div>
+        </div>
+
+        <div class="interview-card">
+          <div class="interview-q"><div class="interview-q-label">Interview Question 02</div><p>"How do you add a network printer when it doesn't show up in the discovery list?"</p></div>
+          <div class="interview-a">
+            <div class="interview-a-label">Strong Answer Framework</div>
+            <p>When a printer doesn't appear automatically, I add it manually by IP address. I go to <strong>Settings → Printers &amp; scanners → Add</strong>, click "The printer I want isn't listed," then choose <strong>Add a printer using a TCP/IP address</strong>. I need the printer's IP — I get this by printing a configuration page directly from the printer's control panel, or by asking the network team. Windows creates a TCP/IP port and attempts to auto-detect the model. If the driver isn't found automatically, I download it from the manufacturer's website using the printer's model number.</p>
+          </div>
+        </div>
+
+        <div class="interview-card">
+          <div class="interview-q"><div class="interview-q-label">Interview Question 03</div><p>"What is the Print Spooler and why does it matter for troubleshooting?"</p></div>
+          <div class="interview-a">
+            <div class="interview-a-label">Strong Answer Framework</div>
+            <p>The Print Spooler is a <strong>Windows service (spoolsv.exe) that manages the print queue</strong> — it receives print jobs, stores them temporarily, and sends them to the printer. It acts as a buffer between applications and printers so a user doesn't have to wait for the printer to finish before they can keep working. For troubleshooting, it matters because if the spooler crashes or a job gets corrupt, nothing can print until you clear the queue. You also can't delete stuck jobs without stopping the spooler first because it holds the file lock on the queued job files.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="content-block reveal">
+        <div class="content-label">Module Completion</div>
+        <h2>Completion Checklist</h2>
+        <div class="checklist">
+          <div class="check-item"><div class="check-box" onclick="this.classList.toggle('checked'); this.textContent = this.classList.contains('checked') ? '✓' : ''"></div><span>I understand the print path from application through spooler to printer</span></div>
+          <div class="check-item"><div class="check-box" onclick="this.classList.toggle('checked'); this.textContent = this.classList.contains('checked') ? '✓' : ''"></div><span>I can clear a stuck print queue by stopping the spooler and deleting PRINTERS folder files</span></div>
+          <div class="check-item"><div class="check-box" onclick="this.classList.toggle('checked'); this.textContent = this.classList.contains('checked') ? '✓' : ''"></div><span>I know how to remove and reinstall a printer driver completely</span></div>
+          <div class="check-item"><div class="check-box" onclick="this.classList.toggle('checked'); this.textContent = this.classList.contains('checked') ? '✓' : ''"></div><span>I can add a network printer manually by IP address</span></div>
+          <div class="check-item"><div class="check-box" onclick="this.classList.toggle('checked'); this.textContent = this.classList.contains('checked') ? '✓' : ''"></div><span>I know the difference between PCL and PostScript drivers</span></div>
+          <div class="check-item"><div class="check-box" onclick="this.classList.toggle('checked'); this.textContent = this.classList.contains('checked') ? '✓' : ''"></div><span>I completed all three scenarios and wrote a full ticket for at least one</span></div>
+        </div>
+
+        <div class="section-divider"></div>
+        <div class="content-label">Up Next</div>
+        <h2>Continue Your Training</h2>
+        <div class="next-modules">
+          <a href="03-wifi-connectivity.html" class="next-card">
+            <div class="next-label">← Previous Module</div>
+            <h4>Module 03 — Wi-Fi Connectivity</h4>
+            <p>ipconfig, ping, DNS, SOP-003</p>
+          </a>
+          <a href="05-cabling.html" class="next-card">
+            <div class="next-label">Next Module →</div>
+            <h4>Module 05 — Cabling &amp; Physical Layer</h4>
+            <p>Cable types, crimping, SOP-005</p>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-wrap">
+    <div class="page-nav">
+      <a href="../learn.html" class="page-nav-back">← Back to Learn IT</a>
+      <a href="05-cabling.html" class="page-nav-next">Next Module →</a>
+    </div>
+  </div>
+
+  <div class="page-wrap" style="padding-bottom:1.5rem;">
+    <div id="complete-block" style="padding:1.5rem;background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.2);border-radius:10px;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;">
+      <div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:#4ade80;margin-bottom:0.3rem;">Module 04 · SOP-004</div>
+        <div style="font-weight:600;font-size:0.95rem;" id="complete-msg">Finished all three phases? Mark this module complete.</div>
+      </div>
+      <button id="btn-complete" onclick="markThisComplete()" style="font-family:'IBM Plex Mono',monospace;font-size:0.7rem;letter-spacing:0.08em;padding:0.6rem 1.25rem;border-radius:6px;background:#22c55e;color:#07081a;border:none;cursor:pointer;font-weight:500;">Mark Complete ✓</button>
+    </div>
+  </div>
+
+  <footer>
+    <span class="footer-copy">© 2025 The Rarest Heart. Built for IT learners.</span>
+    <ul class="footer-links">
+      <li><a href="../sops.html">SOPs</a></li>
+      <li><a href="../labs.html">Labs</a></li>
+      <li><a href="../contact.html">Contact</a></li>
+    </ul>
+  </footer>
+
+  <script src="../js/progress.js"></script>
+  <script>
+    const MODULE_ID = 'm04';
+    function initProgress() { if (typeof trhMarkInProgress==='function') { trhMarkInProgress(MODULE_ID); if (trhGetStatus(MODULE_ID)==='complete') showCompleted(); } }
+    function markThisComplete() { if (typeof trhMarkComplete==='function') trhMarkComplete(MODULE_ID); showCompleted(); }
+    function showCompleted() { document.getElementById('complete-msg').textContent='✓ Module 04 marked complete. Great work.'; const b=document.getElementById('btn-complete'); b.textContent='✓ Complete'; b.style.background='rgba(34,197,94,0.15)'; b.style.color='#4ade80'; b.style.border='1px solid rgba(34,197,94,0.3)'; b.disabled=true; }
+    document.addEventListener('DOMContentLoaded', initProgress);
+    function switchPhase(phase, btn) {
+      document.querySelectorAll('.phase-panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.phase-tab').forEach(t => t.classList.remove('active'));
+      document.getElementById('panel-' + phase).classList.add('active');
+      btn.classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      setTimeout(triggerReveals, 100);
+    }
+    function triggerReveals() {
+      const reveals = document.querySelectorAll('.reveal');
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add('visible'); observer.unobserve(entry.target); } });
+      }, { threshold: 0.1 });
+      reveals.forEach(el => { if (!el.classList.contains('visible')) observer.observe(el); });
+    }
+    document.addEventListener('DOMContentLoaded', triggerReveals);
+  </script>
+</body>
+</html>

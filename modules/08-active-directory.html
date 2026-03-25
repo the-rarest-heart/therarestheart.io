@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Module 08 — Active Directory User Support | The Rarest Heart</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet" />
+  <style>
+    :root { --navy: #07081a; --navy-mid: #0d0f28; --navy-light: #131535; --white: #f4f4f0; --off-white: #c8c8c4; --accent: #4a6cf7; --accent-glow: rgba(74,108,247,0.25); --pulse: #e84a6f; --tier2: #7c4af7; --phase1: #4a6cf7; --phase2: #7c4af7; --phase3: #e84a6f; --green: #22c55e; --amber: #f59e0b; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { background-color: var(--navy); color: var(--white); font-family: 'DM Sans', sans-serif; font-weight: 300; line-height: 1.7; overflow-x: hidden; }
+    body::before { content: ''; position: fixed; inset: 0; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E"); pointer-events: none; z-index: 0; opacity: 0.4; }
+    h1, h2, h3, h4 { font-family: 'Syne', sans-serif; line-height: 1.15; }
+    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; padding: 1.25rem 4rem; display: flex; align-items: center; justify-content: space-between; background: rgba(7,8,26,0.85); backdrop-filter: blur(16px); border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .nav-logo { display: flex; align-items: center; gap: 0.75rem; text-decoration: none; }
+    .nav-logo-heart { width: 96px; height: 96px; }
+    .nav-logo-text { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.3rem; color: var(--white); letter-spacing: -0.02em; }
+    .nav-logo-text span { color: var(--pulse); }
+    .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+    .nav-links a { color: var(--off-white); text-decoration: none; font-size: 0.875rem; font-weight: 400; letter-spacing: 0.02em; transition: color 0.2s; position: relative; }
+    .nav-links a::after { content: ''; position: absolute; bottom: -4px; left: 0; width: 0; height: 1px; background: var(--accent); transition: width 0.3s; }
+    .nav-links a:hover { color: var(--white); } .nav-links a:hover::after { width: 100%; }
+    .nav-links a.active { color: var(--white); } .nav-links a.active::after { width: 100%; }
+    .nav-cta { background: var(--accent); color: var(--white) !important; padding: 0.5rem 1.25rem; border-radius: 4px; font-weight: 500 !important; }
+    .nav-cta::after { display: none !important; } .nav-cta:hover { background: #3a5ce0 !important; }
+    section { position: relative; z-index: 1; }
+    .page-wrap { max-width: 860px; margin: 0 auto; padding: 0 2rem; }
+    .module-header { padding: 8rem 0 3.5rem; border-bottom: 1px solid rgba(255,255,255,0.06); position: relative; overflow: hidden; }
+    .module-header-glow { position: absolute; width: 500px; height: 500px; border-radius: 50%; background: radial-gradient(circle, rgba(124,74,247,0.2) 0%, transparent 70%); top: -150px; right: -100px; pointer-events: none; }
+    .module-header-inner { position: relative; z-index: 1; }
+    .breadcrumb { display: flex; align-items: center; gap: 0.5rem; font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; letter-spacing: 0.1em; color: var(--off-white); opacity: 0.5; margin-bottom: 1.75rem; }
+    .breadcrumb a { color: var(--off-white); text-decoration: none; } .breadcrumb a:hover { color: var(--accent); opacity: 1; } .breadcrumb-sep { opacity: 0.4; }
+    .module-eyebrow { font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; color: #b07aff; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.75rem; opacity: 0; animation: fadeUp 0.7s ease forwards 0.1s; }
+    .module-eyebrow::before { content: ''; display: inline-block; width: 24px; height: 1px; background: #b07aff; }
+    .module-title { font-size: clamp(2.2rem, 5vw, 3.5rem); font-weight: 800; letter-spacing: -0.03em; margin-bottom: 1rem; opacity: 0; animation: fadeUp 0.7s ease forwards 0.25s; }
+    .module-title em { font-style: normal; color: var(--pulse); position: relative; }
+    .module-title em::after { content: ''; position: absolute; bottom: 3px; left: 0; right: 0; height: 3px; background: var(--pulse); opacity: 0.4; border-radius: 2px; }
+    .module-desc { font-size: 1.05rem; color: var(--off-white); max-width: 560px; font-weight: 300; line-height: 1.7; margin-bottom: 2rem; opacity: 0; animation: fadeUp 0.7s ease forwards 0.4s; }
+    .module-chips { display: flex; gap: 0.6rem; flex-wrap: wrap; opacity: 0; animation: fadeUp 0.7s ease forwards 0.55s; }
+    .chip { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.3rem 0.75rem; border-radius: 20px; }
+    .chip-purple { background: rgba(124,74,247,0.12); color: #b07aff; border: 1px solid rgba(124,74,247,0.25); }
+    .chip-gray { background: rgba(255,255,255,0.05); color: var(--off-white); border: 1px solid rgba(255,255,255,0.1); }
+    .phase-nav { display: flex; gap: 0; margin-top: 2.5rem; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 8px; padding: 4px; width: fit-content; opacity: 0; animation: fadeUp 0.7s ease forwards 0.7s; }
+    .phase-tab { font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.6rem 1.4rem; border-radius: 5px; cursor: pointer; transition: all 0.2s; color: var(--off-white); border: none; background: transparent; font-weight: 500; }
+    .phase-tab:hover { color: var(--white); }
+    .phase-tab.p1.active { background: var(--navy-light); color: #7a9eff; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+    .phase-tab.p2.active { background: var(--navy-light); color: #b07aff; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+    .phase-tab.p3.active { background: var(--navy-light); color: #ff7a9a; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+    .phase-panel { display: none; padding: 4rem 0 6rem; } .phase-panel.active { display: block; }
+    .phase-banner { border-radius: 10px; padding: 1.75rem 2rem; margin-bottom: 3rem; display: flex; align-items: center; gap: 1.25rem; }
+    .phase-banner.p1 { background: rgba(74,108,247,0.08); border: 1px solid rgba(74,108,247,0.2); }
+    .phase-banner.p2 { background: rgba(124,74,247,0.08); border: 1px solid rgba(124,74,247,0.2); }
+    .phase-banner.p3 { background: rgba(232,74,111,0.08); border: 1px solid rgba(232,74,111,0.2); }
+    .phase-banner-icon { font-size: 1.75rem; width: 52px; height: 52px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .p1 .phase-banner-icon { background: rgba(74,108,247,0.15); } .p2 .phase-banner-icon { background: rgba(124,74,247,0.15); } .p3 .phase-banner-icon { background: rgba(232,74,111,0.15); }
+    .phase-banner-text h3 { font-size: 1.15rem; font-weight: 800; letter-spacing: -0.01em; margin-bottom: 0.2rem; }
+    .p1 .phase-banner-text h3 { color: #7a9eff; } .p2 .phase-banner-text h3 { color: #b07aff; } .p3 .phase-banner-text h3 { color: #ff7a9a; }
+    .phase-banner-text p { font-size: 0.875rem; color: var(--off-white); font-style: italic; }
+    .content-block { margin-bottom: 3rem; }
+    .content-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.6rem; }
+    .content-block h2 { font-size: 1.5rem; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 0.75rem; }
+    .content-block p { font-size: 0.95rem; color: var(--off-white); line-height: 1.8; margin-bottom: 0.75rem; }
+    .content-block p strong { color: var(--white); font-weight: 600; }
+    .trh-table { width: 100%; border-collapse: collapse; margin: 1.25rem 0; font-size: 0.875rem; }
+    .trh-table th { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--off-white); opacity: 0.7; padding: 0.75rem 1.25rem; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.02); }
+    .trh-table td { padding: 0.9rem 1.25rem; border-bottom: 1px solid rgba(255,255,255,0.05); color: var(--off-white); vertical-align: top; line-height: 1.6; }
+    .trh-table td:first-child { color: var(--white); font-weight: 500; } .trh-table tr:last-child td { border-bottom: none; } .trh-table tr:hover td { background: rgba(255,255,255,0.02); }
+    .callout-info { background: rgba(74,108,247,0.07); border: 1px solid rgba(74,108,247,0.2); border-left: 3px solid var(--accent); border-radius: 8px; padding: 1.5rem 1.75rem; margin: 1.5rem 0; display: flex; gap: 1rem; align-items: flex-start; }
+    .callout-info-icon { font-size: 1.25rem; flex-shrink: 0; margin-top: 1px; }
+    .callout-info-body h4 { font-size: 0.95rem; font-weight: 700; color: #7a9eff; margin-bottom: 0.4rem; }
+    .callout-info-body p { font-size: 0.875rem; color: var(--off-white); line-height: 1.7; margin: 0; }
+    .callout-warning { background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.3); border-left: 3px solid #f59e0b; border-radius: 8px; padding: 1.5rem 1.75rem; margin: 1.5rem 0; display: flex; gap: 1rem; align-items: flex-start; }
+    .callout-warning-icon { font-size: 1.25rem; flex-shrink: 0; margin-top: 1px; }
+    .callout-warning-body h4 { font-size: 0.95rem; font-weight: 700; color: #fbbf24; margin-bottom: 0.4rem; }
+    .callout-warning-body p { font-size: 0.875rem; color: var(--off-white); line-height: 1.7; margin: 0; }
+    .glossary-grid { display: flex; flex-direction: column; gap: 0; border: 1px solid rgba(255,255,255,0.07); border-radius: 8px; overflow: hidden; margin-top: 1.25rem; }
+    .glossary-row { display: grid; grid-template-columns: 200px 1fr; gap: 0; border-bottom: 1px solid rgba(255,255,255,0.05); transition: background 0.2s; }
+    .glossary-row:last-child { border-bottom: none; } .glossary-row:hover { background: rgba(255,255,255,0.02); }
+    .glossary-term { font-family: 'IBM Plex Mono', monospace; font-size: 0.78rem; font-weight: 500; color: var(--accent); padding: 1rem 1.25rem; border-right: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; }
+    .glossary-def { font-size: 0.875rem; color: var(--off-white); padding: 1rem 1.25rem; line-height: 1.6; }
+    .sop-header { background: rgba(124,74,247,0.07); border: 1px solid rgba(124,74,247,0.2); border-radius: 8px; padding: 1.5rem 1.75rem; margin-bottom: 2rem; }
+    .sop-id { font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; color: #b07aff; letter-spacing: 0.15em; margin-bottom: 0.3rem; }
+    .sop-header h3 { font-size: 1.1rem; font-weight: 700; color: var(--white); margin-bottom: 0.4rem; }
+    .sop-header p { font-size: 0.85rem; color: var(--off-white); line-height: 1.6; margin: 0; }
+    .steps-list { display: flex; flex-direction: column; gap: 0.75rem; margin: 1.5rem 0; }
+    .step-card { display: flex; gap: 1.25rem; align-items: flex-start; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 1.25rem 1.5rem; transition: border-color 0.2s; }
+    .step-card:hover { border-color: rgba(124,74,247,0.3); background: rgba(124,74,247,0.03); }
+    .step-num { font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: #b07aff; font-weight: 700; min-width: 28px; margin-top: 2px; }
+    .step-body h4 { font-size: 0.95rem; font-weight: 700; margin-bottom: 0.3rem; color: var(--white); }
+    .step-body p { font-size: 0.875rem; color: var(--off-white); line-height: 1.65; margin: 0; }
+    .step-body p strong { color: var(--white); }
+    .step-body code { font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; background: rgba(255,255,255,0.06); padding: 0.1rem 0.4rem; border-radius: 3px; color: #7a9eff; }
+    .escalation-box { background: rgba(232,74,111,0.06); border: 1px solid rgba(232,74,111,0.2); border-radius: 8px; padding: 1.5rem 1.75rem; margin: 2rem 0; }
+    .escalation-box h4 { font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; color: #ff7a9a; margin-bottom: 0.75rem; }
+    .escalation-box ul { list-style: none; display: flex; flex-direction: column; gap: 0.4rem; }
+    .escalation-box ul li { font-size: 0.875rem; color: var(--off-white); padding-left: 1.25rem; position: relative; line-height: 1.6; }
+    .escalation-box ul li::before { content: '→'; position: absolute; left: 0; color: #ff7a9a; font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; }
+    .quick-ref-table { width: 100%; border-collapse: collapse; border: 1px solid rgba(255,255,255,0.07); border-radius: 8px; overflow: hidden; margin-top: 1.5rem; font-size: 0.875rem; }
+    .quick-ref-table th { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--off-white); opacity: 0.7; padding: 0.75rem 1.25rem; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.02); }
+    .quick-ref-table td { padding: 0.9rem 1.25rem; border-bottom: 1px solid rgba(255,255,255,0.05); color: var(--off-white); vertical-align: top; line-height: 1.6; }
+    .quick-ref-table td:first-child { color: var(--white); font-weight: 500; } .quick-ref-table tr:last-child td { border-bottom: none; }
+    .quick-ref-table code { font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; background: rgba(255,255,255,0.06); padding: 0.1rem 0.4rem; border-radius: 3px; color: #7a9eff; }
+    .scenario-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; overflow: hidden; margin-bottom: 1.5rem; }
+    .scenario-header { padding: 1.25rem 1.75rem; border-bottom: 1px solid rgba(255,255,255,0.06); display: flex; align-items: center; gap: 1rem; }
+    .scenario-num { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; letter-spacing: 0.15em; color: #ff7a9a; background: rgba(232,74,111,0.1); border: 1px solid rgba(232,74,111,0.2); padding: 0.25rem 0.6rem; border-radius: 20px; flex-shrink: 0; }
+    .scenario-header h4 { font-size: 1rem; font-weight: 700; letter-spacing: -0.01em; }
+    .scenario-body { padding: 1.5rem 1.75rem; }
+    .scenario-situation { font-size: 0.925rem; color: var(--off-white); line-height: 1.75; font-style: italic; margin-bottom: 1.25rem; padding-bottom: 1.25rem; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .scenario-tasks h5 { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.75rem; }
+    .task-list { list-style: none; display: flex; flex-direction: column; gap: 0.6rem; }
+    .task-list li { display: flex; gap: 0.75rem; font-size: 0.875rem; color: var(--off-white); line-height: 1.6; }
+    .task-list li .task-num { font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; color: #ff7a9a; font-weight: 700; flex-shrink: 0; margin-top: 2px; width: 18px; }
+    .doc-table { width: 100%; border-collapse: collapse; margin: 1.25rem 0; font-size: 0.875rem; }
+    .doc-table th { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--off-white); opacity: 0.6; padding: 0.75rem 1.25rem; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.02); }
+    .doc-table td { padding: 0.9rem 1.25rem; border-bottom: 1px solid rgba(255,255,255,0.05); color: var(--off-white); vertical-align: top; }
+    .doc-table td:first-child { color: var(--white); font-weight: 500; width: 180px; } .doc-table tr:last-child td { border-bottom: none; }
+    .doc-input-line { display: block; width: 100%; border: none; border-bottom: 1px dashed rgba(255,255,255,0.15); background: transparent; color: var(--white); font-family: 'DM Sans', sans-serif; font-size: 0.875rem; padding: 0.3rem 0; outline: none; transition: border-color 0.2s; }
+    .doc-input-line:focus { border-bottom-color: var(--accent); }
+    .doc-input-line::placeholder { color: rgba(255,255,255,0.15); font-style: italic; }
+    .interview-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; overflow: hidden; margin-bottom: 1.25rem; }
+    .interview-q { padding: 1.25rem 1.75rem; border-bottom: 1px solid rgba(255,255,255,0.06); background: rgba(255,255,255,0.02); }
+    .interview-q-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.4rem; }
+    .interview-q p { font-size: 0.95rem; font-weight: 600; color: var(--white); font-style: italic; margin: 0; line-height: 1.5; }
+    .interview-a { padding: 1.25rem 1.75rem; }
+    .interview-a-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; color: #ff7a9a; margin-bottom: 0.5rem; }
+    .interview-a p { font-size: 0.875rem; color: var(--off-white); line-height: 1.75; margin: 0; }
+    .interview-a strong { color: var(--white); }
+    .checklist { display: flex; flex-direction: column; gap: 0.6rem; margin-top: 1.25rem; }
+    .check-item { display: flex; align-items: flex-start; gap: 0.75rem; font-size: 0.9rem; color: var(--off-white); line-height: 1.6; }
+    .check-box { width: 20px; height: 20px; border: 1.5px solid rgba(255,255,255,0.2); border-radius: 4px; flex-shrink: 0; margin-top: 2px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; }
+    .check-box.checked { background: var(--green); border-color: var(--green); color: white; }
+    .next-modules { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-top: 1.5rem; }
+    .next-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.07); border-radius: 8px; padding: 1.5rem; text-decoration: none; color: inherit; transition: all 0.2s; display: block; }
+    .next-card:hover { border-color: rgba(74,108,247,0.3); background: rgba(74,108,247,0.05); transform: translateY(-2px); }
+    .next-card .next-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; letter-spacing: 0.15em; color: var(--accent); margin-bottom: 0.4rem; }
+    .next-card h4 { font-size: 0.95rem; font-weight: 700; margin-bottom: 0.3rem; }
+    .next-card p { font-size: 0.8rem; color: var(--off-white); margin: 0; }
+    .page-nav { padding: 3rem 0 5rem; border-top: 1px solid rgba(255,255,255,0.06); display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+    .page-nav-back { font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; letter-spacing: 0.08em; color: var(--off-white); text-decoration: none; transition: color 0.2s; }
+    .page-nav-back:hover { color: var(--accent); }
+    .page-nav-next { background: var(--accent); color: var(--white); padding: 0.75rem 1.75rem; border-radius: 4px; text-decoration: none; font-weight: 500; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 0.5rem; transition: background 0.2s, transform 0.2s; }
+    .page-nav-next:hover { background: #3a5ce0; transform: translateY(-1px); }
+    .section-divider { height: 1px; background: rgba(255,255,255,0.06); margin: 2.5rem 0; }
+    footer { border-top: 1px solid rgba(255,255,255,0.06); padding: 3rem 4rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
+    .footer-copy { font-size: 0.8rem; color: var(--off-white); opacity: 0.5; }
+    .footer-links { display: flex; gap: 2rem; list-style: none; }
+    .footer-links a { font-size: 0.8rem; color: var(--off-white); opacity: 0.5; text-decoration: none; transition: opacity 0.2s; }
+    .footer-links a:hover { opacity: 1; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+    .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.6s ease, transform 0.6s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    @media (max-width: 900px) {
+      nav { padding: 1rem 1.5rem; } .nav-links { display: none; }
+      .page-wrap { padding: 0 1.25rem; } .module-header { padding: 7rem 0 2.5rem; }
+      .next-modules { grid-template-columns: 1fr; }
+      .glossary-row { grid-template-columns: 1fr; } .glossary-term { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.05); }
+      footer { padding: 2rem 1.5rem; flex-direction: column; align-items: flex-start; }
+      .phase-nav { width: 100%; } .phase-tab { flex: 1; text-align: center; font-size: 0.65rem; padding: 0.6rem 0.75rem; }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="../index.html" class="nav-logo">
+      <svg class="nav-logo-heart" viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M48 82C48 82 12 58 12 34C12 22.954 20.954 14 32 14C38.627 14 44.51 17.168 48 22.08C51.49 17.168 57.373 14 64 14C75.046 14 84 22.954 84 34C84 58 48 82 48 82Z" fill="#e84a6f" opacity="0.9"/>
+        <path d="M48 82C48 82 12 58 12 34C12 22.954 20.954 14 32 14C38.627 14 44.51 17.168 48 22.08" fill="#c73d5c"/>
+      </svg>
+      <span class="nav-logo-text">the rarest <span>heart</span></span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../learn.html" class="active">Learn IT</a></li>
+      <li><a href="../do.html">Do IT</a></li>
+      <li><a href="../apply.html">Apply IT</a></li>
+      <li><a href="../topics.html">Topics</a></li>
+      <li><a href="../members.html">My Progress</a></li>
+      <li><a href="../contact.html" class="nav-cta">Contact</a></li>
+    </ul>
+  </nav>
+
+  <section class="module-header">
+    <div class="module-header-glow"></div>
+    <div class="page-wrap module-header-inner">
+      <div class="breadcrumb">
+        <a href="../index.html">Home</a><span class="breadcrumb-sep">/</span>
+        <a href="../learn.html">Learn IT</a><span class="breadcrumb-sep">/</span>
+        <span>Module 08</span>
+      </div>
+      <div class="module-eyebrow">Tier 2 · SOP-008 · Module 08 of 09</div>
+      <h1 class="module-title">Active Directory <em>User Support</em></h1>
+      <p class="module-desc">Create, modify, and unlock user accounts in Active Directory. Understand OUs, groups, and permissions. Every corporate IT role requires AD skills — this is non-negotiable.</p>
+      <div class="module-chips">
+        <span class="chip chip-purple">Tier 2 — IT Support</span>
+        <span class="chip chip-gray">SOP-008</span>
+        <span class="chip chip-gray">Intermediate</span>
+        <span class="chip chip-gray">Identity Management</span>
+      </div>
+      <div class="phase-nav">
+        <button class="phase-tab p1 active" onclick="switchPhase('p1', this)">01 · Learn IT</button>
+        <button class="phase-tab p2" onclick="switchPhase('p2', this)">02 · Do IT</button>
+        <button class="phase-tab p3" onclick="switchPhase('p3', this)">03 · Apply IT</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- PHASE 1 -->
+  <div id="panel-p1" class="phase-panel active">
+    <div class="page-wrap">
+      <div class="phase-banner p1">
+        <div class="phase-banner-icon">🏢</div>
+        <div class="phase-banner-text">
+          <h3>Phase 1 — Learn IT</h3>
+          <p>Understand Active Directory structure and the key tasks you'll perform as a Tier 2 IT support technician.</p>
+        </div>
+      </div>
+
+      <div class="content-block reveal">
+        <div class="content-label">Foundation</div>
+        <h2>What Is Active Directory?</h2>
+        <p>Active Directory (AD) is Microsoft's directory service for managing users, computers, groups, and policies in an enterprise network. Every corporate Windows environment uses it. As a Tier 2 tech, you'll use <strong>Active Directory Users and Computers (ADUC)</strong> to handle the majority of user account tasks.</p>
+        <p>Think of AD as the single source of truth for: who someone is, what groups they belong to, what resources they can access, and what policies apply to their computer. One account, controlled centrally.</p>
+
+        <table class="trh-table">
+          <thead><tr><th>AD Object</th><th>What It Is</th><th>Common Tasks</th></tr></thead>
+          <tbody>
+            <tr><td>User Account</td><td>Identity for a person; has username, password, attributes</td><td>Create, disable, unlock, reset password, modify attributes</td></tr>
+            <tr><td>Computer Account</td><td>Represents a domain-joined machine</td><td>Move to correct OU; disable when decommissioned</td></tr>
+            <tr><td>Security Group</td><td>Collection of users; used to assign permissions</td><td>Add/remove members; determine access rights</td></tr>
+            <tr><td>Distribution Group</td><td>Email distribution list; no security permissions</td><td>Add/remove for email routing</td></tr>
+            <tr><td>OU (Org Unit)</td><td>Container to organize objects; GPOs apply at OU level</td><td>Move users to correct OU for correct GPO application</td></tr>
+            <tr><td>GPO</td><td>Group Policy Object; applies settings to users/computers</td><td>Link/unlink GPOs; troubleshoot policy application with gpresult</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="content-block reveal">
+        <div class="content-label">Common AD Tasks</div>
+        <h2>What You'll Do Every Day</h2>
+
+        <table class="trh-table">
+          <thead><tr><th>Task</th><th>When</th><th>Tool</th></tr></thead>
+          <tbody>
+            <tr><td>Unlock account</td><td>User locked out after too many bad passwords</td><td>ADUC → right-click user → Unlock Account</td></tr>
+            <tr><td>Reset password</td><td>User forgot password or security reset required</td><td>ADUC → right-click user → Reset Password</td></tr>
+            <tr><td>Create user account</td><td>New hire onboarding</td><td>ADUC → right-click OU → New → User</td></tr>
+            <tr><td>Disable account</td><td>Employee offboarding or leave of absence</td><td>ADUC → right-click user → Disable Account</td></tr>
+            <tr><td>Add to security group</td><td>User needs access to a resource</td><td>ADUC → user Properties → Member Of → Add</td></tr>
+            <tr><td>Check account expiry</td><td>User can't log in despite correct password</td><td>ADUC → user Properties → Account tab</td></tr>
+            <tr><td>Move user to OU</td><td>Department change; incorrect GPO being applied</td><td>ADUC → right-click user → Move</td></tr>
+          </tbody>
+        </table>
+
+        <div class="callout-warning">
+          <div class="callout-warning-icon">⚠️</div>
+          <div class="callout-warning-body">
+            <h4>Always Verify Identity Before Resetting Passwords</h4>
+            <p>Before resetting any account password, verify the caller's identity using your organization's verification procedure (employee ID, manager confirmation, security questions). Social engineering attacks frequently target the help desk with requests to reset passwords for accounts the attacker doesn't own. No verification = no reset, regardless of how convincing the caller sounds.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="content-block reveal">
+        <div class="content-label">Account Lockout</div>
+        <h2>Why Accounts Lock Out</h2>
+        <p>Account lockout policies are configured in Group Policy. When a user enters the wrong password more than the configured threshold (commonly 5 attempts), the account locks. This prevents brute-force attacks but also creates a common help desk ticket.</p>
+
+        <div class="callout-info">
+          <div class="callout-info-icon">💡</div>
+          <div class="callout-info-body">
+            <h4>Common Cause: Cached Credentials on a Mobile Device</h4>
+            <p>The most frequent cause of repeated lockouts isn't the user forgetting their password — it's a phone or tablet that has the old password cached and keeps trying to authenticate against Exchange or VPN. When you unlock the account and it locks again in 10 minutes, ask the user: "Do you have email set up on your phone? When did you last change your password?" The phone is almost always the culprit.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="content-block reveal">
+        <div class="content-label">Glossary</div>
+        <h2>Key Terms</h2>
+        <div class="glossary-grid">
+          <div class="glossary-row"><div class="glossary-term">Domain Controller</div><div class="glossary-def">A server running Active Directory Domain Services (AD DS). Authenticates all logins and replicates the AD database to other DCs.</div></div>
+          <div class="glossary-row"><div class="glossary-term">SAM Account Name</div><div class="glossary-def">The legacy pre-Windows 2000 username (DOMAIN\username). Still used by many systems and is what you enter in the "User logon name (pre-Windows 2000)" field in ADUC.</div></div>
+          <div class="glossary-row"><div class="glossary-term">UPN</div><div class="glossary-def">User Principal Name. Email-style login format (user@domain.com). Used for modern authentication. Often matches the user's email address.</div></div>
+          <div class="glossary-row"><div class="glossary-term">Distinguished Name</div><div class="glossary-def">The full LDAP path to an AD object. Example: CN=John Smith,OU=Staff,DC=company,DC=com. Used in scripts and LDAP queries.</div></div>
+          <div class="glossary-row"><div class="glossary-term">ADUC</div><div class="glossary-def">Active Directory Users and Computers. The primary GUI tool for managing AD objects. Run from Server Manager, Admin Tools, or via RSAT on a workstation.</div></div>
+          <div class="glossary-row"><div class="glossary-term">RSAT</div><div class="glossary-def">Remote Server Administration Tools. Windows feature that allows admin tools (ADUC, Group Policy, DNS) to run on a workstation instead of a server.</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 2 -->
+  <div id="panel-p2" class="phase-panel">
+    <div class="page-wrap">
+      <div class="phase-banner p2">
+        <div class="phase-banner-icon">📋</div>
+        <div class="phase-banner-text">
+          <h3>Phase 2 — Do IT</h3>
+          <p>Execute SOP-008. Verify identity, follow the procedure, document everything.</p>
+        </div>
+      </div>
+
+      <div class="sop-header">
+        <div class="sop-id">SOP-008 · ACTIVE DIRECTORY USER SUPPORT · REV 1.0</div>
+        <h3>Active Directory Account Management</h3>
+        <p>Use this procedure for account lockouts, password resets, new user creation, and account modifications. Identity verification is mandatory before any account change.</p>
+      </div>
+
+      <div class="steps-list">
+        <div class="step-card">
+          <div class="step-num">01</div>
+          <div class="step-body">
+            <h4>Verify the Requester's Identity</h4>
+            <p>Before making any account change: verify identity per your organization's policy (employee ID, manager approval, challenge questions, or ticket submitted through authenticated portal). Document the verification method in your ticket. <strong>Never skip this step.</strong> For password resets, require the user to be present at their machine if possible.</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">02</div>
+          <div class="step-body">
+            <h4>Open ADUC and Locate the Account</h4>
+            <p>Open <strong>Active Directory Users and Computers</strong> (dsa.msc or from Admin Tools). Use <strong>Action → Find</strong> (or Ctrl+F) to search for the user by name or username. Enable "Advanced Features" from the View menu if you need to see all tabs. Right-click the found account to see all available actions.</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">03</div>
+          <div class="step-body">
+            <h4>Unlock Account / Reset Password</h4>
+            <p>To <strong>unlock</strong>: right-click user → <strong>Unlock Account</strong> (or go to Properties → Account tab → check "Unlock account"). To <strong>reset password</strong>: right-click user → <strong>Reset Password</strong> → set temporary password → check "User must change password at next logon." Communicate the temporary password to the user securely (never via unsecured email).</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">04</div>
+          <div class="step-body">
+            <h4>Check Account Expiry and Logon Restrictions</h4>
+            <p>If the user can't log in despite a correct password: open user Properties → <strong>Account tab</strong>. Check: Account is locked out (checkbox), Account expires date, Logon hours restrictions, and "Account is disabled" checkbox. Also check the <strong>General tab</strong> for notes or account description that may indicate intentional restriction.</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">05</div>
+          <div class="step-body">
+            <h4>Manage Group Membership</h4>
+            <p>To add user to a security group: open user Properties → <strong>Member Of tab → Add</strong>. Type the group name and click Check Names. To add multiple users to a group at once: find the group in ADUC → Properties → <strong>Members tab → Add</strong>. Document which groups were added and why in the ticket. Group membership changes take effect at next login (or when <code>gpupdate /force</code> is run).</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">06</div>
+          <div class="step-body">
+            <h4>Create New User Account</h4>
+            <p>Navigate to the appropriate OU → right-click → <strong>New → User</strong>. Fill in: First name, Last name, User logon name (UPN format), and pre-Windows 2000 logon name (SAMAccountName). Set initial password → check "User must change password at next logon." After creation, immediately add the user to required security groups and verify the OU placement is correct for proper GPO application.</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">07</div>
+          <div class="step-body">
+            <h4>Disable Account (Offboarding)</h4>
+            <p>For departing employees: right-click account → <strong>Disable Account</strong>. Do NOT delete immediately — maintain for 30–90 days per your retention policy (files and email access may be needed). Move the disabled account to a dedicated "Disabled Accounts" OU. Remove from all security groups. Note departure date in the Description field. Escalate if mailbox access or data export is needed.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="escalation-box">
+        <h4>Escalate When</h4>
+        <ul>
+          <li>Account keeps locking repeatedly even after unlock — investigate for cached credentials or potential attack</li>
+          <li>User needs Domain Admin or elevated privilege group membership</li>
+          <li>New OU or Group Policy changes are required</li>
+          <li>User cannot log in to a domain controller or sensitive system</li>
+          <li>Suspected account compromise — lock the account and escalate to security team immediately</li>
+          <li>Bulk account changes needed (onboarding multiple employees)</li>
+        </ul>
+      </div>
+
+      <div class="content-block">
+        <div class="content-label">Quick Reference</div>
+        <h2>AD Tasks Cheat Sheet</h2>
+        <table class="quick-ref-table">
+          <thead><tr><th>Task</th><th>Right-Click Menu</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr><td>Unlock account</td><td>Unlock Account (or Account tab)</td><td>Check for repeated lockouts afterward</td></tr>
+            <tr><td>Reset password</td><td>Reset Password</td><td>Always set "must change at next logon"</td></tr>
+            <tr><td>Disable account</td><td>Disable Account</td><td>Move to Disabled OU; don't delete yet</td></tr>
+            <tr><td>Add to group</td><td>Properties → Member Of → Add</td><td>Takes effect at next login</td></tr>
+            <tr><td>Force policy update</td><td>N/A — run on user's PC</td><td><code>gpupdate /force</code> in elevated CMD</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 3 -->
+  <div id="panel-p3" class="phase-panel">
+    <div class="page-wrap">
+      <div class="phase-banner p3">
+        <div class="phase-banner-icon">🎯</div>
+        <div class="phase-banner-text">
+          <h3>Phase 3 — Apply IT</h3>
+          <p>Handle real AD scenarios. Identity verification and documentation are always required.</p>
+        </div>
+      </div>
+
+      <div class="content-block reveal">
+        <div class="content-label">Scenarios</div>
+        <h2>Practice Tickets</h2>
+
+        <div class="scenario-card">
+          <div class="scenario-header"><span class="scenario-num">SCENARIO 01</span><h4>The Lockout Loop</h4></div>
+          <div class="scenario-body">
+            <div class="scenario-situation">"I keep getting locked out every day. You unlock me and an hour later I'm locked out again. I've changed my password twice and it keeps happening."</div>
+            <div class="scenario-tasks">
+              <h5>Your Tasks</h5>
+              <ul class="task-list">
+                <li><span class="task-num">1.</span>Unlock the account. But before you close the ticket, what is the most common cause of repeated lockouts in a corporate environment?</li>
+                <li><span class="task-num">2.</span>What specific question do you ask the user to quickly diagnose this?</li>
+                <li><span class="task-num">3.</span>The user confirms they have email on their iPhone and last changed their password 3 days ago. What do they need to do and how do you guide them?</li>
+                <li><span class="task-num">4.</span>After the fix, it happens again. What do you escalate and to whom?</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="scenario-card">
+          <div class="scenario-header"><span class="scenario-num">SCENARIO 02</span><h4>New Hire Onboarding</h4></div>
+          <div class="scenario-body">
+            <div class="scenario-situation">"We have a new hire starting Monday — Sarah Chen, joining the Finance team. Can you set up her account? She needs access to the Finance shared drive and the accounting software."</div>
+            <div class="scenario-tasks">
+              <h5>Your Tasks</h5>
+              <ul class="task-list">
+                <li><span class="task-num">1.</span>What information do you need before creating the account?</li>
+                <li><span class="task-num">2.</span>Which OU do you create the account in and why does the OU matter?</li>
+                <li><span class="task-num">3.</span>What password settings do you apply and how do you securely deliver the initial credentials?</li>
+                <li><span class="task-num">4.</span>How do you grant access to the Finance shared drive and the accounting software?</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="scenario-card">
+          <div class="scenario-header"><span class="scenario-num">SCENARIO 03</span><h4>The Social Engineer</h4></div>
+          <div class="scenario-body">
+            <div class="scenario-situation">"Hi, this is Mark from sales. I'm locked out of my account. I'm at a client site and can't log in — I have a presentation in 10 minutes. Can you reset my password right now?"</div>
+            <div class="scenario-tasks">
+              <h5>Your Tasks</h5>
+              <ul class="task-list">
+                <li><span class="task-num">1.</span>The urgency is a social engineering technique. What is your protocol regardless of how urgent the request is?</li>
+                <li><span class="task-num">2.</span>What verification methods can you use when the user is not physically present?</li>
+                <li><span class="task-num">3.</span>The caller cannot answer the verification questions correctly. What do you do?</li>
+                <li><span class="task-num">4.</span>The caller gets angry and says "just do it, I'm a manager." How do you respond?</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="content-block reveal">
+        <div class="content-label">Ticket Practice</div>
+        <h2>Document Your Resolution</h2>
+        <table class="doc-table">
+          <thead><tr><th>Field</th><th>Your Entry</th></tr></thead>
+          <tbody>
+            <tr><td>Account Action</td><td><input class="doc-input-line" placeholder="Unlock / Reset / Create / Disable / Group add..." /></td></tr>
+            <tr><td>Identity Verified</td><td><input class="doc-input-line" placeholder="How identity was verified..." /></td></tr>
+            <tr><td>Change Made</td><td><input class="doc-input-line" placeholder="Exact change made in ADUC..." /></td></tr>
+            <tr><td>Groups Modified</td><td><input class="doc-input-line" placeholder="Groups added or removed..." /></td></tr>
+            <tr><td>User Notified</td><td><input class="doc-input-line" placeholder="How and when user was informed..." /></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="content-block reveal">
+        <div class="content-label">Interview Prep</div>
+        <h2>Questions You'll Face</h2>
+
+        <div class="interview-card">
+          <div class="interview-q"><div class="interview-q-label">Interview Question 01</div><p>"How do you handle a user who is repeatedly getting locked out of their Active Directory account?"</p></div>
+          <div class="interview-a">
+            <div class="interview-a-label">Strong Answer Framework</div>
+            <p>First I unlock the account in ADUC. Then — rather than just closing the ticket — I investigate the root cause. The most common cause of <strong>repeated lockouts is cached credentials on a mobile device</strong> that keeps trying to authenticate with an old password. I ask the user if they have email, VPN, or any work apps on their phone and when they last changed their password. If they changed it recently and have a phone, I guide them to update the mail settings on the device. If it persists, I use the <strong>Microsoft Lockout and Recovery tool</strong> (LockoutStatus or Event Viewer on the DC) to identify which machine is triggering the lockouts.</p>
+          </div>
+        </div>
+
+        <div class="interview-card">
+          <div class="interview-q"><div class="interview-q-label">Interview Question 02</div><p>"What is an OU in Active Directory and why does it matter where a user account is placed?"</p></div>
+          <div class="interview-a">
+            <div class="interview-a-label">Strong Answer Framework</div>
+            <p>An OU (Organizational Unit) is a <strong>container in Active Directory used to organize objects</strong> like users, computers, and groups. The critical reason placement matters is <strong>Group Policy Objects (GPOs)</strong> — policies that control settings, software deployment, and security configuration — apply based on OU membership. A user in the Finance OU gets Finance policies; a user incorrectly placed in the IT OU gets IT policies, which may give them access or restrictions they shouldn't have. When creating a new user account, always confirm the correct OU with the manager or HR to ensure proper policy application from day one.</p>
+          </div>
+        </div>
+
+        <div class="interview-card">
+          <div class="interview-q"><div class="interview-q-label">Interview Question 03</div><p>"A caller says they're an executive and urgently need a password reset. You can't verify their identity through normal channels. What do you do?"</p></div>
+          <div class="interview-a">
+            <div class="interview-a-label">Strong Answer Framework</div>
+            <p>I <strong>do not reset the password</strong> without verification, regardless of who the caller claims to be. Social engineering attacks specifically exploit urgency and authority — claiming to be an executive is a classic technique. I explain politely but firmly that our security policy requires identity verification before any account changes, and that this policy protects everyone, including them. I offer alternative verification paths: have their manager call in to confirm, or have them come to the help desk in person with an ID. If they are who they say they are, they will understand the policy. If they continue to pressure me to bypass it, I escalate to my supervisor — not bypass the policy.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="content-block reveal">
+        <div class="content-label">Module Completion</div>
+        <h2>Completion Checklist</h2>
+        <div class="checklist">
+          <div class="check-item"><div class="check-box" onclick="this.classList.toggle('checked'); this.textContent = this.classList.contains('checked') ? '✓' : ''"></div><span>I understand the six main AD object types and when I'd interact with each</span></div>
+          <div class="check-item"><div class="check-box" onclick="this.classList.toggle('checked'); this.textContent = this.classList.contains('checked') ? '✓' : ''"></div><span>I know how to unlock accounts and reset passwords in ADUC</span></div>
+          <div class="check-item"><div class="check-box" onclick="this.classList.toggle('checked'); this.textContent = this.classList.contains('checked') ? '✓' : ''"></div><span>I understand why mobile device cached credentials cause repeated lockouts</span></div>
+          <div class="check-item"><div class="check-box" onclick="this.classList.toggle('checked'); this.textContent = this.classList.contains('checked') ? '✓' : ''"></div><span>I can create a new user account with proper OU placement and group membership</span></div>
+          <div class="check-item"><div class="check-box" onclick="this.classList.toggle('checked'); this.textContent = this.classList.contains('checked') ? '✓' : ''"></div><span>I always verify identity before making account changes — no exceptions</span></div>
+          <div class="check-item"><div class="check-box" onclick="this.classList.toggle('checked'); this.textContent = this.classList.contains('checked') ? '✓' : ''"></div><span>I completed all three scenarios including the social engineering scenario</span></div>
+        </div>
+
+        <div class="section-divider"></div>
+        <div class="content-label">Up Next</div>
+        <h2>Continue Your Training</h2>
+        <div class="next-modules">
+          <a href="07-performance.html" class="next-card">
+            <div class="next-label">← Previous Module</div>
+            <h4>Module 07 — Performance Diagnostics</h4>
+            <p>Task Manager, Resource Monitor, SOP-007</p>
+          </a>
+          <a href="09-security-hardening.html" class="next-card">
+            <div class="next-label">Next Module →</div>
+            <h4>Module 09 — Security Hardening</h4>
+            <p>Final Tier 2 module — SOP-009</p>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-wrap">
+    <div class="page-nav">
+      <a href="../learn.html" class="page-nav-back">← Back to Learn IT</a>
+      <a href="09-security-hardening.html" class="page-nav-next">Next Module →</a>
+    </div>
+  </div>
+
+  <div class="page-wrap" style="padding-bottom:1.5rem;">
+    <div id="complete-block" style="padding:1.5rem;background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.2);border-radius:10px;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;">
+      <div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:#4ade80;margin-bottom:0.3rem;">Module 08 · SOP-008</div>
+        <div style="font-weight:600;font-size:0.95rem;" id="complete-msg">Finished all three phases? Mark this module complete.</div>
+      </div>
+      <button id="btn-complete" onclick="markThisComplete()" style="font-family:'IBM Plex Mono',monospace;font-size:0.7rem;letter-spacing:0.08em;padding:0.6rem 1.25rem;border-radius:6px;background:#22c55e;color:#07081a;border:none;cursor:pointer;font-weight:500;">Mark Complete ✓</button>
+    </div>
+  </div>
+
+  <footer>
+    <span class="footer-copy">© 2025 The Rarest Heart. Built for IT learners.</span>
+    <ul class="footer-links">
+      <li><a href="../sops.html">SOPs</a></li>
+      <li><a href="../labs.html">Labs</a></li>
+      <li><a href="../contact.html">Contact</a></li>
+    </ul>
+  </footer>
+
+  <script src="../js/progress.js"></script>
+  <script>
+    const MODULE_ID = 'm08';
+    function initProgress() { if (typeof trhMarkInProgress==='function') { trhMarkInProgress(MODULE_ID); if (trhGetStatus(MODULE_ID)==='complete') showCompleted(); } }
+    function markThisComplete() { if (typeof trhMarkComplete==='function') trhMarkComplete(MODULE_ID); showCompleted(); }
+    function showCompleted() { document.getElementById('complete-msg').textContent='✓ Module 08 marked complete. Great work.'; const b=document.getElementById('btn-complete'); b.textContent='✓ Complete'; b.style.background='rgba(34,197,94,0.15)'; b.style.color='#4ade80'; b.style.border='1px solid rgba(34,197,94,0.3)'; b.disabled=true; }
+    document.addEventListener('DOMContentLoaded', initProgress);
+    function switchPhase(phase, btn) {
+      document.querySelectorAll('.phase-panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.phase-tab').forEach(t => t.classList.remove('active'));
+      document.getElementById('panel-' + phase).classList.add('active');
+      btn.classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      setTimeout(triggerReveals, 100);
+    }
+    function triggerReveals() {
+      const reveals = document.querySelectorAll('.reveal');
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add('visible'); observer.unobserve(entry.target); } });
+      }, { threshold: 0.1 });
+      reveals.forEach(el => { if (!el.classList.contains('visible')) observer.observe(el); });
+    }
+    document.addEventListener('DOMContentLoaded', triggerReveals);
+  </script>
+</body>
+</html>

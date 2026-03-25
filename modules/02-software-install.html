@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Module 02 — Software Installation | The Rarest Heart</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --navy: #07081a; --navy-mid: #0d0f28; --navy-light: #131535;
+      --white: #f4f4f0; --off-white: #c8c8c4;
+      --accent: #4a6cf7; --accent-glow: rgba(74,108,247,0.25);
+      --pulse: #e84a6f; --pulse-glow: rgba(232,74,111,0.2);
+      --tier1: #4a6cf7; --tier2: #7c4af7;
+      --phase1: #4a6cf7; --phase2: #7c4af7; --phase3: #e84a6f;
+      --green: #22c55e; --amber: #f59e0b;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { background-color: var(--navy); color: var(--white); font-family: 'DM Sans', sans-serif; font-weight: 300; line-height: 1.7; overflow-x: hidden; }
+    body::before { content: ''; position: fixed; inset: 0; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E"); pointer-events: none; z-index: 0; opacity: 0.4; }
+    h1, h2, h3, h4 { font-family: 'Syne', sans-serif; line-height: 1.15; }
+    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; padding: 1.25rem 4rem; display: flex; align-items: center; justify-content: space-between; background: rgba(7,8,26,0.85); backdrop-filter: blur(16px); border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .nav-logo { display: flex; align-items: center; gap: 0.75rem; text-decoration: none; }
+    .nav-logo-heart { width: 96px; height: 96px; }
+    .nav-logo-text { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.3rem; color: var(--white); letter-spacing: -0.02em; }
+    .nav-logo-text span { color: var(--pulse); }
+    .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+    .nav-links a { color: var(--off-white); text-decoration: none; font-size: 0.875rem; font-weight: 400; letter-spacing: 0.02em; transition: color 0.2s; position: relative; }
+    .nav-links a::after { content: ''; position: absolute; bottom: -4px; left: 0; width: 0; height: 1px; background: var(--accent); transition: width 0.3s; }
+    .nav-links a:hover { color: var(--white); }
+    .nav-links a:hover::after { width: 100%; }
+    .nav-links a.active { color: var(--white); }
+    .nav-links a.active::after { width: 100%; }
+    .nav-cta { background: var(--accent); color: var(--white) !important; padding: 0.5rem 1.25rem; border-radius: 4px; font-weight: 500 !important; }
+    .nav-cta::after { display: none !important; }
+    .nav-cta:hover { background: #3a5ce0 !important; }
+    section { position: relative; z-index: 1; }
+    .page-wrap { max-width: 860px; margin: 0 auto; padding: 0 2rem; }
+    .module-header { padding: 8rem 0 3.5rem; border-bottom: 1px solid rgba(255,255,255,0.06); position: relative; overflow: hidden; }
+    .module-header-glow { position: absolute; width: 500px; height: 500px; border-radius: 50%; background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%); top: -150px; right: -100px; pointer-events: none; }
+    .module-header-inner { position: relative; z-index: 1; }
+    .breadcrumb { display: flex; align-items: center; gap: 0.5rem; font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; letter-spacing: 0.1em; color: var(--off-white); opacity: 0.5; margin-bottom: 1.75rem; }
+    .breadcrumb a { color: var(--off-white); text-decoration: none; transition: color 0.2s; }
+    .breadcrumb a:hover { color: var(--accent); opacity: 1; }
+    .breadcrumb-sep { opacity: 0.4; }
+    .module-eyebrow { font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.75rem; opacity: 0; animation: fadeUp 0.7s ease forwards 0.1s; }
+    .module-eyebrow::before { content: ''; display: inline-block; width: 24px; height: 1px; background: var(--accent); }
+    .module-title { font-size: clamp(2.2rem, 5vw, 3.5rem); font-weight: 800; letter-spacing: -0.03em; margin-bottom: 1rem; opacity: 0; animation: fadeUp 0.7s ease forwards 0.25s; }
+    .module-title em { font-style: normal; color: var(--pulse); position: relative; }
+    .module-title em::after { content: ''; position: absolute; bottom: 3px; left: 0; right: 0; height: 3px; background: var(--pulse); opacity: 0.4; border-radius: 2px; }
+    .module-desc { font-size: 1.05rem; color: var(--off-white); max-width: 560px; font-weight: 300; line-height: 1.7; margin-bottom: 2rem; opacity: 0; animation: fadeUp 0.7s ease forwards 0.4s; }
+    .module-chips { display: flex; gap: 0.6rem; flex-wrap: wrap; opacity: 0; animation: fadeUp 0.7s ease forwards 0.55s; }
+    .chip { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.3rem 0.75rem; border-radius: 20px; }
+    .chip-blue { background: rgba(74,108,247,0.12); color: #7a9eff; border: 1px solid rgba(74,108,247,0.25); }
+    .chip-gray { background: rgba(255,255,255,0.05); color: var(--off-white); border: 1px solid rgba(255,255,255,0.1); }
+    .chip-green { background: rgba(34,197,94,0.1); color: #4ade80; border: 1px solid rgba(34,197,94,0.2); }
+    .phase-nav { display: flex; gap: 0; margin-top: 2.5rem; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 8px; padding: 4px; width: fit-content; opacity: 0; animation: fadeUp 0.7s ease forwards 0.7s; }
+    .phase-tab { font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.6rem 1.4rem; border-radius: 5px; cursor: pointer; transition: all 0.2s; color: var(--off-white); border: none; background: transparent; font-weight: 500; }
+    .phase-tab:hover { color: var(--white); }
+    .phase-tab.p1.active { background: var(--navy-light); color: #7a9eff; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+    .phase-tab.p2.active { background: var(--navy-light); color: #b07aff; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+    .phase-tab.p3.active { background: var(--navy-light); color: #ff7a9a; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+    .phase-panel { display: none; padding: 4rem 0 6rem; }
+    .phase-panel.active { display: block; }
+    .phase-banner { border-radius: 10px; padding: 1.75rem 2rem; margin-bottom: 3rem; display: flex; align-items: center; gap: 1.25rem; }
+    .phase-banner.p1 { background: rgba(74,108,247,0.08); border: 1px solid rgba(74,108,247,0.2); }
+    .phase-banner.p2 { background: rgba(124,74,247,0.08); border: 1px solid rgba(124,74,247,0.2); }
+    .phase-banner.p3 { background: rgba(232,74,111,0.08); border: 1px solid rgba(232,74,111,0.2); }
+    .phase-banner-icon { font-size: 1.75rem; width: 52px; height: 52px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .p1 .phase-banner-icon { background: rgba(74,108,247,0.15); }
+    .p2 .phase-banner-icon { background: rgba(124,74,247,0.15); }
+    .p3 .phase-banner-icon { background: rgba(232,74,111,0.15); }
+    .phase-banner-text h3 { font-size: 1.15rem; font-weight: 800; letter-spacing: -0.01em; margin-bottom: 0.2rem; }
+    .p1 .phase-banner-text h3 { color: #7a9eff; }
+    .p2 .phase-banner-text h3 { color: #b07aff; }
+    .p3 .phase-banner-text h3 { color: #ff7a9a; }
+    .phase-banner-text p { font-size: 0.875rem; color: var(--off-white); font-style: italic; }
+    .content-block { margin-bottom: 3rem; }
+    .content-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.6rem; }
+    .content-block h2 { font-size: 1.5rem; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 0.75rem; }
+    .content-block p { font-size: 0.95rem; color: var(--off-white); line-height: 1.8; margin-bottom: 0.75rem; }
+    .content-block p strong { color: var(--white); font-weight: 600; }
+    .trh-table { width: 100%; border-collapse: collapse; margin: 1.25rem 0; font-size: 0.875rem; }
+    .trh-table th { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--off-white); opacity: 0.7; padding: 0.75rem 1.25rem; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.02); }
+    .trh-table td { padding: 0.9rem 1.25rem; border-bottom: 1px solid rgba(255,255,255,0.05); color: var(--off-white); vertical-align: top; line-height: 1.6; }
+    .trh-table td:first-child { color: var(--white); font-weight: 500; }
+    .trh-table tr:last-child td { border-bottom: none; }
+    .trh-table tr:hover td { background: rgba(255,255,255,0.02); }
+    .account-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin: 1.25rem 0; }
+    .account-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.07); border-radius: 8px; padding: 1.5rem; transition: border-color 0.2s; }
+    .account-card:hover { border-color: rgba(74,108,247,0.3); }
+    .account-card-icon { font-size: 1.4rem; margin-bottom: 0.75rem; }
+    .account-card h4 { font-size: 0.95rem; font-weight: 700; margin-bottom: 0.4rem; letter-spacing: -0.01em; }
+    .account-card p { font-size: 0.8rem; color: var(--off-white); line-height: 1.6; margin: 0; }
+    .account-card .account-tag { display: inline-block; margin-top: 0.75rem; font-family: 'IBM Plex Mono', monospace; font-size: 0.6rem; letter-spacing: 0.08em; padding: 0.2rem 0.6rem; border-radius: 20px; }
+    .tag-local { background: rgba(34,197,94,0.1); color: #4ade80; border: 1px solid rgba(34,197,94,0.2); }
+    .tag-ms { background: rgba(74,108,247,0.1); color: #7a9eff; border: 1px solid rgba(74,108,247,0.2); }
+    .tag-warn { background: rgba(245,158,11,0.1); color: #fbbf24; border: 1px solid rgba(245,158,11,0.2); }
+    .callout-warning { background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.3); border-left: 3px solid #f59e0b; border-radius: 8px; padding: 1.5rem 1.75rem; margin: 1.5rem 0; display: flex; gap: 1rem; align-items: flex-start; }
+    .callout-warning-icon { font-size: 1.25rem; flex-shrink: 0; margin-top: 1px; }
+    .callout-warning-body h4 { font-size: 0.95rem; font-weight: 700; color: #fbbf24; margin-bottom: 0.4rem; }
+    .callout-warning-body p { font-size: 0.875rem; color: var(--off-white); line-height: 1.7; margin: 0; }
+    .callout-info { background: rgba(74,108,247,0.07); border: 1px solid rgba(74,108,247,0.2); border-left: 3px solid var(--accent); border-radius: 8px; padding: 1.5rem 1.75rem; margin: 1.5rem 0; display: flex; gap: 1rem; align-items: flex-start; }
+    .callout-info-icon { font-size: 1.25rem; flex-shrink: 0; margin-top: 1px; }
+    .callout-info-body h4 { font-size: 0.95rem; font-weight: 700; color: #7a9eff; margin-bottom: 0.4rem; }
+    .callout-info-body p { font-size: 0.875rem; color: var(--off-white); line-height: 1.7; margin: 0; }
+    .trh-list { list-style: none; margin: 0.75rem 0 1.25rem; display: flex; flex-direction: column; gap: 0.5rem; }
+    .trh-list li { font-size: 0.9rem; color: var(--off-white); padding-left: 1.25rem; position: relative; line-height: 1.6; }
+    .trh-list li::before { content: '—'; position: absolute; left: 0; color: var(--accent); font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; }
+    .glossary-grid { display: flex; flex-direction: column; gap: 0; border: 1px solid rgba(255,255,255,0.07); border-radius: 8px; overflow: hidden; margin-top: 1.25rem; }
+    .glossary-row { display: grid; grid-template-columns: 200px 1fr; gap: 0; border-bottom: 1px solid rgba(255,255,255,0.05); transition: background 0.2s; }
+    .glossary-row:last-child { border-bottom: none; }
+    .glossary-row:hover { background: rgba(255,255,255,0.02); }
+    .glossary-term { font-family: 'IBM Plex Mono', monospace; font-size: 0.78rem; font-weight: 500; color: var(--accent); padding: 1rem 1.25rem; border-right: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; }
+    .glossary-def { font-size: 0.875rem; color: var(--off-white); padding: 1rem 1.25rem; line-height: 1.6; }
+    .sop-header { background: rgba(124,74,247,0.07); border: 1px solid rgba(124,74,247,0.2); border-radius: 8px; padding: 1.5rem 1.75rem; margin-bottom: 2rem; }
+    .sop-id { font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; color: #b07aff; letter-spacing: 0.15em; margin-bottom: 0.3rem; }
+    .sop-header h3 { font-size: 1.1rem; font-weight: 700; color: var(--white); margin-bottom: 0.4rem; }
+    .sop-header p { font-size: 0.85rem; color: var(--off-white); line-height: 1.6; margin: 0; }
+    .steps-list { display: flex; flex-direction: column; gap: 0.75rem; margin: 1.5rem 0; }
+    .step-card { display: flex; gap: 1.25rem; align-items: flex-start; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 1.25rem 1.5rem; transition: border-color 0.2s; }
+    .step-card:hover { border-color: rgba(124,74,247,0.3); background: rgba(124,74,247,0.03); }
+    .step-num { font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: #b07aff; font-weight: 700; min-width: 28px; margin-top: 2px; }
+    .step-body h4 { font-size: 0.95rem; font-weight: 700; margin-bottom: 0.3rem; color: var(--white); }
+    .step-body p { font-size: 0.875rem; color: var(--off-white); line-height: 1.65; margin: 0; }
+    .step-body p strong { color: var(--white); }
+    .step-body code { font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; background: rgba(255,255,255,0.06); padding: 0.1rem 0.4rem; border-radius: 3px; color: #7a9eff; }
+    .escalation-box { background: rgba(232,74,111,0.06); border: 1px solid rgba(232,74,111,0.2); border-radius: 8px; padding: 1.5rem 1.75rem; margin: 2rem 0; }
+    .escalation-box h4 { font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; color: #ff7a9a; margin-bottom: 0.75rem; }
+    .escalation-box ul { list-style: none; display: flex; flex-direction: column; gap: 0.4rem; }
+    .escalation-box ul li { font-size: 0.875rem; color: var(--off-white); padding-left: 1.25rem; position: relative; line-height: 1.6; }
+    .escalation-box ul li::before { content: '→'; position: absolute; left: 0; color: #ff7a9a; font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; }
+    .quick-ref-table { width: 100%; border-collapse: collapse; border: 1px solid rgba(255,255,255,0.07); border-radius: 8px; overflow: hidden; margin-top: 1.5rem; font-size: 0.875rem; }
+    .quick-ref-table th { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--off-white); opacity: 0.7; padding: 0.75rem 1.25rem; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.02); }
+    .quick-ref-table td { padding: 0.9rem 1.25rem; border-bottom: 1px solid rgba(255,255,255,0.05); color: var(--off-white); vertical-align: top; line-height: 1.6; }
+    .quick-ref-table td:first-child { color: var(--white); font-weight: 500; }
+    .quick-ref-table tr:last-child td { border-bottom: none; }
+    .quick-ref-table code { font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; background: rgba(255,255,255,0.06); padding: 0.1rem 0.4rem; border-radius: 3px; color: #7a9eff; }
+    .scenario-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; overflow: hidden; margin-bottom: 1.5rem; }
+    .scenario-header { padding: 1.25rem 1.75rem; border-bottom: 1px solid rgba(255,255,255,0.06); display: flex; align-items: center; gap: 1rem; }
+    .scenario-num { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; letter-spacing: 0.15em; color: #ff7a9a; background: rgba(232,74,111,0.1); border: 1px solid rgba(232,74,111,0.2); padding: 0.25rem 0.6rem; border-radius: 20px; flex-shrink: 0; }
+    .scenario-header h4 { font-size: 1rem; font-weight: 700; letter-spacing: -0.01em; }
+    .scenario-body { padding: 1.5rem 1.75rem; }
+    .scenario-situation { font-size: 0.925rem; color: var(--off-white); line-height: 1.75; font-style: italic; margin-bottom: 1.25rem; padding-bottom: 1.25rem; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .scenario-tasks h5 { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.75rem; }
+    .task-list { list-style: none; display: flex; flex-direction: column; gap: 0.6rem; }
+    .task-list li { display: flex; gap: 0.75rem; font-size: 0.875rem; color: var(--off-white); line-height: 1.6; }
+    .task-list li .task-num { font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; color: #ff7a9a; font-weight: 700; flex-shrink: 0; margin-top: 2px; width: 18px; }
+    .doc-table { width: 100%; border-collapse: collapse; margin: 1.25rem 0; font-size: 0.875rem; }
+    .doc-table th { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--off-white); opacity: 0.6; padding: 0.75rem 1.25rem; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.02); }
+    .doc-table td { padding: 0.9rem 1.25rem; border-bottom: 1px solid rgba(255,255,255,0.05); color: var(--off-white); vertical-align: top; }
+    .doc-table td:first-child { color: var(--white); font-weight: 500; width: 180px; }
+    .doc-table tr:last-child td { border-bottom: none; }
+    .doc-input-line { display: block; width: 100%; border: none; border-bottom: 1px dashed rgba(255,255,255,0.15); background: transparent; color: var(--white); font-family: 'DM Sans', sans-serif; font-size: 0.875rem; padding: 0.3rem 0; outline: none; transition: border-color 0.2s; }
+    .doc-input-line:focus { border-bottom-color: var(--accent); }
+    .doc-input-line::placeholder { color: rgba(255,255,255,0.15); font-style: italic; }
+    .interview-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; overflow: hidden; margin-bottom: 1.25rem; }
+    .interview-q { padding: 1.25rem 1.75rem; border-bottom: 1px solid rgba(255,255,255,0.06); background: rgba(255,255,255,0.02); }
+    .interview-q-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.4rem; }
+    .interview-q p { font-size: 0.95rem; font-weight: 600; color: var(--white); font-style: italic; margin: 0; line-height: 1.5; }
+    .interview-a { padding: 1.25rem 1.75rem; }
+    .interview-a-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; color: #ff7a9a; margin-bottom: 0.5rem; }
+    .interview-a p { font-size: 0.875rem; color: var(--off-white); line-height: 1.75; margin: 0; }
+    .interview-a strong { color: var(--white); }
+    .checklist { display: flex; flex-direction: column; gap: 0.6rem; margin-top: 1.25rem; }
+    .check-item { display: flex; align-items: flex-start; gap: 0.75rem; font-size: 0.9rem; color: var(--off-white); line-height: 1.6; }
+    .check-box { width: 20px; height: 20px; border: 1.5px solid rgba(255,255,255,0.2); border-radius: 4px; flex-shrink: 0; margin-top: 2px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; }
+    .check-box.checked { background: var(--green); border-color: var(--green); color: white; }
+    .next-modules { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-top: 1.5rem; }
+    .next-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.07); border-radius: 8px; padding: 1.5rem; text-decoration: none; color: inherit; transition: all 0.2s; display: block; }
+    .next-card:hover { border-color: rgba(74,108,247,0.3); background: rgba(74,108,247,0.05); transform: translateY(-2px); }
+    .next-card .next-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; letter-spacing: 0.15em; color: var(--accent); margin-bottom: 0.4rem; }
+    .next-card h4 { font-size: 0.95rem; font-weight: 700; margin-bottom: 0.3rem; }
+    .next-card p { font-size: 0.8rem; color: var(--off-white); margin: 0; }
+    .page-nav { padding: 3rem 0 5rem; border-top: 1px solid rgba(255,255,255,0.06); display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+    .page-nav-back { font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; letter-spacing: 0.08em; color: var(--off-white); text-decoration: none; transition: color 0.2s; }
+    .page-nav-back:hover { color: var(--accent); }
+    .page-nav-next { background: var(--accent); color: var(--white); padding: 0.75rem 1.75rem; border-radius: 4px; text-decoration: none; font-weight: 500; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 0.5rem; transition: background 0.2s, transform 0.2s; border: none; cursor: pointer; }
+    .page-nav-next:hover { background: #3a5ce0; transform: translateY(-1px); }
+    .section-divider { height: 1px; background: rgba(255,255,255,0.06); margin: 2.5rem 0; }
+    footer { border-top: 1px solid rgba(255,255,255,0.06); padding: 3rem 4rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
+    .footer-copy { font-size: 0.8rem; color: var(--off-white); opacity: 0.5; }
+    .footer-links { display: flex; gap: 2rem; list-style: none; }
+    .footer-links a { font-size: 0.8rem; color: var(--off-white); opacity: 0.5; text-decoration: none; transition: opacity 0.2s; }
+    .footer-links a:hover { opacity: 1; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+    .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.6s ease, transform 0.6s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    @media (max-width: 900px) {
+      nav { padding: 1rem 1.5rem; } .nav-links { display: none; }
+      .page-wrap { padding: 0 1.25rem; } .module-header { padding: 7rem 0 2.5rem; }
+      .account-cards { grid-template-columns: 1fr; } .next-modules { grid-template-columns: 1fr; }
+      .glossary-row { grid-template-columns: 1fr; } .glossary-term { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.05); }
+      footer { padding: 2rem 1.5rem; flex-direction: column; align-items: flex-start; }
+      .phase-nav { width: 100%; } .phase-tab { flex: 1; text-align: center; font-size: 0.65rem; padding: 0.6rem 0.75rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a href="../index.html" class="nav-logo">
+      <img src="../images/trhlogo.svg" alt="The Rarest Heart" class="nav-logo-heart" width="96" height="96">
+      <span class="nav-logo-text">The Rarest <span>Heart</span></span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../learn.html" class="active">Learn</a></li>
+      <li><a href="../sops.html">SOPs</a></li>
+      <li><a href="../labs.html">Labs</a></li>
+      <li><a href="../members.html">My Progress</a></li>
+      <li><a href="../contact.html" class="nav-cta">Get Support</a></li>
+    </ul>
+  </nav>
+
+  <div class="module-header">
+    <div class="module-header-glow"></div>
+    <div class="page-wrap module-header-inner">
+      <div class="breadcrumb">
+        <a href="../index.html">Home</a>
+        <span class="breadcrumb-sep">/</span>
+        <a href="../learn.html">Learn</a>
+        <span class="breadcrumb-sep">/</span>
+        <span style="color:var(--white); opacity:1;">Module 02</span>
+      </div>
+      <p class="module-eyebrow">Module 02 · Tier 1 · SOP-002</p>
+      <h1 class="module-title">Software Installation &<br /><em>Verification</em></h1>
+      <p class="module-desc">One of the most common Tier 1 tasks — and one of the most commonly done wrong. By the end of this module you'll understand system requirements, admin rights, installation types, and how to verify the job is actually done.</p>
+      <div class="module-chips">
+        <span class="chip chip-blue">Tier 1 — Help Desk</span>
+        <span class="chip chip-gray">SOP-002</span>
+        <span class="chip chip-gray">⏱ 10–15 min</span>
+        <span class="chip chip-green">Beginner</span>
+      </div>
+      <div class="phase-nav">
+        <button class="phase-tab p1 active" onclick="switchPhase('p1', this)">📘 Phase 1 — Learn It</button>
+        <button class="phase-tab p2" onclick="switchPhase('p2', this)">🛠️ Phase 2 — Do It</button>
+        <button class="phase-tab p3" onclick="switchPhase('p3', this)">🎯 Phase 3 — Apply It</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 1 -->
+  <div class="phase-panel active" id="panel-p1">
+    <div class="page-wrap">
+      <div class="phase-banner p1 reveal">
+        <div class="phase-banner-icon">📘</div>
+        <div class="phase-banner-text">
+          <h3>Phase 1 — Learn IT</h3>
+          <p>Build the knowledge before you touch the keyboard</p>
+        </div>
+      </div>
+
+      <div class="content-block reveal">
+        <p class="content-label">// 1.1</p>
+        <h2>Why Software Installations Fail</h2>
+        <p>Most failed installs come down to one of six causes. Knowing the cause before you start saves time and prevents making things worse.</p>
+        <table class="trh-table">
+          <thead><tr><th>Failure Reason</th><th>What's Actually Happening</th></tr></thead>
+          <tbody>
+            <tr><td>No admin rights</td><td>Wrong account type — the user doesn't have permission to install software. Most corporate environments require elevation.</td></tr>
+            <tr><td>System requirements not met</td><td>Missing RAM, old OS version, or incompatible CPU architecture (32 vs 64-bit). Always check before downloading.</td></tr>
+            <tr><td>Corrupted installer</td><td>Download was incomplete or corrupted. Re-download from the official source — never from a third-party mirror.</td></tr>
+            <tr><td>Conflicting software</td><td>Another version is already installed. Must uninstall old version first, including leftover registry entries.</td></tr>
+            <tr><td>Disk space too low</td><td>Not enough free space on the target drive. Most installs need more breathing room than the stated minimum.</td></tr>
+            <tr><td>Group Policy block</td><td>IT policy is actively preventing the install. Requires escalation or a proper software request through the correct channel.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="section-divider"></div>
+
+      <div class="content-block reveal">
+        <p class="content-label">// 1.2</p>
+        <h2>Understanding User Account Control (UAC)</h2>
+        <div class="account-cards">
+          <div class="account-card">
+            <div class="account-card-icon">🛡️</div>
+            <h4>What is UAC?</h4>
+            <p>User Account Control is Windows' way of making sure you meant to make a change that affects the system. It's the prompt that says "Do you want to allow this app to make changes?"</p>
+            <span class="account-tag tag-local">Security Feature</span>
+          </div>
+          <div class="account-card">
+            <div class="account-card-icon">⚠️</div>
+            <h4>Why It Exists</h4>
+            <p>Without UAC, any program you run could silently install itself, change system settings, or add startup entries. UAC adds a speed bump that stops malware from doing the same thing.</p>
+            <span class="account-tag tag-warn">Malware Prevention</span>
+          </div>
+          <div class="account-card">
+            <div class="account-card-icon">✅</div>
+            <h4>What To Do</h4>
+            <p>Always read the prompt before clicking Yes. Check that the publisher name matches what you're installing. If it shows "Unknown" for known software, stop and verify the source.</p>
+            <span class="account-tag tag-ms">Best Practice</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-divider"></div>
+
+      <div class="content-block reveal">
+        <p class="content-label">// 1.3</p>
+        <h2>Installation Types</h2>
+        <div class="callout-info">
+          <div class="callout-info-icon">💡</div>
+          <div class="callout-info-body">
+            <h4>Know Your Installer Format</h4>
+            <p>The format of an installer changes how you handle it. MSI installers are designed for enterprise deployment. EXE installers can be anything. Knowing the difference saves time.</p>
+          </div>
+        </div>
+        <table class="trh-table">
+          <thead><tr><th>Type</th><th>What It Is</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr><td>.msi</td><td>Windows Installer Package</td><td>Standard enterprise format. Can be deployed via Group Policy. Usually has the most reliable uninstall path.</td></tr>
+            <tr><td>.exe</td><td>Executable Installer</td><td>Can contain anything — an MSI wrapper, a custom installer, or a self-extracting archive. Most consumer software uses this format.</td></tr>
+            <tr><td>.appx / .msix</td><td>Microsoft Store Package</td><td>Modern app format used by Windows Store apps. Usually installed through the Store or PowerShell.</td></tr>
+            <tr><td>.zip</td><td>Manual Installation</td><td>Not a true installer. Requires copying files to a specific folder and sometimes manually adding to PATH. Handle with care.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="section-divider"></div>
+
+      <div class="content-block reveal">
+        <p class="content-label">// 1.4</p>
+        <h2>Key Terms to Know</h2>
+        <div class="glossary-grid">
+          <div class="glossary-row"><div class="glossary-term">UAC</div><div class="glossary-def">User Account Control. The system mechanism that prompts for elevation when software needs admin rights.</div></div>
+          <div class="glossary-row"><div class="glossary-term">Elevation</div><div class="glossary-def">Running a process with administrator-level permissions. Right-click → "Run as administrator" is the manual method.</div></div>
+          <div class="glossary-row"><div class="glossary-term">Silent Install</div><div class="glossary-def">Installing software without user-facing prompts. Common for enterprise deployments via script or Group Policy.</div></div>
+          <div class="glossary-row"><div class="glossary-term">Uninstall Residue</div><div class="glossary-def">Files, registry entries, and scheduled tasks left behind after removal. Causes "ghost" conflicts with fresh installs.</div></div>
+          <div class="glossary-row"><div class="glossary-term">32-bit vs 64-bit</div><div class="glossary-def">Architecture difference. Always install the 64-bit version on a 64-bit OS unless directed otherwise.</div></div>
+        </div>
+      </div>
+
+      <div class="page-nav reveal">
+        <a href="../learn.html" class="page-nav-back">← Back to Learn</a>
+        <button class="page-nav-next" onclick="switchPhase('p2', document.querySelectorAll('.phase-tab')[1])">Phase 2 — Do IT →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 2 -->
+  <div class="phase-panel" id="panel-p2">
+    <div class="page-wrap">
+      <div class="phase-banner p2 reveal">
+        <div class="phase-banner-icon">🛠️</div>
+        <div class="phase-banner-text">
+          <h3>Phase 2 — Do IT</h3>
+          <p>Step-by-step execution — follow this every time</p>
+        </div>
+      </div>
+
+      <div class="sop-header reveal">
+        <div class="sop-id">SOP-002</div>
+        <h3>Software Installation — Standard Procedure</h3>
+        <p>Use this procedure for any software installation request. Deviation requires documentation.</p>
+      </div>
+
+      <div class="steps-list reveal">
+        <div class="step-card">
+          <div class="step-num">01</div>
+          <div class="step-body">
+            <h4>Verify the request is authorized</h4>
+            <p>Before installing anything, confirm the request came from an authorized person. In a business environment, software installs often require manager approval or a service ticket. Ask: <strong>"Do you have a ticket number or approval for this?"</strong></p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">02</div>
+          <div class="step-body">
+            <h4>Check system requirements</h4>
+            <p>Verify on the vendor's page: OS version (Windows 10/11), RAM, disk space, and CPU architecture. On the user's machine: Settings → System → About for OS and RAM. Check This PC for disk space. Cross-reference before proceeding.</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">03</div>
+          <div class="step-body">
+            <h4>Download from official source only</h4>
+            <p>Never use third-party download sites. Go directly to the vendor's website. Verify the URL matches the official domain. Right-click the downloaded file → Properties → check the digital signature if available.</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">04</div>
+          <div class="step-body">
+            <h4>Run the installer with admin rights</h4>
+            <p>Right-click the installer → <strong>"Run as administrator."</strong> This ensures UAC elevation is handled correctly. If prompted by UAC, verify the publisher name matches the expected software vendor. Do not click Yes if the publisher shows "Unknown" for known commercial software.</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">05</div>
+          <div class="step-body">
+            <h4>Complete the installation</h4>
+            <p>Follow the installer prompts. Key decisions: install path (use default unless directed), components (install only what's needed). <strong>Decline any bundled third-party software</strong> — toolbars, browser add-ons, and other extras are never needed.</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">06</div>
+          <div class="step-body">
+            <h4>Verify the installation</h4>
+            <p>Open the application to confirm it launches. Check Start Menu or Desktop for the shortcut. Verify version: Help → About, or check Control Panel → Programs. Run a basic function test — open a file, check that core features work.</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">07</div>
+          <div class="step-body">
+            <h4>Document and close the ticket</h4>
+            <p>Record: software name, version, installation date, install path, and whether any special steps were required. Note any deviations from standard procedure. Close the ticket with status: <strong>Resolved.</strong></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="escalation-box reveal">
+        <h4>Escalate to Tier 2 If:</h4>
+        <ul>
+          <li>Software is blocked by Group Policy and cannot be installed</li>
+          <li>Installation requires a license key that the user cannot provide</li>
+          <li>Install fails repeatedly with errors that persist after re-download</li>
+          <li>The software requires server-side configuration or database setup</li>
+          <li>User is requesting software not on the approved software list</li>
+        </ul>
+      </div>
+
+      <div class="content-block reveal">
+        <p class="content-label">// quick reference</p>
+        <h2>Common Installation Errors</h2>
+        <table class="quick-ref-table">
+          <thead><tr><th>Error</th><th>Likely Cause</th><th>First Fix</th></tr></thead>
+          <tbody>
+            <tr><td>Error 1603</td><td>Fatal error during installation</td><td>Run as admin, clear <code>%temp%</code>, restart and retry</td></tr>
+            <tr><td>"Cannot access specified device"</td><td>File or path permissions blocked</td><td>Check AV isn't quarantining installer. Re-download.</td></tr>
+            <tr><td>"This app has been blocked"</td><td>SmartScreen or Group Policy block</td><td>Verify source. Check with IT manager before bypassing.</td></tr>
+            <tr><td>"Not enough disk space"</td><td>Drive is full</td><td>Check This PC. Clear temp files: Win+R → <code>%temp%</code> → delete contents</td></tr>
+            <tr><td>App installs but won't launch</td><td>Missing dependency</td><td>Check if Visual C++ Redistributable or .NET Framework update is needed</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="page-nav reveal">
+        <button class="page-nav-back" onclick="switchPhase('p1', document.querySelectorAll('.phase-tab')[0])" style="background:none;border:none;cursor:pointer;font-family:'IBM Plex Mono',monospace;font-size:0.75rem;letter-spacing:0.08em;color:var(--off-white);">← Phase 1 — Learn IT</button>
+        <button class="page-nav-next" onclick="switchPhase('p3', document.querySelectorAll('.phase-tab')[2])">Phase 3 — Apply IT →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 3 -->
+  <div class="phase-panel" id="panel-p3">
+    <div class="page-wrap">
+      <div class="phase-banner p3 reveal">
+        <div class="phase-banner-icon">🎯</div>
+        <div class="phase-banner-text">
+          <h3>Phase 3 — Apply IT</h3>
+          <p>Turn knowledge into career-ready skills</p>
+        </div>
+      </div>
+
+      <div class="content-block reveal">
+        <p class="content-label">// 3.1 — real-world scenarios</p>
+        <h2>Apply What You Learned</h2>
+        <p>Work through each scenario. Think before you act. Document as you go.</p>
+      </div>
+
+      <div class="scenario-card reveal">
+        <div class="scenario-header">
+          <span class="scenario-num">SCENARIO 01</span>
+          <h4>The Blocked Install</h4>
+        </div>
+        <div class="scenario-body">
+          <p class="scenario-situation">A user submits a ticket: "I need Adobe Acrobat Reader installed on my laptop. I tried to run the installer but it says I don't have permission." You remote in and see UAC is showing an "Unknown Publisher" warning — and the file was downloaded from a site called adobe-reader-download.net.</p>
+          <div class="scenario-tasks">
+            <h5>// your task</h5>
+            <ul class="task-list">
+              <li><span class="task-num">01.</span> What are the two red flags in this situation?</li>
+              <li><span class="task-num">02.</span> What is the correct first step before downloading anything?</li>
+              <li><span class="task-num">03.</span> Walk through the correct installation process from the beginning.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="scenario-card reveal">
+        <div class="scenario-header">
+          <span class="scenario-num">SCENARIO 02</span>
+          <h4>The Wrong Version</h4>
+        </div>
+        <div class="scenario-body">
+          <p class="scenario-situation">A user calls because their newly installed application crashes immediately on launch. You remote in and see they're running a 64-bit Windows 11 machine but installed the 32-bit version of the software. They also have a previous version from two years ago still showing in Programs and Features.</p>
+          <div class="scenario-tasks">
+            <h5>// your task</h5>
+            <ul class="task-list">
+              <li><span class="task-num">01.</span> What is the correct remediation order?</li>
+              <li><span class="task-num">02.</span> How do you verify you're downloading the right architecture version?</li>
+              <li><span class="task-num">03.</span> What do you document in the ticket?</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="scenario-card reveal">
+        <div class="scenario-header">
+          <span class="scenario-num">SCENARIO 03</span>
+          <h4>The Group Policy Block</h4>
+        </div>
+        <div class="scenario-body">
+          <p class="scenario-situation">A small business employee needs a specialized accounting tool installed. You run the installer and receive: "The installation of this application has been blocked by your system administrator." You've verified the installer is legitimate and from the official source.</p>
+          <div class="scenario-tasks">
+            <h5>// your task</h5>
+            <ul class="task-list">
+              <li><span class="task-num">01.</span> What does this error message tell you about the root cause?</li>
+              <li><span class="task-num">02.</span> Who do you involve next and what do you tell them?</li>
+              <li><span class="task-num">03.</span> How do you document and close this ticket while it's being escalated?</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-divider"></div>
+
+      <div class="content-block reveal">
+        <p class="content-label">// 3.2 — documentation practice</p>
+        <h2>Write the Ticket Note</h2>
+        <p>Use the format below and write the ticket note for <strong>Scenario 1.</strong></p>
+        <table class="doc-table">
+          <thead><tr><th>Field</th><th>Your Entry</th></tr></thead>
+          <tbody>
+            <tr><td>Date / Time</td><td><input class="doc-input-line" type="text" placeholder="e.g. 2026-03-08 · 9:15 AM" /></td></tr>
+            <tr><td>Software Requested</td><td><input class="doc-input-line" type="text" placeholder="Name and version if known" /></td></tr>
+            <tr><td>Source URL Verified?</td><td><input class="doc-input-line" type="text" placeholder="Yes / No — what URL was used?" /></td></tr>
+            <tr><td>Admin Rights Used?</td><td><input class="doc-input-line" type="text" placeholder="Yes / No" /></td></tr>
+            <tr><td>Installation Result</td><td><input class="doc-input-line" type="text" placeholder="Success / Failed / Blocked" /></td></tr>
+            <tr><td>Issues Encountered</td><td><input class="doc-input-line" type="text" placeholder="Describe any errors or deviations" /></td></tr>
+            <tr><td>Steps Taken</td><td><input class="doc-input-line" type="text" placeholder="SOP-002 steps taken, any deviations" /></td></tr>
+            <tr><td>Resolution / Status</td><td><input class="doc-input-line" type="text" placeholder="Resolved / Escalated / Pending" /></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="section-divider"></div>
+
+      <div class="content-block reveal">
+        <p class="content-label">// 3.3 — interview preparation</p>
+        <h2>Practice These Out Loud</h2>
+        <p>Employers at every level ask some version of these questions. Put the frameworks below into your own words.</p>
+      </div>
+
+      <div class="interview-card reveal">
+        <div class="interview-q">
+          <div class="interview-q-label">// interview question 01</div>
+          <p>"Walk me through how you handle a software installation request from start to finish."</p>
+        </div>
+        <div class="interview-a">
+          <div class="interview-a-label">// model answer framework</div>
+          <p>Start with <strong>authorization</strong> → check system requirements → download from official source only → run as administrator → follow prompts declining bundled software → verify it launches and core functions work → <strong>document everything.</strong></p>
+        </div>
+      </div>
+
+      <div class="interview-card reveal">
+        <div class="interview-q">
+          <div class="interview-q-label">// interview question 02</div>
+          <p>"A user says they downloaded software from 'a site they found on Google' and it's not working. What do you do?"</p>
+        </div>
+        <div class="interview-a">
+          <div class="interview-a-label">// model answer framework</div>
+          <p>First, I treat this as a potential <strong>security issue</strong> before a tech issue. I'd check the download source, run the file through Windows Defender, and if anything looks suspicious, quarantine and escalate. Then I'd locate the official vendor site and start fresh with a legitimate installer.</p>
+        </div>
+      </div>
+
+      <div class="interview-card reveal">
+        <div class="interview-q">
+          <div class="interview-q-label">// interview question 03</div>
+          <p>"How do you handle an installation that keeps failing with Error 1603?"</p>
+        </div>
+        <div class="interview-a">
+          <div class="interview-a-label">// model answer framework</div>
+          <p>Error 1603 is a generic Windows Installer error that usually points to permissions, a conflicting install, or a corrupted <code>%temp%</code> directory. My steps: run as admin, clear <code>%temp%</code>, check Add/Remove Programs for any existing version, restart the machine, retry. If it still fails, I check the Windows Installer log in <code>%temp%</code> for the actual root cause.</p>
+        </div>
+      </div>
+
+      <div class="section-divider"></div>
+
+      <div class="content-block reveal">
+        <p class="content-label">// module completion checklist</p>
+        <h2>Before You Move On</h2>
+        <p>Check each item before marking this module complete.</p>
+        <div class="checklist">
+          <div class="check-item"><div class="check-box" onclick="toggleCheck(this)"></div><span>I can name at least 4 common reasons software installation fails.</span></div>
+          <div class="check-item"><div class="check-box" onclick="toggleCheck(this)"></div><span>I know what UAC is, why it exists, and what to look for in the prompt.</span></div>
+          <div class="check-item"><div class="check-box" onclick="toggleCheck(this)"></div><span>I can identify .msi vs .exe vs .appx installer types and how they differ.</span></div>
+          <div class="check-item"><div class="check-box" onclick="toggleCheck(this)"></div><span>I can walk through SOP-002 all 7 steps from memory.</span></div>
+          <div class="check-item"><div class="check-box" onclick="toggleCheck(this)"></div><span>I know when to escalate an installation request vs. resolve it at Tier 1.</span></div>
+          <div class="check-item"><div class="check-box" onclick="toggleCheck(this)"></div><span>I completed Scenario 1 and wrote the ticket note.</span></div>
+          <div class="check-item"><div class="check-box" onclick="toggleCheck(this)"></div><span>I practiced answering all 3 interview questions out loud.</span></div>
+        </div>
+      </div>
+
+      <div class="section-divider"></div>
+
+      <div class="content-block reveal">
+        <p class="content-label">// what comes next</p>
+        <h2>Keep Building</h2>
+        <p>Every module follows the same structure. The further you go, the more you'll realize you already know.</p>
+        <div class="next-modules">
+          <a href="01-password-resets.html" class="next-card">
+            <div class="next-label">// module 01 — tier 1</div>
+            <h4>Password Resets & Account Lockouts</h4>
+            <p>SOP-001 · The most common Tier 1 ticket. Revisit if needed.</p>
+          </a>
+          <a href="03-wifi-connectivity.html" class="next-card">
+            <div class="next-label">// module 03 — tier 1</div>
+            <h4>Wi-Fi & Network Connectivity</h4>
+            <p>SOP-003 · Connectivity troubleshooting from the physical layer to DNS.</p>
+          </a>
+        </div>
+      </div>
+
+      <div class="page-nav reveal">
+        <button class="page-nav-back" onclick="switchPhase('p2', document.querySelectorAll('.phase-tab')[1])" style="background:none;border:none;cursor:pointer;font-family:'IBM Plex Mono',monospace;font-size:0.75rem;letter-spacing:0.08em;color:var(--off-white);">← Phase 2 — Do IT</button>
+        <a href="../learn.html" class="page-nav-next">Back to All Modules →</a>
+      </div>
+      <div id="complete-block" style="margin-top:2rem;padding:1.5rem;background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.2);border-radius:10px;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;">
+        <div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:#4ade80;margin-bottom:0.3rem;">Module 02 · SOP-002</div>
+          <div style="font-weight:600;font-size:0.95rem;" id="complete-msg">Finished all three phases? Mark this module complete.</div>
+        </div>
+        <button id="btn-complete" onclick="markThisComplete()" style="font-family:'IBM Plex Mono',monospace;font-size:0.7rem;letter-spacing:0.08em;padding:0.6rem 1.25rem;border-radius:6px;background:#22c55e;color:#07081a;border:none;cursor:pointer;font-weight:500;">Mark Complete ✓</button>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <span class="footer-copy">© 2026 The Rarest Heart · therarestheart.io</span>
+    <ul class="footer-links">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../learn.html">Learn</a></li>
+      <li><a href="../sops.html">SOPs</a></li>
+      <li><a href="../contact.html">Contact</a></li>
+    </ul>
+  </footer>
+
+  <script src="../js/progress.js"></script>
+  <script>
+    const MODULE_ID = 'm02';
+    function initProgress() { if (typeof trhMarkInProgress==='function') { trhMarkInProgress(MODULE_ID); if (trhGetStatus(MODULE_ID)==='complete') showCompleted(); } }
+    function markThisComplete() { if (typeof trhMarkComplete==='function') trhMarkComplete(MODULE_ID); showCompleted(); }
+    function showCompleted() { document.getElementById('complete-msg').textContent='✓ Module 02 marked complete. Great work.'; const b=document.getElementById('btn-complete'); b.textContent='✓ Complete'; b.style.background='rgba(34,197,94,0.15)'; b.style.color='#4ade80'; b.style.border='1px solid rgba(34,197,94,0.3)'; b.disabled=true; }
+    document.addEventListener('DOMContentLoaded', initProgress);
+    function switchPhase(phase, btn) {
+      document.querySelectorAll('.phase-panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.phase-tab').forEach(t => t.classList.remove('active'));
+      document.getElementById('panel-' + phase).classList.add('active');
+      btn.classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      setTimeout(triggerReveals, 100);
+    }
+    function triggerReveals() {
+      const reveals = document.querySelectorAll('.phase-panel.active .reveal');
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry, i) => {
+          if (entry.isIntersecting) { setTimeout(() => entry.target.classList.add('visible'), i * 80); }
+        });
+      }, { threshold: 0.05 });
+      reveals.forEach(el => { el.classList.remove('visible'); observer.observe(el); });
+    }
+    function toggleCheck(el) {
+      el.classList.toggle('checked');
+      el.innerHTML = el.classList.contains('checked') ? '✓' : '';
+    }
+    window.addEventListener('load', triggerReveals);
+    const nav = document.querySelector('nav');
+    window.addEventListener('scroll', () => {
+      nav.style.borderBottomColor = window.scrollY > 40 ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.04)';
+    });
+  </script>
+</body>
+</html>

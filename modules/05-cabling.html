@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Module 05 — Cabling & Physical Layer | The Rarest Heart</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet" />
+  <style>
+    :root { --navy: #07081a; --navy-mid: #0d0f28; --navy-light: #131535; --white: #f4f4f0; --off-white: #c8c8c4; --accent: #4a6cf7; --accent-glow: rgba(74,108,247,0.25); --pulse: #e84a6f; --pulse-glow: rgba(232,74,111,0.2); --tier1: #4a6cf7; --tier2: #7c4af7; --phase1: #4a6cf7; --phase2: #7c4af7; --phase3: #e84a6f; --green: #22c55e; --amber: #f59e0b; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { background-color: var(--navy); color: var(--white); font-family: 'DM Sans', sans-serif; font-weight: 300; line-height: 1.7; overflow-x: hidden; }
+    body::before { content: ''; position: fixed; inset: 0; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E"); pointer-events: none; z-index: 0; opacity: 0.4; }
+    h1, h2, h3, h4 { font-family: 'Syne', sans-serif; line-height: 1.15; }
+    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; padding: 1.25rem 4rem; display: flex; align-items: center; justify-content: space-between; background: rgba(7,8,26,0.85); backdrop-filter: blur(16px); border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .nav-logo { display: flex; align-items: center; gap: 0.75rem; text-decoration: none; }
+    .nav-logo-heart { width: 96px; height: 96px; }
+    .nav-logo-text { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.3rem; color: var(--white); letter-spacing: -0.02em; }
+    .nav-logo-text span { color: var(--pulse); }
+    .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+    .nav-links a { color: var(--off-white); text-decoration: none; font-size: 0.875rem; font-weight: 400; letter-spacing: 0.02em; transition: color 0.2s; position: relative; }
+    .nav-links a::after { content: ''; position: absolute; bottom: -4px; left: 0; width: 0; height: 1px; background: var(--accent); transition: width 0.3s; }
+    .nav-links a:hover { color: var(--white); } .nav-links a:hover::after { width: 100%; }
+    .nav-links a.active { color: var(--white); } .nav-links a.active::after { width: 100%; }
+    .nav-cta { background: var(--accent); color: var(--white) !important; padding: 0.5rem 1.25rem; border-radius: 4px; font-weight: 500 !important; }
+    .nav-cta::after { display: none !important; } .nav-cta:hover { background: #3a5ce0 !important; }
+    section { position: relative; z-index: 1; }
+    .page-wrap { max-width: 860px; margin: 0 auto; padding: 0 2rem; }
+    .module-header { padding: 8rem 0 3.5rem; border-bottom: 1px solid rgba(255,255,255,0.06); position: relative; overflow: hidden; }
+    .module-header-glow { position: absolute; width: 500px; height: 500px; border-radius: 50%; background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%); top: -150px; right: -100px; pointer-events: none; }
+    .module-header-inner { position: relative; z-index: 1; }
+    .breadcrumb { display: flex; align-items: center; gap: 0.5rem; font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; letter-spacing: 0.1em; color: var(--off-white); opacity: 0.5; margin-bottom: 1.75rem; }
+    .breadcrumb a { color: var(--off-white); text-decoration: none; transition: color 0.2s; } .breadcrumb a:hover { color: var(--accent); opacity: 1; } .breadcrumb-sep { opacity: 0.4; }
+    .module-eyebrow { font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.75rem; opacity: 0; animation: fadeUp 0.7s ease forwards 0.1s; }
+    .module-eyebrow::before { content: ''; display: inline-block; width: 24px; height: 1px; background: var(--accent); }
+    .module-title { font-size: clamp(2.2rem, 5vw, 3.5rem); font-weight: 800; letter-spacing: -0.03em; margin-bottom: 1rem; opacity: 0; animation: fadeUp 0.7s ease forwards 0.25s; }
+    .module-title em { font-style: normal; color: var(--pulse); position: relative; }
+    .module-title em::after { content: ''; position: absolute; bottom: 3px; left: 0; right: 0; height: 3px; background: var(--pulse); opacity: 0.4; border-radius: 2px; }
+    .module-desc { font-size: 1.05rem; color: var(--off-white); max-width: 560px; font-weight: 300; line-height: 1.7; margin-bottom: 2rem; opacity: 0; animation: fadeUp 0.7s ease forwards 0.4s; }
+    .module-chips { display: flex; gap: 0.6rem; flex-wrap: wrap; opacity: 0; animation: fadeUp 0.7s ease forwards 0.55s; }
+    .chip { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.3rem 0.75rem; border-radius: 20px; }
+    .chip-blue { background: rgba(74,108,247,0.12); color: #7a9eff; border: 1px solid rgba(74,108,247,0.25); }
+    .chip-gray { background: rgba(255,255,255,0.05); color: var(--off-white); border: 1px solid rgba(255,255,255,0.1); }
+    .chip-green { background: rgba(34,197,94,0.1); color: #4ade80; border: 1px solid rgba(34,197,94,0.2); }
+    .phase-nav { display: flex; gap: 0; margin-top: 2.5rem; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 8px; padding: 4px; width: fit-content; opacity: 0; animation: fadeUp 0.7s ease forwards 0.7s; }
+    .phase-tab { font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.6rem 1.4rem; border-radius: 5px; cursor: pointer; transition: all 0.2s; color: var(--off-white); border: none; background: transparent; font-weight: 500; }
+    .phase-tab:hover { color: var(--white); }
+    .phase-tab.p1.active { background: var(--navy-light); color: #7a9eff; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+    .phase-tab.p2.active { background: var(--navy-light); color: #b07aff; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+    .phase-tab.p3.active { background: var(--navy-light); color: #ff7a9a; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+    .phase-panel { display: none; padding: 4rem 0 6rem; } .phase-panel.active { display: block; }
+    .phase-banner { border-radius: 10px; padding: 1.75rem 2rem; margin-bottom: 3rem; display: flex; align-items: center; gap: 1.25rem; }
+    .phase-banner.p1 { background: rgba(74,108,247,0.08); border: 1px solid rgba(74,108,247,0.2); }
+    .phase-banner.p2 { background: rgba(124,74,247,0.08); border: 1px solid rgba(124,74,247,0.2); }
+    .phase-banner.p3 { background: rgba(232,74,111,0.08); border: 1px solid rgba(232,74,111,0.2); }
+    .phase-banner-icon { font-size: 1.75rem; width: 52px; height: 52px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .p1 .phase-banner-icon { background: rgba(74,108,247,0.15); } .p2 .phase-banner-icon { background: rgba(124,74,247,0.15); } .p3 .phase-banner-icon { background: rgba(232,74,111,0.15); }
+    .phase-banner-text h3 { font-size: 1.15rem; font-weight: 800; letter-spacing: -0.01em; margin-bottom: 0.2rem; }
+    .p1 .phase-banner-text h3 { color: #7a9eff; } .p2 .phase-banner-text h3 { color: #b07aff; } .p3 .phase-banner-text h3 { color: #ff7a9a; }
+    .phase-banner-text p { font-size: 0.875rem; color: var(--off-white); font-style: italic; }
+    .content-block { margin-bottom: 3rem; }
+    .content-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.6rem; }
+    .content-block h2 { font-size: 1.5rem; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 0.75rem; }
+    .content-block p { font-size: 0.95rem; color: var(--off-white); line-height: 1.8; margin-bottom: 0.75rem; }
+    .content-block p strong { color: var(--white); font-weight: 600; }
+    .trh-table { width: 100%; border-collapse: collapse; margin: 1.25rem 0; font-size: 0.875rem; }
+    .trh-table th { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--off-white); opacity: 0.7; padding: 0.75rem 1.25rem; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.02); }
+    .trh-table td { padding: 0.9rem 1.25rem; border-bottom: 1px solid rgba(255,255,255,0.05); color: var(--off-white); vertical-align: top; line-height: 1.6; }
+    .trh-table td:first-child { color: var(--white); font-weight: 500; } .trh-table tr:last-child td { border-bottom: none; } .trh-table tr:hover td { background: rgba(255,255,255,0.02); }
+    .callout-warning { background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.3); border-left: 3px solid #f59e0b; border-radius: 8px; padding: 1.5rem 1.75rem; margin: 1.5rem 0; display: flex; gap: 1rem; align-items: flex-start; }
+    .callout-warning-icon { font-size: 1.25rem; flex-shrink: 0; margin-top: 1px; }
+    .callout-warning-body h4 { font-size: 0.95rem; font-weight: 700; color: #fbbf24; margin-bottom: 0.4rem; }
+    .callout-warning-body p { font-size: 0.875rem; color: var(--off-white); line-height: 1.7; margin: 0; }
+    .callout-info { background: rgba(74,108,247,0.07); border: 1px solid rgba(74,108,247,0.2); border-left: 3px solid var(--accent); border-radius: 8px; padding: 1.5rem 1.75rem; margin: 1.5rem 0; display: flex; gap: 1rem; align-items: flex-start; }
+    .callout-info-icon { font-size: 1.25rem; flex-shrink: 0; margin-top: 1px; }
+    .callout-info-body h4 { font-size: 0.95rem; font-weight: 700; color: #7a9eff; margin-bottom: 0.4rem; }
+    .callout-info-body p { font-size: 0.875rem; color: var(--off-white); line-height: 1.7; margin: 0; }
+    .glossary-grid { display: flex; flex-direction: column; gap: 0; border: 1px solid rgba(255,255,255,0.07); border-radius: 8px; overflow: hidden; margin-top: 1.25rem; }
+    .glossary-row { display: grid; grid-template-columns: 200px 1fr; gap: 0; border-bottom: 1px solid rgba(255,255,255,0.05); transition: background 0.2s; }
+    .glossary-row:last-child { border-bottom: none; } .glossary-row:hover { background: rgba(255,255,255,0.02); }
+    .glossary-term { font-family: 'IBM Plex Mono', monospace; font-size: 0.78rem; font-weight: 500; color: var(--accent); padding: 1rem 1.25rem; border-right: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; }
+    .glossary-def { font-size: 0.875rem; color: var(--off-white); padding: 1rem 1.25rem; line-height: 1.6; }
+    .sop-header { background: rgba(124,74,247,0.07); border: 1px solid rgba(124,74,247,0.2); border-radius: 8px; padding: 1.5rem 1.75rem; margin-bottom: 2rem; }
+    .sop-id { font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; color: #b07aff; letter-spacing: 0.15em; margin-bottom: 0.3rem; }
+    .sop-header h3 { font-size: 1.1rem; font-weight: 700; color: var(--white); margin-bottom: 0.4rem; }
+    .sop-header p { font-size: 0.85rem; color: var(--off-white); line-height: 1.6; margin: 0; }
+    .steps-list { display: flex; flex-direction: column; gap: 0.75rem; margin: 1.5rem 0; }
+    .step-card { display: flex; gap: 1.25rem; align-items: flex-start; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 1.25rem 1.5rem; transition: border-color 0.2s; }
+    .step-card:hover { border-color: rgba(124,74,247,0.3); background: rgba(124,74,247,0.03); }
+    .step-num { font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: #b07aff; font-weight: 700; min-width: 28px; margin-top: 2px; }
+    .step-body h4 { font-size: 0.95rem; font-weight: 700; margin-bottom: 0.3rem; color: var(--white); }
+    .step-body p { font-size: 0.875rem; color: var(--off-white); line-height: 1.65; margin: 0; }
+    .step-body p strong { color: var(--white); }
+    .step-body code { font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; background: rgba(255,255,255,0.06); padding: 0.1rem 0.4rem; border-radius: 3px; color: #7a9eff; }
+    .escalation-box { background: rgba(232,74,111,0.06); border: 1px solid rgba(232,74,111,0.2); border-radius: 8px; padding: 1.5rem 1.75rem; margin: 2rem 0; }
+    .escalation-box h4 { font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; color: #ff7a9a; margin-bottom: 0.75rem; }
+    .escalation-box ul { list-style: none; display: flex; flex-direction: column; gap: 0.4rem; }
+    .escalation-box ul li { font-size: 0.875rem; color: var(--off-white); padding-left: 1.25rem; position: relative; line-height: 1.6; }
+    .escalation-box ul li::before { content: '→'; position: absolute; left: 0; color: #ff7a9a; font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; }
+    .quick-ref-table { width: 100%; border-collapse: collapse; border: 1px solid rgba(255,255,255,0.07); border-radius: 8px; overflow: hidden; margin-top: 1.5rem; font-size: 0.875rem; }
+    .quick-ref-table th { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--off-white); opacity: 0.7; padding: 0.75rem 1.25rem; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.02); }
+    .quick-ref-table td { padding: 0.9rem 1.25rem; border-bottom: 1px solid rgba(255,255,255,0.05); color: var(--off-white); vertical-align: top; line-height: 1.6; }
+    .quick-ref-table td:first-child { color: var(--white); font-weight: 500; } .quick-ref-table tr:last-child td { border-bottom: none; }
+    .scenario-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; overflow: hidden; margin-bottom: 1.5rem; }
+    .scenario-header { padding: 1.25rem 1.75rem; border-bottom: 1px solid rgba(255,255,255,0.06); display: flex; align-items: center; gap: 1rem; }
+    .scenario-num { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; letter-spacing: 0.15em; color: #ff7a9a; background: rgba(232,74,111,0.1); border: 1px solid rgba(232,74,111,0.2); padding: 0.25rem 0.6rem; border-radius: 20px; flex-shrink: 0; }
+    .scenario-header h4 { font-size: 1rem; font-weight: 700; letter-spacing: -0.01em; }
+    .scenario-body { padding: 1.5rem 1.75rem; }
+    .scenario-situation { font-size: 0.925rem; color: var(--off-white); line-height: 1.75; font-style: italic; margin-bottom: 1.25rem; padding-bottom: 1.25rem; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .scenario-tasks h5 { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.75rem; }
+    .task-list { list-style: none; display: flex; flex-direction: column; gap: 0.6rem; }
+    .task-list li { display: flex; gap: 0.75rem; font-size: 0.875rem; color: var(--off-white); line-height: 1.6; }
+    .task-list li .task-num { font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; color: #ff7a9a; font-weight: 700; flex-shrink: 0; margin-top: 2px; width: 18px; }
+    .doc-table { width: 100%; border-collapse: collapse; margin: 1.25rem 0; font-size: 0.875rem; }
+    .doc-table th { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--off-white); opacity: 0.6; padding: 0.75rem 1.25rem; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.02); }
+    .doc-table td { padding: 0.9rem 1.25rem; border-bottom: 1px solid rgba(255,255,255,0.05); color: var(--off-white); vertical-align: top; }
+    .doc-table td:first-child { color: var(--white); font-weight: 500; width: 180px; } .doc-table tr:last-child td { border-bottom: none; }
+    .doc-input-line { display: block; width: 100%; border: none; border-bottom: 1px dashed rgba(255,255,255,0.15); background: transparent; color: var(--white); font-family: 'DM Sans', sans-serif; font-size: 0.875rem; padding: 0.3rem 0; outline: none; transition: border-color 0.2s; }
+    .doc-input-line:focus { border-bottom-color: var(--accent); }
+    .doc-input-line::placeholder { color: rgba(255,255,255,0.15); font-style: italic; }
+    .interview-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; overflow: hidden; margin-bottom: 1.25rem; }
+    .interview-q { padding: 1.25rem 1.75rem; border-bottom: 1px solid rgba(255,255,255,0.06); background: rgba(255,255,255,0.02); }
+    .interview-q-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.4rem; }
+    .interview-q p { font-size: 0.95rem; font-weight: 600; color: var(--white); font-style: italic; margin: 0; line-height: 1.5; }
+    .interview-a { padding: 1.25rem 1.75rem; }
+    .interview-a-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; color: #ff7a9a; margin-bottom: 0.5rem; }
+    .interview-a p { font-size: 0.875rem; color: var(--off-white); line-height: 1.75; margin: 0; }
+    .interview-a strong { color: var(--white); }
+    .checklist { display: flex; flex-direction: column; gap: 0.6rem; margin-top: 1.25rem; }
+    .check-item { display: flex; align-items: flex-start; gap: 0.75rem; font-size: 0.9rem; color: var(--off-white); line-height: 1.6; }
+    .check-box { width: 20px; height: 20px; border: 1.5px solid rgba(255,255,255,0.2); border-radius: 4px; flex-shrink: 0; margin-top: 2px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; }
+    .check-box.checked { background: var(--green); border-color: var(--green); color: white; }
+    .next-modules { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-top: 1.5rem; }
+    .next-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.07); border-radius: 8px; padding: 1.5rem; text-decoration: none; color: inherit; transition: all 0.2s; display: block; }
+    .next-card:hover { border-color: rgba(74,108,247,0.3); background: rgba(74,108,247,0.05); transform: translateY(-2px); }
+    .next-card .next-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; letter-spacing: 0.15em; color: var(--accent); margin-bottom: 0.4rem; }
+    .next-card h4 { font-size: 0.95rem; font-weight: 700; margin-bottom: 0.3rem; }
+    .next-card p { font-size: 0.8rem; color: var(--off-white); margin: 0; }
+    .page-nav { padding: 3rem 0 5rem; border-top: 1px solid rgba(255,255,255,0.06); display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+    .page-nav-back { font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; letter-spacing: 0.08em; color: var(--off-white); text-decoration: none; transition: color 0.2s; }
+    .page-nav-back:hover { color: var(--accent); }
+    .page-nav-next { background: var(--accent); color: var(--white); padding: 0.75rem 1.75rem; border-radius: 4px; text-decoration: none; font-weight: 500; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 0.5rem; transition: background 0.2s, transform 0.2s; border: none; cursor: pointer; }
+    .page-nav-next:hover { background: #3a5ce0; transform: translateY(-1px); }
+    .section-divider { height: 1px; background: rgba(255,255,255,0.06); margin: 2.5rem 0; }
+    footer { border-top: 1px solid rgba(255,255,255,0.06); padding: 3rem 4rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
+    .footer-copy { font-size: 0.8rem; color: var(--off-white); opacity: 0.5; }
+    .footer-links { display: flex; gap: 2rem; list-style: none; }
+    .footer-links a { font-size: 0.8rem; color: var(--off-white); opacity: 0.5; text-decoration: none; transition: opacity 0.2s; }
+    .footer-links a:hover { opacity: 1; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+    .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.6s ease, transform 0.6s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    @media (max-width: 900px) {
+      nav { padding: 1rem 1.5rem; } .nav-links { display: none; }
+      .page-wrap { padding: 0 1.25rem; } .module-header { padding: 7rem 0 2.5rem; }
+      .next-modules { grid-template-columns: 1fr; }
+      .glossary-row { grid-template-columns: 1fr; } .glossary-term { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.05); }
+      footer { padding: 2rem 1.5rem; flex-direction: column; align-items: flex-start; }
+      .phase-nav { width: 100%; } .phase-tab { flex: 1; text-align: center; font-size: 0.65rem; padding: 0.6rem 0.75rem; }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="../index.html" class="nav-logo">
+      <svg class="nav-logo-heart" viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M48 82C48 82 12 58 12 34C12 22.954 20.954 14 32 14C38.627 14 44.51 17.168 48 22.08C51.49 17.168 57.373 14 64 14C75.046 14 84 22.954 84 34C84 58 48 82 48 82Z" fill="#e84a6f" opacity="0.9"/>
+        <path d="M48 82C48 82 12 58 12 34C12 22.954 20.954 14 32 14C38.627 14 44.51 17.168 48 22.08" fill="#c73d5c"/>
+      </svg>
+      <span class="nav-logo-text">the rarest <span>heart</span></span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../learn.html" class="active">Learn IT</a></li>
+      <li><a href="../do.html">Do IT</a></li>
+      <li><a href="../apply.html">Apply IT</a></li>
+      <li><a href="../topics.html">Topics</a></li>
+      <li><a href="../members.html">My Progress</a></li>
+      <li><a href="../contact.html" class="nav-cta">Contact</a></li>
+    </ul>
+  </nav>
+
+  <section class="module-header">
+    <div class="module-header-glow"></div>
+    <div class="page-wrap module-header-inner">
+      <div class="breadcrumb">
+        <a href="../index.html">Home</a><span class="breadcrumb-sep">/</span>
+        <a href="../learn.html">Learn IT</a><span class="breadcrumb-sep">/</span>
+        <span>Module 05</span>
+      </div>
+      <div class="module-eyebrow">Tier 1 · SOP-005 · Module 05 of 09</div>
+      <h1 class="module-title">Cabling &amp; <em>Physical Layer</em></h1>
+      <p class="module-desc">Know your cable standards, connector types, and physical layer fundamentals. The physical layer is where every network starts — and where half the problems actually live.</p>
+      <div class="module-chips">
+        <span class="chip chip-blue">Tier 1 — Help Desk</span>
+        <span class="chip chip-gray">SOP-005</span>
+        <span class="chip chip-green">Beginner</span>
+        <span class="chip chip-gray">Physical Infrastructure</span>
+      </div>
+      <div class="phase-nav">
+        <button class="phase-tab p1 active" onclick="switchPhase('p1', this)">01 · Learn IT</button>
+        <button class="phase-tab p2" onclick="switchPhase('p2', this)">02 · Do IT</button>
+        <button class="phase-tab p3" onclick="switchPhase('p3', this)">03 · Apply IT</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- PHASE 1 -->
+  <div id="panel-p1" class="phase-panel active">
+    <div class="page-wrap">
+      <div class="phase-banner p1">
+        <div class="phase-banner-icon">🔌</div>
+        <div class="phase-banner-text">
+          <h3>Phase 1 — Learn IT</h3>
+          <p>Learn the cable standards, connector types, and physical infrastructure that every IT tech needs to identify and work with confidently.</p>
+        </div>
+      </div>
+
+      <div class="content-block reveal">
+        <div class="content-label">Foundation</div>
+        <h2>The Physical Layer (OSI Layer 1)</h2>
+        <p>Layer 1 is the physical medium — copper wire, fiber optic glass, or radio waves. Before any software troubleshooting can help, the physical layer must work. A cracked cable, a bad crimp, or a wrong connector type will fail silently in ways that look like software problems until you test the physical layer directly.</p>
+        <p>Most environments use <strong>twisted pair copper cable (Ethernet)</strong> for desktop and server connections, <strong>fiber optic</strong> for backbone and long-distance runs, and <strong>coaxial</strong> for cable TV and some older setups. Help desk techs deal with copper 99% of the time.</p>
+      </div>
+
+      <div class="content-block reveal">
+        <div class="content-label">Cable Standards</div>
+        <h2>Ethernet Cable Categories</h2>
+        <table class="trh-table">
+          <thead><tr><th>Category</th><th>Max Speed</th><th>Max Length</th><th>Common Use</th></tr></thead>
+          <tbody>
+            <tr><td>Cat 5</td><td>100 Mbps</td><td>100m</td><td>Legacy; avoid in new installs</td></tr>
+            <tr><td>Cat 5e</td><td>1 Gbps</td><td>100m</td><td>Still common in older offices</td></tr>
+            <tr><td>Cat 6</td><td>1 Gbps (10G up to 55m)</td><td>100m</td><td>Current standard for most offices</td></tr>
+            <tr><td>Cat 6a</td><td>10 Gbps</td><td>100m</td><td>Data centers, high-bandwidth runs</td></tr>
+            <tr><td>Cat 7</td><td>10 Gbps</td><td>100m</td><td>Shielded; data centers and industrial</td></tr>
+            <tr><td>Cat 8</td><td>25–40 Gbps</td><td>30m</td><td>Data center switch-to-switch connections</td></tr>
+          </tbody>
+        </table>
+
+        <div class="callout-info">
+          <div class="callout-info-icon">💡</div>
+          <div class="callout-info-body">
+            <h4>The 100 Meter Rule</h4>
+            <p>All copper Ethernet standards have a 100-meter (328 feet) maximum segment length. Beyond that, signal degrades and you'll see intermittent drops and errors. If a run is longer, you need a switch or repeater to extend it. Fiber has no such limit for practical distances.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="content-block reveal">
+        <div class="content-label">Connector Types</div>
+        <h2>Common Connectors You'll Work With</h2>
+        <table class="trh-table">
+          <thead><tr><th>Connector</th><th>Used For</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr><td>RJ-45</td><td>Ethernet (twisted pair)</td><td>8-pin, clear plastic. Used on all Cat 5e/6/6a runs</td></tr>
+            <tr><td>RJ-11</td><td>Telephone / DSL</td><td>6-pin, smaller than RJ-45. Don't mix them up</td></tr>
+            <tr><td>LC (Fiber)</td><td>Single-mode & multi-mode fiber</td><td>Small form factor; most common fiber connector today</td></tr>
+            <tr><td>SC (Fiber)</td><td>Single-mode & multi-mode fiber</td><td>Older square connector; still found in legacy installs</td></tr>
+            <tr><td>USB-A / USB-C</td><td>Peripheral connections</td><td>USB-C reversible; both used for adapters and docking</td></tr>
+            <tr><td>HDMI / DisplayPort</td><td>Video/audio output</td><td>HDMI common on monitors; DisplayPort on pro displays</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="content-block reveal">
+        <div class="content-label">Wiring Standards</div>
+        <h2>T568A vs. T568B — The Only Two That Matter</h2>
+        <p>When terminating (crimping) an RJ-45 connector onto a cable, you must follow a specific color sequence. There are two standards: <strong>T568A</strong> and <strong>T568B</strong>. T568B is the most widely used in North American commercial installations.</p>
+        <p>Both ends of a <strong>straight-through cable</strong> use the same standard (both T568B). A <strong>crossover cable</strong> uses T568A on one end and T568B on the other — used historically to connect two computers directly, though modern switches handle this automatically (auto-MDI/MDX).</p>
+
+        <table class="trh-table">
+          <thead><tr><th>Pin</th><th>T568A Color</th><th>T568B Color</th><th>Function</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td>White/Green</td><td>White/Orange</td><td>TX+</td></tr>
+            <tr><td>2</td><td>Green</td><td>Orange</td><td>TX-</td></tr>
+            <tr><td>3</td><td>White/Orange</td><td>White/Green</td><td>RX+</td></tr>
+            <tr><td>4</td><td>Blue</td><td>Blue</td><td>Unused (PoE)</td></tr>
+            <tr><td>5</td><td>White/Blue</td><td>White/Blue</td><td>Unused (PoE)</td></tr>
+            <tr><td>6</td><td>Orange</td><td>Green</td><td>RX-</td></tr>
+            <tr><td>7</td><td>White/Brown</td><td>White/Brown</td><td>Unused</td></tr>
+            <tr><td>8</td><td>Brown</td><td>Brown</td><td>Unused</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="content-block reveal">
+        <div class="content-label">Troubleshooting Physical Layer</div>
+        <h2>How Physical Problems Present</h2>
+        <table class="trh-table">
+          <thead><tr><th>Symptom</th><th>Likely Physical Cause</th><th>Test</th></tr></thead>
+          <tbody>
+            <tr><td>No link light on NIC or switch</td><td>Bad cable, wrong port, dead NIC</td><td>Swap cable; try different switch port</td></tr>
+            <tr><td>Intermittent drops / packet loss</td><td>Bent cable, damaged crimp, near EMI source</td><td>Cable tester; move cable away from power runs</td></tr>
+            <tr><td>Slow speeds (below expected)</td><td>Cat 5 in a Cat 6 environment, cable too long</td><td>Check cable label; measure run length</td></tr>
+            <tr><td>No link but cable looks fine</td><td>Wire broken internally (stressed bend)</td><td>Test with cable tester; replace cable</td></tr>
+            <tr><td>Connector feels loose</td><td>Tab broken, crimp failed</td><td>Re-crimp or replace the end</td></tr>
+          </tbody>
+        </table>
+
+        <div class="callout-warning">
+          <div class="callout-warning-icon">⚠️</div>
+          <div class="callout-warning-body">
+            <h4>Never Run Ethernet Parallel to Power Cables</h4>
+            <p>Running network cable next to electrical conduit introduces electromagnetic interference (EMI) that causes packet errors and intermittent drops. Always cross power cables at 90 degrees if you must intersect, and maintain at least 12 inches of separation for parallel runs. Use shielded cable (STP) if separation isn't possible.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="content-block reveal">
+        <div class="content-label">Glossary</div>
+        <h2>Key Terms</h2>
+        <div class="glossary-grid">
+          <div class="glossary-row"><div class="glossary-term">UTP</div><div class="glossary-def">Unshielded Twisted Pair. Standard copper Ethernet cable. Pairs of wires twisted together to reduce interference from each other.</div></div>
+          <div class="glossary-row"><div class="glossary-term">STP</div><div class="glossary-def">Shielded Twisted Pair. Has a foil or braided shield around the pairs to block EMI. Used in industrial or high-interference environments.</div></div>
+          <div class="glossary-row"><div class="glossary-term">Crimping</div><div class="glossary-def">The process of attaching an RJ-45 connector to the end of a cable using a crimping tool that pushes the pins into the wire insulation.</div></div>
+          <div class="glossary-row"><div class="glossary-term">PoE</div><div class="glossary-def">Power over Ethernet. Delivers electrical power through the Ethernet cable to devices like IP cameras, VoIP phones, and wireless access points.</div></div>
+          <div class="glossary-row"><div class="glossary-term">Patch Panel</div><div class="glossary-def">A panel in the network closet where wall runs terminate. Allows easy cable management and cross-connecting between ports using short patch cables.</div></div>
+          <div class="glossary-row"><div class="glossary-term">Loopback</div><div class="glossary-def">A test that sends a signal back to the sender. Loopback adapters test NIC hardware; ping 127.0.0.1 tests the software TCP/IP stack.</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 2 -->
+  <div id="panel-p2" class="phase-panel">
+    <div class="page-wrap">
+      <div class="phase-banner p2">
+        <div class="phase-banner-icon">📋</div>
+        <div class="phase-banner-text">
+          <h3>Phase 2 — Do IT</h3>
+          <p>Execute SOP-005 for any physical layer connectivity issue. Test before replacing.</p>
+        </div>
+      </div>
+
+      <div class="sop-header">
+        <div class="sop-id">SOP-005 · PHYSICAL LAYER / CABLING · REV 1.0</div>
+        <h3>Physical Layer Connectivity Troubleshooting</h3>
+        <p>Use this procedure when a wired connection has no link light, intermittent drops, or speed is below the expected rate. Always test the physical layer before touching software or settings.</p>
+      </div>
+
+      <div class="steps-list">
+        <div class="step-card">
+          <div class="step-num">01</div>
+          <div class="step-body">
+            <h4>Verify Link Light Status</h4>
+            <p>Check the NIC (back of desktop or side of laptop) — is the link light on? Check the switch or wall port as well. No link light on either end = no physical connection. A flashing amber/orange light may indicate a speed mismatch or duplex issue. Green steady = connected; green flashing = activity.</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">02</div>
+          <div class="step-body">
+            <h4>Swap the Patch Cable First</h4>
+            <p>Replace the cable between the computer and the wall port (or switch). Use a known-good cable. This rules out the most common failure — a damaged patch cable. If the link light comes on after swapping, the original cable was the problem. Label the bad cable and dispose of it.</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">03</div>
+          <div class="step-body">
+            <h4>Test the Wall Port</h4>
+            <p>Plug a known-good laptop directly into the wall port with a known-good cable. If you get a link, the wall port is fine — the problem is the user's machine or original cable. If no link, the wall port may be dead or unplugged at the patch panel. Trace the port number and check the patch panel in the comms room.</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">04</div>
+          <div class="step-body">
+            <h4>Use a Cable Tester If Available</h4>
+            <p>A cable tester verifies continuity on all 8 pins and can identify miswires, opens, and shorts. Run the tester on the suspect cable. If pins don't light in order (1-2-3-6 for a T568B cable), the cable has a wiring fault. Re-crimp or replace it. A tone generator (fox and hound) helps trace cables through walls and ceilings.</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">05</div>
+          <div class="step-body">
+            <h4>Check the Switch Port</h4>
+            <p>Move the cable to a different switch port. If the link comes up on the new port, the original switch port may be failed or disabled. Check the switch management interface (if accessible) to confirm port status. A port that shows "err-disabled" requires network team intervention.</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">06</div>
+          <div class="step-body">
+            <h4>Inspect and Re-Terminate Connectors</h4>
+            <p>If a cable must be re-terminated: strip 1–1.5 inches of outer jacket, untwist the pairs, arrange in T568B color order, trim to equal length, insert into RJ-45 connector with jacket inside the housing, and crimp firmly. Test with a cable tester after crimping. A bad crimp is worse than a bad cable — it causes intermittent failures that are hard to diagnose.</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">07</div>
+          <div class="step-body">
+            <h4>Check NIC Health in Device Manager</h4>
+            <p>If physical cable tests pass but there's still no connectivity: open <strong>Device Manager → Network Adapters</strong>. Look for yellow exclamation marks. Right-click → <strong>Properties</strong> to see error codes. Try disabling and re-enabling the adapter. If the NIC is failing, it may need to be replaced (USB-to-Ethernet adapter as a workaround for laptops).</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="escalation-box">
+        <h4>Escalate to Tier 2 / Network Team When</h4>
+        <ul>
+          <li>Multiple ports on the same switch show no link (switch may be down)</li>
+          <li>A switch port is in "err-disabled" state</li>
+          <li>Cable runs need to be pulled through walls or ceilings</li>
+          <li>Fiber connections need to be tested or replaced</li>
+          <li>Intermittent drops persist after replacing cable and testing the port</li>
+          <li>NIC replacement is needed on a company-owned device</li>
+        </ul>
+      </div>
+
+      <div class="content-block">
+        <div class="content-label">Quick Reference</div>
+        <h2>Physical Layer Cheat Sheet</h2>
+        <table class="quick-ref-table">
+          <thead><tr><th>Symptom</th><th>First Check</th><th>Fix</th></tr></thead>
+          <tbody>
+            <tr><td>No link light</td><td>Cable at both ends; NIC in Device Manager</td><td>Swap cable; try different port</td></tr>
+            <tr><td>Intermittent drops</td><td>Cable routing (near EMI?); crimp quality</td><td>Replace cable; re-route away from power</td></tr>
+            <tr><td>Speed below expected</td><td>Cable category label; run length</td><td>Replace with correct Cat rating</td></tr>
+            <tr><td>Wall port dead</td><td>Patch panel connection in comms room</td><td>Re-patch panel port; escalate if structural</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 3 -->
+  <div id="panel-p3" class="phase-panel">
+    <div class="page-wrap">
+      <div class="phase-banner p3">
+        <div class="phase-banner-icon">🎯</div>
+        <div class="phase-banner-text">
+          <h3>Phase 3 — Apply IT</h3>
+          <p>Apply physical layer knowledge to real scenarios and practice your interview answers.</p>
+        </div>
+      </div>
+
+      <div class="content-block reveal">
+        <div class="content-label">Scenarios</div>
+        <h2>Practice Tickets</h2>
+
+        <div class="scenario-card">
+          <div class="scenario-header"><span class="scenario-num">SCENARIO 01</span><h4>No Link Light</h4></div>
+          <div class="scenario-body">
+            <div class="scenario-situation">"I just moved to a new desk. My computer is plugged into the wall but I have no internet. The light on the back of my computer isn't on."</div>
+            <div class="scenario-tasks">
+              <h5>Your Tasks</h5>
+              <ul class="task-list">
+                <li><span class="task-num">1.</span>What does no link light tell you and what is your first action?</li>
+                <li><span class="task-num">2.</span>You swap the cable and still no link. What do you test next?</li>
+                <li><span class="task-num">3.</span>A known-good laptop gets no link from that wall port either. Where do you go next?</li>
+                <li><span class="task-num">4.</span>You find the patch panel port is unplugged. You re-patch it. What do you verify before closing the ticket?</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="scenario-card">
+          <div class="scenario-header"><span class="scenario-num">SCENARIO 02</span><h4>Intermittent Drops</h4></div>
+          <div class="scenario-body">
+            <div class="scenario-situation">"My network keeps dropping every 10–15 minutes. It comes back on its own but it's disrupting my work. The cable looks fine visually."</div>
+            <div class="scenario-tasks">
+              <h5>Your Tasks</h5>
+              <ul class="task-list">
+                <li><span class="task-num">1.</span>Why can't you trust a visual inspection of a cable to determine if it's good?</li>
+                <li><span class="task-num">2.</span>What tool do you use to properly test the cable and what does it check?</li>
+                <li><span class="task-num">3.</span>The cable tests fine. You notice it runs along the same path as several power cables. What is the issue and what do you recommend?</li>
+                <li><span class="task-num">4.</span>Write the resolution steps you would document in the ticket.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="scenario-card">
+          <div class="scenario-header"><span class="scenario-num">SCENARIO 03</span><h4>Speed Bottleneck</h4></div>
+          <div class="scenario-body">
+            <div class="scenario-situation">"Our office speed test shows 100 Mbps but our ISP contract says we should be getting 1 Gbps. This is affecting file transfers to the server."</div>
+            <div class="scenario-tasks">
+              <h5>Your Tasks</h5>
+              <ul class="task-list">
+                <li><span class="task-num">1.</span>What physical layer component is the most likely bottleneck and why?</li>
+                <li><span class="task-num">2.</span>How do you identify what category of cable is currently installed?</li>
+                <li><span class="task-num">3.</span>The cable is labeled Cat 5e. Is this the problem? What is the max speed of Cat 5e?</li>
+                <li><span class="task-num">4.</span>What cable category would you recommend for replacement and why?</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="content-block reveal">
+        <div class="content-label">Ticket Practice</div>
+        <h2>Document Your Resolution</h2>
+        <table class="doc-table">
+          <thead><tr><th>Field</th><th>Your Entry</th></tr></thead>
+          <tbody>
+            <tr><td>User Reported</td><td><input class="doc-input-line" placeholder="Describe the complaint..." /></td></tr>
+            <tr><td>Initial Findings</td><td><input class="doc-input-line" placeholder="Link light status, cable observations..." /></td></tr>
+            <tr><td>Root Cause</td><td><input class="doc-input-line" placeholder="Bad cable / bad port / EMI / etc." /></td></tr>
+            <tr><td>Steps Taken</td><td><input class="doc-input-line" placeholder="What you tested and replaced..." /></td></tr>
+            <tr><td>Resolution</td><td><input class="doc-input-line" placeholder="What fixed it?" /></td></tr>
+            <tr><td>Verification</td><td><input class="doc-input-line" placeholder="How you confirmed resolution..." /></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="content-block reveal">
+        <div class="content-label">Interview Prep</div>
+        <h2>Questions You'll Face</h2>
+
+        <div class="interview-card">
+          <div class="interview-q"><div class="interview-q-label">Interview Question 01</div><p>"What is the difference between Cat 5e and Cat 6 cable and when would you use each?"</p></div>
+          <div class="interview-a">
+            <div class="interview-a-label">Strong Answer Framework</div>
+            <p>Cat 5e supports <strong>1 Gbps up to 100 meters</strong> and is common in older offices still running fine for most tasks. Cat 6 also does 1 Gbps up to 100m but has tighter twists and a spline separator that reduces crosstalk — it can also do 10 Gbps up to 55 meters. I'd use Cat 5e when replacing a damaged run in an existing Cat 5e infrastructure where 1 Gbps is sufficient. I'd specify Cat 6 or Cat 6a for any new installation because the marginal cost difference is small and it future-proofs the investment for 10G speeds.</p>
+          </div>
+        </div>
+
+        <div class="interview-card">
+          <div class="interview-q"><div class="interview-q-label">Interview Question 02</div><p>"A user says their wired connection keeps dropping intermittently. How do you diagnose a physical layer problem?"</p></div>
+          <div class="interview-a">
+            <div class="interview-a-label">Strong Answer Framework</div>
+            <p>Intermittent drops are the trickiest physical layer problem because the connection seems to work. My first step is <strong>swapping the patch cable</strong> with a known-good cable — a damaged cable can test fine visually but have broken conductors internally. Then I use a <strong>cable tester</strong> to verify continuity on all 8 pins. I also check the cable routing — parallel runs alongside power cables can introduce EMI causing packet errors. If the cable tests fine and routing is clean, I move to the switch port (try a different port) and finally look at the NIC in Device Manager for errors.</p>
+          </div>
+        </div>
+
+        <div class="interview-card">
+          <div class="interview-q"><div class="interview-q-label">Interview Question 03</div><p>"Can you explain the T568B wiring standard and why it matters?"</p></div>
+          <div class="interview-a">
+            <div class="interview-a-label">Strong Answer Framework</div>
+            <p>T568B is the <strong>standard pin-to-color mapping</strong> for terminating RJ-45 connectors, and it's the most common standard in North American commercial environments. The order on pins 1–8 is: white/orange, orange, white/green, blue, white/blue, green, white/brown, brown. It matters because both ends of a cable must use the same standard (both T568B for a straight-through cable) or you'll get a miswire — the cable will fail a tester and produce no link. If you're extending an existing infrastructure, you match whatever standard is already in use to stay consistent. The other standard, T568A, is functionally identical — just pins 1,2 and 3,6 are swapped.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="content-block reveal">
+        <div class="content-label">Module Completion</div>
+        <h2>Completion Checklist</h2>
+        <div class="checklist">
+          <div class="check-item"><div class="check-box" onclick="this.classList.toggle('checked'); this.textContent = this.classList.contains('checked') ? '✓' : ''"></div><span>I know the cable categories (Cat 5e through Cat 8) and their speed/distance specs</span></div>
+          <div class="check-item"><div class="check-box" onclick="this.classList.toggle('checked'); this.textContent = this.classList.contains('checked') ? '✓' : ''"></div><span>I can identify RJ-45, RJ-11, LC, and SC connectors by sight</span></div>
+          <div class="check-item"><div class="check-box" onclick="this.classList.toggle('checked'); this.textContent = this.classList.contains('checked') ? '✓' : ''"></div><span>I know the T568B pin color order from memory</span></div>
+          <div class="check-item"><div class="check-box" onclick="this.classList.toggle('checked'); this.textContent = this.classList.contains('checked') ? '✓' : ''"></div><span>I can describe what a cable tester checks and how to interpret the results</span></div>
+          <div class="check-item"><div class="check-box" onclick="this.classList.toggle('checked'); this.textContent = this.classList.contains('checked') ? '✓' : ''"></div><span>I understand the 100 meter rule and what happens when it's exceeded</span></div>
+          <div class="check-item"><div class="check-box" onclick="this.classList.toggle('checked'); this.textContent = this.classList.contains('checked') ? '✓' : ''"></div><span>I completed all three scenarios and can explain my troubleshooting logic</span></div>
+        </div>
+
+        <div class="section-divider"></div>
+        <div class="content-label">Up Next</div>
+        <h2>Continue Your Training</h2>
+        <div class="next-modules">
+          <a href="04-printer-troubleshooting.html" class="next-card">
+            <div class="next-label">← Previous Module</div>
+            <h4>Module 04 — Printer Troubleshooting</h4>
+            <p>Print queues, spooler, and SOP-004</p>
+          </a>
+          <a href="06-malware-removal.html" class="next-card">
+            <div class="next-label">Next Module →</div>
+            <h4>Module 06 — Malware Detection &amp; Removal</h4>
+            <p>Tier 2 begins — malware types and SOP-006</p>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-wrap">
+    <div class="page-nav">
+      <a href="../learn.html" class="page-nav-back">← Back to Learn IT</a>
+      <a href="06-malware-removal.html" class="page-nav-next">Next Module →</a>
+    </div>
+  </div>
+
+  <div class="page-wrap" style="padding-bottom:1.5rem;">
+    <div id="complete-block" style="padding:1.5rem;background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.2);border-radius:10px;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;">
+      <div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:#4ade80;margin-bottom:0.3rem;">Module 05 · SOP-005</div>
+        <div style="font-weight:600;font-size:0.95rem;" id="complete-msg">Finished all three phases? Mark this module complete.</div>
+      </div>
+      <button id="btn-complete" onclick="markThisComplete()" style="font-family:'IBM Plex Mono',monospace;font-size:0.7rem;letter-spacing:0.08em;padding:0.6rem 1.25rem;border-radius:6px;background:#22c55e;color:#07081a;border:none;cursor:pointer;font-weight:500;">Mark Complete ✓</button>
+    </div>
+  </div>
+
+  <footer>
+    <span class="footer-copy">© 2025 The Rarest Heart. Built for IT learners.</span>
+    <ul class="footer-links">
+      <li><a href="../sops.html">SOPs</a></li>
+      <li><a href="../labs.html">Labs</a></li>
+      <li><a href="../contact.html">Contact</a></li>
+    </ul>
+  </footer>
+
+  <script src="../js/progress.js"></script>
+  <script>
+    const MODULE_ID = 'm05';
+    function initProgress() { if (typeof trhMarkInProgress==='function') { trhMarkInProgress(MODULE_ID); if (trhGetStatus(MODULE_ID)==='complete') showCompleted(); } }
+    function markThisComplete() { if (typeof trhMarkComplete==='function') trhMarkComplete(MODULE_ID); showCompleted(); }
+    function showCompleted() { document.getElementById('complete-msg').textContent='✓ Module 05 marked complete. Great work.'; const b=document.getElementById('btn-complete'); b.textContent='✓ Complete'; b.style.background='rgba(34,197,94,0.15)'; b.style.color='#4ade80'; b.style.border='1px solid rgba(34,197,94,0.3)'; b.disabled=true; }
+    document.addEventListener('DOMContentLoaded', initProgress);
+    function switchPhase(phase, btn) {
+      document.querySelectorAll('.phase-panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.phase-tab').forEach(t => t.classList.remove('active'));
+      document.getElementById('panel-' + phase).classList.add('active');
+      btn.classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      setTimeout(triggerReveals, 100);
+    }
+    function triggerReveals() {
+      const reveals = document.querySelectorAll('.reveal');
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add('visible'); observer.unobserve(entry.target); } });
+      }, { threshold: 0.1 });
+      reveals.forEach(el => { if (!el.classList.contains('visible')) observer.observe(el); });
+    }
+    document.addEventListener('DOMContentLoaded', triggerReveals);
+  </script>
+</body>
+</html>

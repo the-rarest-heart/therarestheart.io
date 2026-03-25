@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Module 03 — Wi-Fi & Network Connectivity | The Rarest Heart</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --navy: #07081a; --navy-mid: #0d0f28; --navy-light: #131535;
+      --white: #f4f4f0; --off-white: #c8c8c4;
+      --accent: #4a6cf7; --accent-glow: rgba(74,108,247,0.25);
+      --pulse: #e84a6f; --pulse-glow: rgba(232,74,111,0.2);
+      --tier1: #4a6cf7; --tier2: #7c4af7;
+      --phase1: #4a6cf7; --phase2: #7c4af7; --phase3: #e84a6f;
+      --green: #22c55e; --amber: #f59e0b;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { background-color: var(--navy); color: var(--white); font-family: 'DM Sans', sans-serif; font-weight: 300; line-height: 1.7; overflow-x: hidden; }
+    body::before { content: ''; position: fixed; inset: 0; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E"); pointer-events: none; z-index: 0; opacity: 0.4; }
+    h1, h2, h3, h4 { font-family: 'Syne', sans-serif; line-height: 1.15; }
+    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; padding: 1.25rem 4rem; display: flex; align-items: center; justify-content: space-between; background: rgba(7,8,26,0.85); backdrop-filter: blur(16px); border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .nav-logo { display: flex; align-items: center; gap: 0.75rem; text-decoration: none; }
+    .nav-logo-heart { width: 96px; height: 96px; }
+    .nav-logo-text { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.3rem; color: var(--white); letter-spacing: -0.02em; }
+    .nav-logo-text span { color: var(--pulse); }
+    .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+    .nav-links a { color: var(--off-white); text-decoration: none; font-size: 0.875rem; font-weight: 400; letter-spacing: 0.02em; transition: color 0.2s; position: relative; }
+    .nav-links a::after { content: ''; position: absolute; bottom: -4px; left: 0; width: 0; height: 1px; background: var(--accent); transition: width 0.3s; }
+    .nav-links a:hover { color: var(--white); }
+    .nav-links a:hover::after { width: 100%; }
+    .nav-links a.active { color: var(--white); }
+    .nav-links a.active::after { width: 100%; }
+    .nav-cta { background: var(--accent); color: var(--white) !important; padding: 0.5rem 1.25rem; border-radius: 4px; font-weight: 500 !important; }
+    .nav-cta::after { display: none !important; }
+    .nav-cta:hover { background: #3a5ce0 !important; }
+    section { position: relative; z-index: 1; }
+    .page-wrap { max-width: 860px; margin: 0 auto; padding: 0 2rem; }
+    .module-header { padding: 8rem 0 3.5rem; border-bottom: 1px solid rgba(255,255,255,0.06); position: relative; overflow: hidden; }
+    .module-header-glow { position: absolute; width: 500px; height: 500px; border-radius: 50%; background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%); top: -150px; right: -100px; pointer-events: none; }
+    .module-header-inner { position: relative; z-index: 1; }
+    .breadcrumb { display: flex; align-items: center; gap: 0.5rem; font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; letter-spacing: 0.1em; color: var(--off-white); opacity: 0.5; margin-bottom: 1.75rem; }
+    .breadcrumb a { color: var(--off-white); text-decoration: none; transition: color 0.2s; }
+    .breadcrumb a:hover { color: var(--accent); opacity: 1; }
+    .breadcrumb-sep { opacity: 0.4; }
+    .module-eyebrow { font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.75rem; opacity: 0; animation: fadeUp 0.7s ease forwards 0.1s; }
+    .module-eyebrow::before { content: ''; display: inline-block; width: 24px; height: 1px; background: var(--accent); }
+    .module-title { font-size: clamp(2.2rem, 5vw, 3.5rem); font-weight: 800; letter-spacing: -0.03em; margin-bottom: 1rem; opacity: 0; animation: fadeUp 0.7s ease forwards 0.25s; }
+    .module-title em { font-style: normal; color: var(--pulse); position: relative; }
+    .module-title em::after { content: ''; position: absolute; bottom: 3px; left: 0; right: 0; height: 3px; background: var(--pulse); opacity: 0.4; border-radius: 2px; }
+    .module-desc { font-size: 1.05rem; color: var(--off-white); max-width: 560px; font-weight: 300; line-height: 1.7; margin-bottom: 2rem; opacity: 0; animation: fadeUp 0.7s ease forwards 0.4s; }
+    .module-chips { display: flex; gap: 0.6rem; flex-wrap: wrap; opacity: 0; animation: fadeUp 0.7s ease forwards 0.55s; }
+    .chip { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.3rem 0.75rem; border-radius: 20px; }
+    .chip-blue { background: rgba(74,108,247,0.12); color: #7a9eff; border: 1px solid rgba(74,108,247,0.25); }
+    .chip-gray { background: rgba(255,255,255,0.05); color: var(--off-white); border: 1px solid rgba(255,255,255,0.1); }
+    .chip-green { background: rgba(34,197,94,0.1); color: #4ade80; border: 1px solid rgba(34,197,94,0.2); }
+    .phase-nav { display: flex; gap: 0; margin-top: 2.5rem; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 8px; padding: 4px; width: fit-content; opacity: 0; animation: fadeUp 0.7s ease forwards 0.7s; }
+    .phase-tab { font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.6rem 1.4rem; border-radius: 5px; cursor: pointer; transition: all 0.2s; color: var(--off-white); border: none; background: transparent; font-weight: 500; }
+    .phase-tab:hover { color: var(--white); }
+    .phase-tab.p1.active { background: var(--navy-light); color: #7a9eff; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+    .phase-tab.p2.active { background: var(--navy-light); color: #b07aff; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+    .phase-tab.p3.active { background: var(--navy-light); color: #ff7a9a; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+    .phase-panel { display: none; padding: 4rem 0 6rem; }
+    .phase-panel.active { display: block; }
+    .phase-banner { border-radius: 10px; padding: 1.75rem 2rem; margin-bottom: 3rem; display: flex; align-items: center; gap: 1.25rem; }
+    .phase-banner.p1 { background: rgba(74,108,247,0.08); border: 1px solid rgba(74,108,247,0.2); }
+    .phase-banner.p2 { background: rgba(124,74,247,0.08); border: 1px solid rgba(124,74,247,0.2); }
+    .phase-banner.p3 { background: rgba(232,74,111,0.08); border: 1px solid rgba(232,74,111,0.2); }
+    .phase-banner-icon { font-size: 1.75rem; width: 52px; height: 52px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .p1 .phase-banner-icon { background: rgba(74,108,247,0.15); }
+    .p2 .phase-banner-icon { background: rgba(124,74,247,0.15); }
+    .p3 .phase-banner-icon { background: rgba(232,74,111,0.15); }
+    .phase-banner-text h3 { font-size: 1.15rem; font-weight: 800; letter-spacing: -0.01em; margin-bottom: 0.2rem; }
+    .p1 .phase-banner-text h3 { color: #7a9eff; }
+    .p2 .phase-banner-text h3 { color: #b07aff; }
+    .p3 .phase-banner-text h3 { color: #ff7a9a; }
+    .phase-banner-text p { font-size: 0.875rem; color: var(--off-white); font-style: italic; }
+    .content-block { margin-bottom: 3rem; }
+    .content-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.6rem; }
+    .content-block h2 { font-size: 1.5rem; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 0.75rem; }
+    .content-block p { font-size: 0.95rem; color: var(--off-white); line-height: 1.8; margin-bottom: 0.75rem; }
+    .content-block p strong { color: var(--white); font-weight: 600; }
+    .trh-table { width: 100%; border-collapse: collapse; margin: 1.25rem 0; font-size: 0.875rem; }
+    .trh-table th { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--off-white); opacity: 0.7; padding: 0.75rem 1.25rem; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.02); }
+    .trh-table td { padding: 0.9rem 1.25rem; border-bottom: 1px solid rgba(255,255,255,0.05); color: var(--off-white); vertical-align: top; line-height: 1.6; }
+    .trh-table td:first-child { color: var(--white); font-weight: 500; }
+    .trh-table tr:last-child td { border-bottom: none; }
+    .trh-table tr:hover td { background: rgba(255,255,255,0.02); }
+    .account-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin: 1.25rem 0; }
+    .account-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.07); border-radius: 8px; padding: 1.5rem; transition: border-color 0.2s; }
+    .account-card:hover { border-color: rgba(74,108,247,0.3); }
+    .account-card-icon { font-size: 1.4rem; margin-bottom: 0.75rem; }
+    .account-card h4 { font-size: 0.95rem; font-weight: 700; margin-bottom: 0.4rem; letter-spacing: -0.01em; }
+    .account-card p { font-size: 0.8rem; color: var(--off-white); line-height: 1.6; margin: 0; }
+    .account-card .account-tag { display: inline-block; margin-top: 0.75rem; font-family: 'IBM Plex Mono', monospace; font-size: 0.6rem; letter-spacing: 0.08em; padding: 0.2rem 0.6rem; border-radius: 20px; }
+    .tag-local { background: rgba(34,197,94,0.1); color: #4ade80; border: 1px solid rgba(34,197,94,0.2); }
+    .tag-ms { background: rgba(74,108,247,0.1); color: #7a9eff; border: 1px solid rgba(74,108,247,0.2); }
+    .tag-warn { background: rgba(245,158,11,0.1); color: #fbbf24; border: 1px solid rgba(245,158,11,0.2); }
+    .callout-warning { background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.3); border-left: 3px solid #f59e0b; border-radius: 8px; padding: 1.5rem 1.75rem; margin: 1.5rem 0; display: flex; gap: 1rem; align-items: flex-start; }
+    .callout-warning-icon { font-size: 1.25rem; flex-shrink: 0; margin-top: 1px; }
+    .callout-warning-body h4 { font-size: 0.95rem; font-weight: 700; color: #fbbf24; margin-bottom: 0.4rem; }
+    .callout-warning-body p { font-size: 0.875rem; color: var(--off-white); line-height: 1.7; margin: 0; }
+    .callout-info { background: rgba(74,108,247,0.07); border: 1px solid rgba(74,108,247,0.2); border-left: 3px solid var(--accent); border-radius: 8px; padding: 1.5rem 1.75rem; margin: 1.5rem 0; display: flex; gap: 1rem; align-items: flex-start; }
+    .callout-info-icon { font-size: 1.25rem; flex-shrink: 0; margin-top: 1px; }
+    .callout-info-body h4 { font-size: 0.95rem; font-weight: 700; color: #7a9eff; margin-bottom: 0.4rem; }
+    .callout-info-body p { font-size: 0.875rem; color: var(--off-white); line-height: 1.7; margin: 0; }
+    .trh-list { list-style: none; margin: 0.75rem 0 1.25rem; display: flex; flex-direction: column; gap: 0.5rem; }
+    .trh-list li { font-size: 0.9rem; color: var(--off-white); padding-left: 1.25rem; position: relative; line-height: 1.6; }
+    .trh-list li::before { content: '—'; position: absolute; left: 0; color: var(--accent); font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; }
+    .glossary-grid { display: flex; flex-direction: column; gap: 0; border: 1px solid rgba(255,255,255,0.07); border-radius: 8px; overflow: hidden; margin-top: 1.25rem; }
+    .glossary-row { display: grid; grid-template-columns: 200px 1fr; gap: 0; border-bottom: 1px solid rgba(255,255,255,0.05); transition: background 0.2s; }
+    .glossary-row:last-child { border-bottom: none; }
+    .glossary-row:hover { background: rgba(255,255,255,0.02); }
+    .glossary-term { font-family: 'IBM Plex Mono', monospace; font-size: 0.78rem; font-weight: 500; color: var(--accent); padding: 1rem 1.25rem; border-right: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; }
+    .glossary-def { font-size: 0.875rem; color: var(--off-white); padding: 1rem 1.25rem; line-height: 1.6; }
+    .sop-header { background: rgba(124,74,247,0.07); border: 1px solid rgba(124,74,247,0.2); border-radius: 8px; padding: 1.5rem 1.75rem; margin-bottom: 2rem; }
+    .sop-id { font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; color: #b07aff; letter-spacing: 0.15em; margin-bottom: 0.3rem; }
+    .sop-header h3 { font-size: 1.1rem; font-weight: 700; color: var(--white); margin-bottom: 0.4rem; }
+    .sop-header p { font-size: 0.85rem; color: var(--off-white); line-height: 1.6; margin: 0; }
+    .steps-list { display: flex; flex-direction: column; gap: 0.75rem; margin: 1.5rem 0; }
+    .step-card { display: flex; gap: 1.25rem; align-items: flex-start; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 1.25rem 1.5rem; transition: border-color 0.2s; }
+    .step-card:hover { border-color: rgba(124,74,247,0.3); background: rgba(124,74,247,0.03); }
+    .step-num { font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: #b07aff; font-weight: 700; min-width: 28px; margin-top: 2px; }
+    .step-body h4 { font-size: 0.95rem; font-weight: 700; margin-bottom: 0.3rem; color: var(--white); }
+    .step-body p { font-size: 0.875rem; color: var(--off-white); line-height: 1.65; margin: 0; }
+    .step-body p strong { color: var(--white); }
+    .step-body code { font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; background: rgba(255,255,255,0.06); padding: 0.1rem 0.4rem; border-radius: 3px; color: #7a9eff; }
+    .escalation-box { background: rgba(232,74,111,0.06); border: 1px solid rgba(232,74,111,0.2); border-radius: 8px; padding: 1.5rem 1.75rem; margin: 2rem 0; }
+    .escalation-box h4 { font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; color: #ff7a9a; margin-bottom: 0.75rem; }
+    .escalation-box ul { list-style: none; display: flex; flex-direction: column; gap: 0.4rem; }
+    .escalation-box ul li { font-size: 0.875rem; color: var(--off-white); padding-left: 1.25rem; position: relative; line-height: 1.6; }
+    .escalation-box ul li::before { content: '→'; position: absolute; left: 0; color: #ff7a9a; font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; }
+    .quick-ref-table { width: 100%; border-collapse: collapse; border: 1px solid rgba(255,255,255,0.07); border-radius: 8px; overflow: hidden; margin-top: 1.5rem; font-size: 0.875rem; }
+    .quick-ref-table th { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--off-white); opacity: 0.7; padding: 0.75rem 1.25rem; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.02); }
+    .quick-ref-table td { padding: 0.9rem 1.25rem; border-bottom: 1px solid rgba(255,255,255,0.05); color: var(--off-white); vertical-align: top; line-height: 1.6; }
+    .quick-ref-table td:first-child { color: var(--white); font-weight: 500; }
+    .quick-ref-table tr:last-child td { border-bottom: none; }
+    .quick-ref-table code { font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; background: rgba(255,255,255,0.06); padding: 0.1rem 0.4rem; border-radius: 3px; color: #7a9eff; }
+    .scenario-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; overflow: hidden; margin-bottom: 1.5rem; }
+    .scenario-header { padding: 1.25rem 1.75rem; border-bottom: 1px solid rgba(255,255,255,0.06); display: flex; align-items: center; gap: 1rem; }
+    .scenario-num { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; letter-spacing: 0.15em; color: #ff7a9a; background: rgba(232,74,111,0.1); border: 1px solid rgba(232,74,111,0.2); padding: 0.25rem 0.6rem; border-radius: 20px; flex-shrink: 0; }
+    .scenario-header h4 { font-size: 1rem; font-weight: 700; letter-spacing: -0.01em; }
+    .scenario-body { padding: 1.5rem 1.75rem; }
+    .scenario-situation { font-size: 0.925rem; color: var(--off-white); line-height: 1.75; font-style: italic; margin-bottom: 1.25rem; padding-bottom: 1.25rem; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .scenario-tasks h5 { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.75rem; }
+    .task-list { list-style: none; display: flex; flex-direction: column; gap: 0.6rem; }
+    .task-list li { display: flex; gap: 0.75rem; font-size: 0.875rem; color: var(--off-white); line-height: 1.6; }
+    .task-list li .task-num { font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; color: #ff7a9a; font-weight: 700; flex-shrink: 0; margin-top: 2px; width: 18px; }
+    .doc-table { width: 100%; border-collapse: collapse; margin: 1.25rem 0; font-size: 0.875rem; }
+    .doc-table th { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--off-white); opacity: 0.6; padding: 0.75rem 1.25rem; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.02); }
+    .doc-table td { padding: 0.9rem 1.25rem; border-bottom: 1px solid rgba(255,255,255,0.05); color: var(--off-white); vertical-align: top; }
+    .doc-table td:first-child { color: var(--white); font-weight: 500; width: 180px; }
+    .doc-table tr:last-child td { border-bottom: none; }
+    .doc-input-line { display: block; width: 100%; border: none; border-bottom: 1px dashed rgba(255,255,255,0.15); background: transparent; color: var(--white); font-family: 'DM Sans', sans-serif; font-size: 0.875rem; padding: 0.3rem 0; outline: none; transition: border-color 0.2s; }
+    .doc-input-line:focus { border-bottom-color: var(--accent); }
+    .doc-input-line::placeholder { color: rgba(255,255,255,0.15); font-style: italic; }
+    .interview-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; overflow: hidden; margin-bottom: 1.25rem; }
+    .interview-q { padding: 1.25rem 1.75rem; border-bottom: 1px solid rgba(255,255,255,0.06); background: rgba(255,255,255,0.02); }
+    .interview-q-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.4rem; }
+    .interview-q p { font-size: 0.95rem; font-weight: 600; color: var(--white); font-style: italic; margin: 0; line-height: 1.5; }
+    .interview-a { padding: 1.25rem 1.75rem; }
+    .interview-a-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; color: #ff7a9a; margin-bottom: 0.5rem; }
+    .interview-a p { font-size: 0.875rem; color: var(--off-white); line-height: 1.75; margin: 0; }
+    .interview-a strong { color: var(--white); }
+    .checklist { display: flex; flex-direction: column; gap: 0.6rem; margin-top: 1.25rem; }
+    .check-item { display: flex; align-items: flex-start; gap: 0.75rem; font-size: 0.9rem; color: var(--off-white); line-height: 1.6; }
+    .check-box { width: 20px; height: 20px; border: 1.5px solid rgba(255,255,255,0.2); border-radius: 4px; flex-shrink: 0; margin-top: 2px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; }
+    .check-box.checked { background: var(--green); border-color: var(--green); color: white; }
+    .next-modules { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-top: 1.5rem; }
+    .next-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.07); border-radius: 8px; padding: 1.5rem; text-decoration: none; color: inherit; transition: all 0.2s; display: block; }
+    .next-card:hover { border-color: rgba(74,108,247,0.3); background: rgba(74,108,247,0.05); transform: translateY(-2px); }
+    .next-card .next-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; letter-spacing: 0.15em; color: var(--accent); margin-bottom: 0.4rem; }
+    .next-card h4 { font-size: 0.95rem; font-weight: 700; margin-bottom: 0.3rem; }
+    .next-card p { font-size: 0.8rem; color: var(--off-white); margin: 0; }
+    .page-nav { padding: 3rem 0 5rem; border-top: 1px solid rgba(255,255,255,0.06); display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+    .page-nav-back { font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; letter-spacing: 0.08em; color: var(--off-white); text-decoration: none; transition: color 0.2s; }
+    .page-nav-back:hover { color: var(--accent); }
+    .page-nav-next { background: var(--accent); color: var(--white); padding: 0.75rem 1.75rem; border-radius: 4px; text-decoration: none; font-weight: 500; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 0.5rem; transition: background 0.2s, transform 0.2s; border: none; cursor: pointer; }
+    .page-nav-next:hover { background: #3a5ce0; transform: translateY(-1px); }
+    .section-divider { height: 1px; background: rgba(255,255,255,0.06); margin: 2.5rem 0; }
+    footer { border-top: 1px solid rgba(255,255,255,0.06); padding: 3rem 4rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
+    .footer-copy { font-size: 0.8rem; color: var(--off-white); opacity: 0.5; }
+    .footer-links { display: flex; gap: 2rem; list-style: none; }
+    .footer-links a { font-size: 0.8rem; color: var(--off-white); opacity: 0.5; text-decoration: none; transition: opacity 0.2s; }
+    .footer-links a:hover { opacity: 1; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+    .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.6s ease, transform 0.6s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    @media (max-width: 900px) {
+      nav { padding: 1rem 1.5rem; } .nav-links { display: none; }
+      .page-wrap { padding: 0 1.25rem; } .module-header { padding: 7rem 0 2.5rem; }
+      .account-cards { grid-template-columns: 1fr; } .next-modules { grid-template-columns: 1fr; }
+      .glossary-row { grid-template-columns: 1fr; } .glossary-term { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.05); }
+      footer { padding: 2rem 1.5rem; flex-direction: column; align-items: flex-start; }
+      .phase-nav { width: 100%; } .phase-tab { flex: 1; text-align: center; font-size: 0.65rem; padding: 0.6rem 0.75rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a href="../index.html" class="nav-logo">
+      <svg class="nav-logo-heart" viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M48 82C48 82 12 58 12 34C12 22.954 20.954 14 32 14C38.627 14 44.51 17.168 48 22.08C51.49 17.168 57.373 14 64 14C75.046 14 84 22.954 84 34C84 58 48 82 48 82Z" fill="#e84a6f" opacity="0.9"/>
+        <path d="M48 82C48 82 12 58 12 34C12 22.954 20.954 14 32 14C38.627 14 44.51 17.168 48 22.08" fill="#c73d5c"/>
+      </svg>
+      <span class="nav-logo-text">the rarest <span>heart</span></span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../learn.html" class="active">Learn IT</a></li>
+      <li><a href="../do.html">Do IT</a></li>
+      <li><a href="../apply.html">Apply IT</a></li>
+      <li><a href="../topics.html">Topics</a></li>
+      <li><a href="../members.html">My Progress</a></li>
+      <li><a href="../contact.html" class="nav-cta">Contact</a></li>
+    </ul>
+  </nav>
+
+  <section class="module-header">
+    <div class="module-header-glow"></div>
+    <div class="page-wrap module-header-inner">
+      <div class="breadcrumb">
+        <a href="../index.html">Home</a>
+        <span class="breadcrumb-sep">/</span>
+        <a href="../learn.html">Learn IT</a>
+        <span class="breadcrumb-sep">/</span>
+        <span>Module 03</span>
+      </div>
+      <div class="module-eyebrow">Tier 1 · SOP-003 · Module 03 of 09</div>
+      <h1 class="module-title">Wi-Fi &amp; <em>Network</em> Connectivity</h1>
+      <p class="module-desc">Diagnose and resolve wireless and wired network issues using layered troubleshooting. Master ipconfig, ping, and DNS commands every help desk tech needs to know.</p>
+      <div class="module-chips">
+        <span class="chip chip-blue">Tier 1 — Help Desk</span>
+        <span class="chip chip-gray">SOP-003</span>
+        <span class="chip chip-green">Beginner</span>
+        <span class="chip chip-gray">Network Basics</span>
+      </div>
+      <div class="phase-nav">
+        <button class="phase-tab p1 active" onclick="switchPhase('p1', this)">01 · Learn IT</button>
+        <button class="phase-tab p2" onclick="switchPhase('p2', this)">02 · Do IT</button>
+        <button class="phase-tab p3" onclick="switchPhase('p3', this)">03 · Apply IT</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── PHASE 1: LEARN IT ─── -->
+  <div id="panel-p1" class="phase-panel active">
+    <div class="page-wrap">
+
+      <div class="phase-banner p1">
+        <div class="phase-banner-icon">📡</div>
+        <div class="phase-banner-text">
+          <h3>Phase 1 — Learn IT</h3>
+          <p>Build your mental model of how networks work so you can think through problems, not just follow steps.</p>
+        </div>
+      </div>
+
+      <div class="content-block reveal">
+        <div class="content-label">Foundation</div>
+        <h2>Why Networks Fail</h2>
+        <p>Network connectivity is one of the most common issues you will troubleshoot. The key is knowing <strong>where in the stack the failure lives</strong> — a physical cable problem looks different from a DHCP failure, which looks different from a DNS outage. Jumping straight to "reinstall the driver" wastes everyone's time.</p>
+        <p>Most connectivity issues at Tier 1 fall into one of four buckets: physical layer problems, IP addressing failures, gateway/router issues, or DNS failures. The OSI model gives you a framework to test each layer methodically.</p>
+
+        <table class="trh-table">
+          <thead>
+            <tr><th>Layer</th><th>What It Controls</th><th>Common Failure Signs</th><th>First Test</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Physical (L1)</td><td>Cable, NIC, Wi-Fi radio</td><td>No link light, "unidentified network"</td><td>Reseat cable / toggle Wi-Fi</td></tr>
+            <tr><td>Data Link (L2)</td><td>MAC address, switch port</td><td>Connected but no internet</td><td>Check adapter in Device Manager</td></tr>
+            <tr><td>Network (L3)</td><td>IP address, routing, DHCP</td><td>169.254.x.x APIPA address</td><td><code>ipconfig /all</code></td></tr>
+            <tr><td>Transport (L4)</td><td>TCP/UDP ports</td><td>Some apps work, others don't</td><td>Firewall / port check</td></tr>
+            <tr><td>Application (L7)</td><td>DNS, HTTP, app protocols</td><td>Browser says "server not found"</td><td><code>ping 8.8.8.8</code> then <code>nslookup</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="content-block reveal">
+        <div class="content-label">Core Concepts</div>
+        <h2>IP Addressing Explained</h2>
+        <p>Every device on a network needs an IP address to communicate. When you run <code>ipconfig</code> you will see an IPv4 address, subnet mask, and default gateway. Understanding these three values tells you a lot about the problem.</p>
+
+        <div class="account-cards">
+          <div class="account-card">
+            <div class="account-card-icon">✅</div>
+            <h4>Valid DHCP Address</h4>
+            <p>IP starts with 10.x.x.x, 172.16–31.x.x, or 192.168.x.x. Gateway is populated. Device has a lease from the DHCP server.</p>
+            <span class="account-tag tag-local">Healthy</span>
+          </div>
+          <div class="account-card">
+            <div class="account-card-icon">⚠️</div>
+            <h4>APIPA Address</h4>
+            <p>IP starts with 169.254.x.x. Windows assigned this when DHCP failed. No gateway means no internet — DHCP is the problem.</p>
+            <span class="account-tag tag-warn">DHCP Failed</span>
+          </div>
+          <div class="account-card">
+            <div class="account-card-icon">🔧</div>
+            <h4>Static / Manual IP</h4>
+            <p>Manually set by IT or user. Can cause conflicts if the wrong address is used, or no internet if gateway is wrong.</p>
+            <span class="account-tag tag-ms">Check Config</span>
+          </div>
+        </div>
+
+        <div class="callout-warning">
+          <div class="callout-warning-icon">⚠️</div>
+          <div class="callout-warning-body">
+            <h4>169.254.x.x = DHCP Problem, Not a Network Problem</h4>
+            <p>Many techs see an APIPA address and assume the network is down. The physical connection may be fine — Windows just cannot reach the DHCP server to get an address. Always run <strong>ipconfig /release</strong> and <strong>ipconfig /renew</strong> first before escalating.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="content-block reveal">
+        <div class="content-label">Common Causes</div>
+        <h2>Why Wi-Fi Specifically Fails</h2>
+        <p>Wired connections are binary — either the cable works or it doesn't. Wi-Fi has more variables: signal strength, band selection, authentication, driver issues, and interference all play a role.</p>
+
+        <table class="trh-table">
+          <thead>
+            <tr><th>Cause</th><th>Symptom</th><th>Fix</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Wrong password / bad profile</td><td>Authentication failed, can't join</td><td>Forget network, reconnect fresh</td></tr>
+            <tr><td>Driver outdated or corrupt</td><td>Adapter missing from Device Manager</td><td>Reinstall driver via Device Manager</td></tr>
+            <tr><td>IP conflict</td><td>Connected but limited access</td><td>ipconfig /release, /renew</td></tr>
+            <tr><td>DNS misconfigured</td><td>Ping by IP works, browser fails</td><td>Set DNS to 8.8.8.8 or flush DNS cache</td></tr>
+            <tr><td>Router / AP issue</td><td>All devices on network affected</td><td>Reboot router; escalate if persistent</td></tr>
+            <tr><td>Wi-Fi disabled in BIOS/settings</td><td>No adapter visible in OS</td><td>Check Fn key, Device Manager, BIOS</td></tr>
+            <tr><td>Captive portal not completed</td><td>Connected to Wi-Fi but no internet</td><td>Open browser, complete login page</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="content-block reveal">
+        <div class="content-label">Essential Commands</div>
+        <h2>Your Network Diagnostic Toolkit</h2>
+        <p>These five commands handle 90% of Tier 1 network troubleshooting. Run them in order — it's a systematic test from the inside out.</p>
+
+        <table class="trh-table">
+          <thead>
+            <tr><th>Command</th><th>What It Does</th><th>What to Look For</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>ipconfig /all</code></td><td>Shows full IP config for all adapters</td><td>IP address, gateway, DNS servers, DHCP enabled</td></tr>
+            <tr><td><code>ipconfig /release</code></td><td>Releases current DHCP lease</td><td>Run before /renew when APIPA appears</td></tr>
+            <tr><td><code>ipconfig /renew</code></td><td>Requests a new IP from DHCP server</td><td>Should get a valid 10.x or 192.168.x address</td></tr>
+            <tr><td><code>ipconfig /flushdns</code></td><td>Clears DNS resolver cache</td><td>Fixes stale or corrupt DNS entries</td></tr>
+            <tr><td><code>ping 8.8.8.8</code></td><td>Tests connectivity to Google DNS by IP</td><td>If this works but browser fails, DNS is broken</td></tr>
+            <tr><td><code>ping google.com</code></td><td>Tests DNS resolution</td><td>If this fails but ping 8.8.8.8 works, DNS issue confirmed</td></tr>
+            <tr><td><code>nslookup google.com</code></td><td>Queries DNS server directly</td><td>Confirms DNS server address and resolution</td></tr>
+            <tr><td><code>netsh wlan show profiles</code></td><td>Lists saved Wi-Fi profiles</td><td>Find corrupt profiles to delete</td></tr>
+          </tbody>
+        </table>
+
+        <div class="callout-info">
+          <div class="callout-info-icon">💡</div>
+          <div class="callout-info-body">
+            <h4>The Ping Test Logic</h4>
+            <p>Ping 127.0.0.1 first (loopback) → confirms TCP/IP stack works. Then ping gateway (from ipconfig) → confirms local network. Then ping 8.8.8.8 → confirms internet. Then ping google.com → confirms DNS. Each step narrows down the layer where the failure lives.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="content-block reveal">
+        <div class="content-label">Glossary</div>
+        <h2>Key Terms</h2>
+        <div class="glossary-grid">
+          <div class="glossary-row">
+            <div class="glossary-term">DHCP</div>
+            <div class="glossary-def">Dynamic Host Configuration Protocol. Automatically assigns IP addresses, subnet masks, gateways, and DNS servers to devices when they join a network.</div>
+          </div>
+          <div class="glossary-row">
+            <div class="glossary-term">DNS</div>
+            <div class="glossary-def">Domain Name System. Translates human-readable domain names (google.com) into IP addresses (142.250.x.x) that computers use to route traffic.</div>
+          </div>
+          <div class="glossary-row">
+            <div class="glossary-term">Gateway</div>
+            <div class="glossary-def">Usually the router's IP address. All traffic destined for outside the local network is sent here first. A missing gateway means no internet.</div>
+          </div>
+          <div class="glossary-row">
+            <div class="glossary-term">APIPA</div>
+            <div class="glossary-def">Automatic Private IP Addressing. When Windows can't reach a DHCP server, it self-assigns a 169.254.x.x address. Always indicates DHCP failure.</div>
+          </div>
+          <div class="glossary-row">
+            <div class="glossary-term">Subnet Mask</div>
+            <div class="glossary-def">Defines which part of an IP address identifies the network vs. the device. Common value: 255.255.255.0 means first three octets = network.</div>
+          </div>
+          <div class="glossary-row">
+            <div class="glossary-term">NIC</div>
+            <div class="glossary-def">Network Interface Card. The hardware component (physical or wireless) that connects a device to a network. Has a unique MAC address burned in.</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ─── PHASE 2: DO IT ─── -->
+  <div id="panel-p2" class="phase-panel">
+    <div class="page-wrap">
+
+      <div class="phase-banner p2">
+        <div class="phase-banner-icon">📋</div>
+        <div class="phase-banner-text">
+          <h3>Phase 2 — Do IT</h3>
+          <p>Execute the standard procedure. Follow every step exactly — this is how professionals handle network connectivity tickets.</p>
+        </div>
+      </div>
+
+      <div class="sop-header">
+        <div class="sop-id">SOP-003 · NETWORK CONNECTIVITY · REV 1.0</div>
+        <h3>Wi-Fi &amp; Network Connectivity Troubleshooting</h3>
+        <p>Use this procedure for any ticket where a user reports inability to access the internet, network shares, or company resources. Work from Layer 1 upward. Document every command output.</p>
+      </div>
+
+      <div class="steps-list">
+        <div class="step-card">
+          <div class="step-num">01</div>
+          <div class="step-body">
+            <h4>Gather Symptoms &amp; Scope the Issue</h4>
+            <p>Ask: Is this one device or multiple? Wired or wireless? Does anything work (can they ping the gateway)? What changed recently? If multiple devices are affected, the problem is likely the router or ISP — escalate immediately rather than chasing individual devices.</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">02</div>
+          <div class="step-body">
+            <h4>Check Physical Layer First</h4>
+            <p>For <strong>wired</strong>: confirm link light is on at both ends of the cable. Try a different cable and a different port on the switch. For <strong>wireless</strong>: confirm Wi-Fi is enabled (check the Fn key, airplane mode toggle, and Device Manager). Look for yellow exclamation marks on the adapter.</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">03</div>
+          <div class="step-body">
+            <h4>Run ipconfig /all and Assess IP Address</h4>
+            <p>Open Command Prompt and run <code>ipconfig /all</code>. Check: Does the adapter have a valid IP (not 169.254.x.x)? Is the Default Gateway populated? Are DNS servers listed? Screenshot the output for your ticket notes.</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">04</div>
+          <div class="step-body">
+            <h4>Release and Renew DHCP Lease if Needed</h4>
+            <p>If the IP is 169.254.x.x or missing: run <code>ipconfig /release</code> followed by <code>ipconfig /renew</code>. Run <code>ipconfig /all</code> again to confirm a valid address was obtained. If still no valid IP, move to step 5.</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">05</div>
+          <div class="step-body">
+            <h4>Test Connectivity Layer by Layer with Ping</h4>
+            <p>Run: <code>ping 127.0.0.1</code> (loopback) → <code>ping [gateway IP]</code> → <code>ping 8.8.8.8</code> → <code>ping google.com</code>. The first step that fails tells you the layer. If ping 8.8.8.8 works but google.com fails, DNS is broken. Document exactly which step failed.</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">06</div>
+          <div class="step-body">
+            <h4>Flush DNS Cache and Reset If DNS Is the Issue</h4>
+            <p>Run <code>ipconfig /flushdns</code>. Then run <code>netsh int ip reset</code> and <code>netsh winsock reset</code> in an elevated Command Prompt. Restart the computer after winsock reset — it will not take effect without a reboot.</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">07</div>
+          <div class="step-body">
+            <h4>Forget and Reconnect to Wi-Fi Network</h4>
+            <p>For wireless issues: go to <strong>Settings → Network &amp; Internet → Wi-Fi → Manage known networks</strong>. Select the network and click <strong>Forget</strong>. Reconnect fresh with the correct credentials. This clears any corrupt profile or cached bad password.</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">08</div>
+          <div class="step-body">
+            <h4>Update or Reinstall Network Adapter Driver</h4>
+            <p>Open <strong>Device Manager</strong>. Expand <strong>Network Adapters</strong>. Right-click the Wi-Fi or Ethernet adapter → <strong>Update driver</strong>. If device has a yellow exclamation: right-click → <strong>Uninstall device</strong> → reboot. Windows will reinstall the driver automatically. If that fails, download the driver from the OEM website.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="escalation-box">
+        <h4>Escalate to Tier 2 When</h4>
+        <ul>
+          <li>Multiple users on the same network segment are affected</li>
+          <li>DHCP /renew consistently returns no address despite physical connection confirmed</li>
+          <li>Ping to gateway fails from all devices (router/switch likely down)</li>
+          <li>Driver reinstall does not resolve adapter visibility</li>
+          <li>User requires static IP configuration with specific DNS settings</li>
+          <li>VPN connectivity issues after local network is confirmed working</li>
+        </ul>
+      </div>
+
+      <div class="content-block">
+        <div class="content-label">Quick Reference</div>
+        <h2>Network Commands Cheat Sheet</h2>
+        <table class="quick-ref-table">
+          <thead>
+            <tr><th>Command</th><th>Purpose</th><th>Expected Output</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>ipconfig /all</code></td><td>Full IP configuration</td><td>IP, subnet, gateway, DNS, DHCP state</td></tr>
+            <tr><td><code>ipconfig /release</code></td><td>Drop DHCP lease</td><td>IP address cleared</td></tr>
+            <tr><td><code>ipconfig /renew</code></td><td>Get new DHCP lease</td><td>New valid IP assigned</td></tr>
+            <tr><td><code>ipconfig /flushdns</code></td><td>Clear DNS cache</td><td>"Successfully flushed the DNS Resolver Cache"</td></tr>
+            <tr><td><code>ping 127.0.0.1</code></td><td>Test TCP/IP stack</td><td>4 replies with 0ms latency</td></tr>
+            <tr><td><code>ping 8.8.8.8</code></td><td>Test internet (no DNS)</td><td>Replies confirm internet access</td></tr>
+            <tr><td><code>ping google.com</code></td><td>Test DNS resolution</td><td>Resolves to IP and replies</td></tr>
+            <tr><td><code>nslookup google.com</code></td><td>Query DNS directly</td><td>Returns DNS server and IP for domain</td></tr>
+            <tr><td><code>netsh winsock reset</code></td><td>Reset network stack</td><td>"Winsock reset completed" (reboot required)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ─── PHASE 3: APPLY IT ─── -->
+  <div id="panel-p3" class="phase-panel">
+    <div class="page-wrap">
+
+      <div class="phase-banner p3">
+        <div class="phase-banner-icon">🎯</div>
+        <div class="phase-banner-text">
+          <h3>Phase 3 — Apply IT</h3>
+          <p>Test your skills against real-world scenarios. Document like a pro and nail the interview questions.</p>
+        </div>
+      </div>
+
+      <div class="content-block reveal">
+        <div class="content-label">Scenarios</div>
+        <h2>Practice Tickets</h2>
+
+        <div class="scenario-card">
+          <div class="scenario-header">
+            <span class="scenario-num">SCENARIO 01</span>
+            <h4>The APIPA Mystery</h4>
+          </div>
+          <div class="scenario-body">
+            <div class="scenario-situation">"I can't access any websites or network drives. My laptop was working fine yesterday. I'm in the office and connected to the office Wi-Fi — I can see the network name in the taskbar."</div>
+            <div class="scenario-tasks">
+              <h5>Your Tasks</h5>
+              <ul class="task-list">
+                <li><span class="task-num">1.</span>What is your first diagnostic command and what output are you looking for?</li>
+                <li><span class="task-num">2.</span>The IP shows 169.254.33.17. What does this tell you and what do you run next?</li>
+                <li><span class="task-num">3.</span>After /release and /renew, they get a valid IP. The browser still shows "no internet." What is your next test?</li>
+                <li><span class="task-num">4.</span>Ping 8.8.8.8 succeeds, ping google.com fails. What is broken and what do you run?</li>
+                <li><span class="task-num">5.</span>Write the ticket resolution note using proper documentation format.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="scenario-card">
+          <div class="scenario-header">
+            <span class="scenario-num">SCENARIO 02</span>
+            <h4>The Missing Adapter</h4>
+          </div>
+          <div class="scenario-body">
+            <div class="scenario-situation">"My Wi-Fi just disappeared. I don't see it in the taskbar at all. The Fn+F8 button doesn't do anything. I'm running Windows 11 on a company laptop."</div>
+            <div class="scenario-tasks">
+              <h5>Your Tasks</h5>
+              <ul class="task-list">
+                <li><span class="task-num">1.</span>What tool do you open first and what are you looking for?</li>
+                <li><span class="task-num">2.</span>You see the Wi-Fi adapter with a yellow exclamation. What does this mean and what are your next two steps?</li>
+                <li><span class="task-num">3.</span>After uninstalling and rebooting, the adapter appears but the driver is still showing as error. What do you do?</li>
+                <li><span class="task-num">4.</span>Where do you get the correct driver and what information do you need from the machine?</li>
+                <li><span class="task-num">5.</span>At what point would you escalate this ticket?</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="scenario-card">
+          <div class="scenario-header">
+            <span class="scenario-num">SCENARIO 03</span>
+            <h4>The Whole Floor is Down</h4>
+          </div>
+          <div class="scenario-body">
+            <div class="scenario-situation">"Nobody on the 3rd floor can access the internet. We're all connected to Wi-Fi but nothing loads. The phones with cellular data work fine."</div>
+            <div class="scenario-tasks">
+              <h5>Your Tasks</h5>
+              <ul class="task-list">
+                <li><span class="task-num">1.</span>Based on the scope of the issue, what is the most likely problem category?</li>
+                <li><span class="task-num">2.</span>Should you run ipconfig /release and /renew on all 30 machines? Why or why not?</li>
+                <li><span class="task-num">3.</span>What do you check first in the network closet / comms room?</li>
+                <li><span class="task-num">4.</span>Who do you escalate to and what information do you provide them?</li>
+                <li><span class="task-num">5.</span>Write a brief incident note that you would log while the Tier 2 team investigates.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="content-block reveal">
+        <div class="content-label">Ticket Practice</div>
+        <h2>Document Your Resolution</h2>
+        <p>Fill in this ticket template for Scenario 01 above. Good documentation is what separates professional techs from hobbyists.</p>
+        <table class="doc-table">
+          <thead><tr><th>Field</th><th>Your Entry</th></tr></thead>
+          <tbody>
+            <tr><td>User Reported</td><td><input class="doc-input-line" placeholder="Describe the user's complaint in one sentence..." /></td></tr>
+            <tr><td>Initial Findings</td><td><input class="doc-input-line" placeholder="What did ipconfig /all show?" /></td></tr>
+            <tr><td>Root Cause</td><td><input class="doc-input-line" placeholder="DHCP failure / DNS failure / etc." /></td></tr>
+            <tr><td>Steps Taken</td><td><input class="doc-input-line" placeholder="Commands run, in order..." /></td></tr>
+            <tr><td>Resolution</td><td><input class="doc-input-line" placeholder="What fixed it?" /></td></tr>
+            <tr><td>Verification</td><td><input class="doc-input-line" placeholder="How did you confirm it was resolved?" /></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="content-block reveal">
+        <div class="content-label">Interview Prep</div>
+        <h2>Questions You'll Face</h2>
+
+        <div class="interview-card">
+          <div class="interview-q">
+            <div class="interview-q-label">Interview Question 01</div>
+            <p>"Walk me through how you would troubleshoot a computer that is connected to Wi-Fi but can't access the internet."</p>
+          </div>
+          <div class="interview-a">
+            <div class="interview-a-label">Strong Answer Framework</div>
+            <p>Start by scoping the issue — <strong>is it one device or many?</strong> If multiple, the problem is likely the router or ISP. For a single device, I run <code>ipconfig /all</code> to check the IP address. An APIPA address (169.254.x.x) means DHCP failed, so I run /release and /renew. Once a valid IP is confirmed, I run a layered ping test — gateway first, then 8.8.8.8, then google.com. If 8.8.8.8 succeeds but google.com fails, I flush DNS with <code>ipconfig /flushdns</code>. If everything pings but the browser still fails, I check proxy settings. I document every command and output in the ticket.</p>
+          </div>
+        </div>
+
+        <div class="interview-card">
+          <div class="interview-q">
+            <div class="interview-q-label">Interview Question 02</div>
+            <p>"What does a 169.254.x.x IP address mean and how do you fix it?"</p>
+          </div>
+          <div class="interview-a">
+            <div class="interview-a-label">Strong Answer Framework</div>
+            <p>A 169.254.x.x address is an <strong>APIPA address</strong> — Automatic Private IP Addressing. It means Windows tried to get a DHCP lease and couldn't reach the DHCP server, so it self-assigned a fallback address. The fix is to run <code>ipconfig /release</code> to drop the current state, then <code>ipconfig /renew</code> to request a new lease. If it persists, I check the physical connection and look at whether other devices on the same network can get IPs — if not, the DHCP server itself may be down, which means escalation.</p>
+          </div>
+        </div>
+
+        <div class="interview-card">
+          <div class="interview-q">
+            <div class="interview-q-label">Interview Question 03</div>
+            <p>"What is the difference between pinging 8.8.8.8 and pinging google.com, and why does that distinction matter?"</p>
+          </div>
+          <div class="interview-a">
+            <div class="interview-a-label">Strong Answer Framework</div>
+            <p>Pinging <strong>8.8.8.8 tests internet connectivity without using DNS</strong> — it goes directly to Google's DNS server by IP. Pinging <strong>google.com requires DNS resolution</strong> first, converting the name to an IP, then sending the ping. If 8.8.8.8 works but google.com fails, DNS is broken even though the internet connection itself is fine. This matters because many users think "the internet is down" when actually their TCP/IP works perfectly — they just have a DNS issue, which is a much faster fix than a connectivity problem.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="content-block reveal">
+        <div class="content-label">Module Completion</div>
+        <h2>Completion Checklist</h2>
+        <div class="checklist">
+          <div class="check-item">
+            <div class="check-box" onclick="this.classList.toggle('checked'); this.textContent = this.classList.contains('checked') ? '✓' : ''"></div>
+            <span>I can explain the OSI model layers and which commands test each one</span>
+          </div>
+          <div class="check-item">
+            <div class="check-box" onclick="this.classList.toggle('checked'); this.textContent = this.classList.contains('checked') ? '✓' : ''"></div>
+            <span>I understand what an APIPA address (169.254.x.x) means and why it occurs</span>
+          </div>
+          <div class="check-item">
+            <div class="check-box" onclick="this.classList.toggle('checked'); this.textContent = this.classList.contains('checked') ? '✓' : ''"></div>
+            <span>I can run ipconfig /all and interpret every field in the output</span>
+          </div>
+          <div class="check-item">
+            <div class="check-box" onclick="this.classList.toggle('checked'); this.textContent = this.classList.contains('checked') ? '✓' : ''"></div>
+            <span>I can execute a layered ping test and identify the exact layer where connectivity breaks</span>
+          </div>
+          <div class="check-item">
+            <div class="check-box" onclick="this.classList.toggle('checked'); this.textContent = this.classList.contains('checked') ? '✓' : ''"></div>
+            <span>I know how to forget and reconnect to a Wi-Fi network to clear a corrupt profile</span>
+          </div>
+          <div class="check-item">
+            <div class="check-box" onclick="this.classList.toggle('checked'); this.textContent = this.classList.contains('checked') ? '✓' : ''"></div>
+            <span>I can update or reinstall a network adapter driver in Device Manager</span>
+          </div>
+          <div class="check-item">
+            <div class="check-box" onclick="this.classList.toggle('checked'); this.textContent = this.classList.contains('checked') ? '✓' : ''"></div>
+            <span>I completed all three practice scenarios and wrote at least one full ticket</span>
+          </div>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <div class="content-label">Up Next</div>
+        <h2>Continue Your Training</h2>
+        <div class="next-modules">
+          <a href="02-software-install.html" class="next-card">
+            <div class="next-label">← Previous Module</div>
+            <h4>Module 02 — Software Installation</h4>
+            <p>UAC, installation types, and SOP-002</p>
+          </a>
+          <a href="04-printer-troubleshooting.html" class="next-card">
+            <div class="next-label">Next Module →</div>
+            <h4>Module 04 — Printer Troubleshooting</h4>
+            <p>Print queues, drivers, and SOP-004</p>
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="page-wrap">
+    <div class="page-nav">
+      <a href="../learn.html" class="page-nav-back">← Back to Learn IT</a>
+      <a href="04-printer-troubleshooting.html" class="page-nav-next">Next Module →</a>
+    </div>
+  </div>
+
+  <div class="page-wrap" style="padding-bottom:1.5rem;">
+    <div id="complete-block" style="padding:1.5rem;background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.2);border-radius:10px;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;">
+      <div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:#4ade80;margin-bottom:0.3rem;">Module 03 · SOP-003</div>
+        <div style="font-weight:600;font-size:0.95rem;" id="complete-msg">Finished all three phases? Mark this module complete.</div>
+      </div>
+      <button id="btn-complete" onclick="markThisComplete()" style="font-family:'IBM Plex Mono',monospace;font-size:0.7rem;letter-spacing:0.08em;padding:0.6rem 1.25rem;border-radius:6px;background:#22c55e;color:#07081a;border:none;cursor:pointer;font-weight:500;">Mark Complete ✓</button>
+    </div>
+  </div>
+
+  <footer>
+    <span class="footer-copy">© 2025 The Rarest Heart. Built for IT learners.</span>
+    <ul class="footer-links">
+      <li><a href="../sops.html">SOPs</a></li>
+      <li><a href="../labs.html">Labs</a></li>
+      <li><a href="../contact.html">Contact</a></li>
+    </ul>
+  </footer>
+
+  <script src="../js/progress.js"></script>
+  <script>
+    const MODULE_ID = 'm03';
+    function initProgress() { if (typeof trhMarkInProgress==='function') { trhMarkInProgress(MODULE_ID); if (trhGetStatus(MODULE_ID)==='complete') showCompleted(); } }
+    function markThisComplete() { if (typeof trhMarkComplete==='function') trhMarkComplete(MODULE_ID); showCompleted(); }
+    function showCompleted() { document.getElementById('complete-msg').textContent='✓ Module 03 marked complete. Great work.'; const b=document.getElementById('btn-complete'); b.textContent='✓ Complete'; b.style.background='rgba(34,197,94,0.15)'; b.style.color='#4ade80'; b.style.border='1px solid rgba(34,197,94,0.3)'; b.disabled=true; }
+    document.addEventListener('DOMContentLoaded', initProgress);
+    function switchPhase(phase, btn) {
+      document.querySelectorAll('.phase-panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.phase-tab').forEach(t => t.classList.remove('active'));
+      document.getElementById('panel-' + phase).classList.add('active');
+      btn.classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      setTimeout(triggerReveals, 100);
+    }
+    function triggerReveals() {
+      const reveals = document.querySelectorAll('.reveal');
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add('visible'); observer.unobserve(entry.target); } });
+      }, { threshold: 0.1 });
+      reveals.forEach(el => { if (!el.classList.contains('visible')) observer.observe(el); });
+    }
+    document.addEventListener('DOMContentLoaded', triggerReveals);
+  </script>
+</body>
+</html>
