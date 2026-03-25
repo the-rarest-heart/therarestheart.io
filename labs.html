@@ -27,7 +27,7 @@
     .nav-cta::after { display: none !important; } .nav-cta:hover { background: #3a5ce0 !important; }
     section { position: relative; z-index: 1; }
     .page-wrap { max-width: 1000px; margin: 0 auto; padding: 0 2rem; }
-    .page-hero { padding: 8rem 0 4rem; border-bottom: 1px solid rgba(255,255,255,0.06); position: relative; overflow: hidden; }
+    .page-hero { padding: 10rem 0 4rem; border-bottom: 1px solid rgba(255,255,255,0.06); position: relative; overflow: hidden; }
     .page-hero-glow { position: absolute; width: 600px; height: 600px; border-radius: 50%; background: radial-gradient(circle, var(--green-glow) 0%, transparent 70%); top: -200px; right: -150px; pointer-events: none; }
     .page-hero-inner { position: relative; z-index: 1; }
     .page-eyebrow { font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--green); margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.75rem; opacity: 0; animation: fadeUp 0.7s ease forwards 0.1s; }
@@ -89,7 +89,7 @@
     .reveal.visible { opacity: 1; transform: translateY(0); }
     @media (max-width: 900px) {
       nav { padding: 1rem 1.5rem; } .nav-links { display: none; }
-      .page-wrap { padding: 0 1.25rem; } .page-hero { padding: 7rem 0 3rem; }
+      .page-wrap { padding: 0 1.25rem; } .page-hero { padding: 8.5rem 0 3rem; }
       .setup-steps { grid-template-columns: 1fr; }
       .platform-grid { grid-template-columns: 1fr; }
       footer { padding: 2rem 1.5rem; flex-direction: column; align-items: flex-start; }
@@ -99,10 +99,7 @@
 <body>
   <nav>
     <a href="index.html" class="nav-logo">
-      <svg class="nav-logo-heart" viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M48 82C48 82 12 58 12 34C12 22.954 20.954 14 32 14C38.627 14 44.51 17.168 48 22.08C51.49 17.168 57.373 14 64 14C75.046 14 84 22.954 84 34C84 58 48 82 48 82Z" fill="#e84a6f" opacity="0.9"/>
-        <path d="M48 82C48 82 12 58 12 34C12 22.954 20.954 14 32 14C38.627 14 44.51 17.168 48 22.08" fill="#c73d5c"/>
-      </svg>
+      <img src="images/trhlogo.svg" alt="The Rarest Heart" class="nav-logo-heart" width="96" height="96">
       <span class="nav-logo-text">the rarest <span>heart</span></span>
     </a>
     <ul class="nav-links">
