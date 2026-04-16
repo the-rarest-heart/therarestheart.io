@@ -539,12 +539,12 @@
   </div>
 
   <div class="page-wrap" style="padding-bottom:1.5rem;">
-    <div id="complete-block" style="padding:1.5rem;background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.2);border-radius:10px;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;">
+    <div id="complete-block" style="padding:1.5rem;background:rgba(0,229,80,0.06);border:1px solid rgba(0,229,80,0.2);border-radius:10px;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;">
       <div>
         <div style="font-family:'IBM Plex Mono',monospace;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:#00e550;margin-bottom:0.3rem;">Module 07 · SOP-007</div>
         <div style="font-weight:600;font-size:0.95rem;" id="complete-msg">Finished all three phases? Mark this module complete.</div>
       </div>
-      <button id="btn-complete" onclick="markThisComplete()" style="font-family:'IBM Plex Mono',monospace;font-size:0.7rem;letter-spacing:0.08em;padding:0.6rem 1.25rem;border-radius:6px;background:#22c55e;color:#07081a;border:none;cursor:pointer;font-weight:500;">Mark Complete ✓</button>
+      <button id="btn-complete" onclick="markThisComplete()" style="font-family:'IBM Plex Mono',monospace;font-size:0.7rem;letter-spacing:0.08em;padding:0.6rem 1.25rem;border-radius:6px;background:#22c55e;color:#080809;border:none;cursor:pointer;font-weight:500;">Mark Complete ✓</button>
     </div>
   </div>
 
@@ -562,7 +562,7 @@
     const MODULE_ID = 'm07';
     function initProgress() { if (typeof trhMarkInProgress==='function') { trhMarkInProgress(MODULE_ID); if (trhGetStatus(MODULE_ID)==='complete') showCompleted(); } }
     function markThisComplete() { if (typeof trhMarkComplete==='function') trhMarkComplete(MODULE_ID); showCompleted(); }
-    function showCompleted() { document.getElementById('complete-msg').textContent='✓ Module 07 marked complete. Great work.'; const b=document.getElementById('btn-complete'); b.textContent='✓ Complete'; b.style.background='rgba(34,197,94,0.15)'; b.style.color='#00e550'; b.style.border='1px solid rgba(34,197,94,0.3)'; b.disabled=true; }
+    function showCompleted() { document.getElementById('complete-msg').textContent='✓ Module 07 marked complete. Great work.'; const b=document.getElementById('btn-complete'); b.textContent='✓ Complete'; b.style.background='rgba(0,229,80,0.15)'; b.style.color='#00e550'; b.style.border='1px solid rgba(34,197,94,0.3)'; b.disabled=true; }
     document.addEventListener('DOMContentLoaded', initProgress);
     function switchPhase(phase, btn) {
       document.querySelectorAll('.phase-panel').forEach(p => p.classList.remove('active'));

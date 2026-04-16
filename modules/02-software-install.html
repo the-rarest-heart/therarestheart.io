@@ -62,7 +62,7 @@
     .chip { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.3rem 0.75rem; border-radius: 20px; }
     .chip-blue { background: rgba(0,229,80,0.12); color: #00e550; border: 1px solid rgba(0,229,80,0.25); }
     .chip-gray { background: rgba(255,255,255,0.05); color: var(--off-white); border: 1px solid rgba(255,255,255,0.1); }
-    .chip-green { background: rgba(34,197,94,0.1); color: #00e550; border: 1px solid rgba(34,197,94,0.2); }
+    .chip-green { background: rgba(34,197,94,0.1); color: #00e550; border: 1px solid rgba(0,229,80,0.2); }
     .phase-nav { display: flex; gap: 0; margin-top: 2.5rem; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 8px; padding: 4px; width: fit-content; opacity: 0; animation: fadeUp 0.7s ease forwards 0.7s; }
     .phase-tab { font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.6rem 1.4rem; border-radius: 5px; cursor: pointer; transition: all 0.2s; color: var(--off-white); border: none; background: transparent; font-weight: 500; }
     .phase-tab:hover { color: var(--white); }
@@ -102,7 +102,7 @@
     .account-card h4 { font-size: 0.95rem; font-weight: 700; margin-bottom: 0.4rem; letter-spacing: -0.01em; }
     .account-card p { font-size: 0.8rem; color: var(--off-white); line-height: 1.6; margin: 0; }
     .account-card .account-tag { display: inline-block; margin-top: 0.75rem; font-family: 'IBM Plex Mono', monospace; font-size: 0.6rem; letter-spacing: 0.08em; padding: 0.2rem 0.6rem; border-radius: 20px; }
-    .tag-local { background: rgba(34,197,94,0.1); color: #00e550; border: 1px solid rgba(34,197,94,0.2); }
+    .tag-local { background: rgba(34,197,94,0.1); color: #00e550; border: 1px solid rgba(0,229,80,0.2); }
     .tag-ms { background: rgba(0,229,80,0.1); color: #00e550; border: 1px solid rgba(0,229,80,0.2); }
     .tag-warn { background: rgba(245,158,11,0.1); color: #fbbf24; border: 1px solid rgba(245,158,11,0.2); }
     .callout-warning { background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.3); border-left: 3px solid #f59e0b; border-radius: 8px; padding: 1.5rem 1.75rem; margin: 1.5rem 0; display: flex; gap: 1rem; align-items: flex-start; }
@@ -624,12 +624,12 @@
         <button class="page-nav-back" onclick="switchPhase('p2', document.querySelectorAll('.phase-tab')[1])" style="background:none;border:none;cursor:pointer;font-family:'IBM Plex Mono',monospace;font-size:0.75rem;letter-spacing:0.08em;color:var(--off-white);">← Phase 2 — Do IT</button>
         <a href="../learn.html" class="page-nav-next">Back to All Modules →</a>
       </div>
-      <div id="complete-block" style="margin-top:2rem;padding:1.5rem;background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.2);border-radius:10px;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;">
+      <div id="complete-block" style="margin-top:2rem;padding:1.5rem;background:rgba(0,229,80,0.06);border:1px solid rgba(0,229,80,0.2);border-radius:10px;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;">
         <div>
           <div style="font-family:'IBM Plex Mono',monospace;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:#00e550;margin-bottom:0.3rem;">Module 02 · SOP-002</div>
           <div style="font-weight:600;font-size:0.95rem;" id="complete-msg">Finished all three phases? Mark this module complete.</div>
         </div>
-        <button id="btn-complete" onclick="markThisComplete()" style="font-family:'IBM Plex Mono',monospace;font-size:0.7rem;letter-spacing:0.08em;padding:0.6rem 1.25rem;border-radius:6px;background:#22c55e;color:#07081a;border:none;cursor:pointer;font-weight:500;">Mark Complete ✓</button>
+        <button id="btn-complete" onclick="markThisComplete()" style="font-family:'IBM Plex Mono',monospace;font-size:0.7rem;letter-spacing:0.08em;padding:0.6rem 1.25rem;border-radius:6px;background:#22c55e;color:#080809;border:none;cursor:pointer;font-weight:500;">Mark Complete ✓</button>
       </div>
     </div>
   </div>
@@ -649,7 +649,7 @@
     const MODULE_ID = 'm02';
     function initProgress() { if (typeof trhMarkInProgress==='function') { trhMarkInProgress(MODULE_ID); if (trhGetStatus(MODULE_ID)==='complete') showCompleted(); } }
     function markThisComplete() { if (typeof trhMarkComplete==='function') trhMarkComplete(MODULE_ID); showCompleted(); }
-    function showCompleted() { document.getElementById('complete-msg').textContent='✓ Module 02 marked complete. Great work.'; const b=document.getElementById('btn-complete'); b.textContent='✓ Complete'; b.style.background='rgba(34,197,94,0.15)'; b.style.color='#00e550'; b.style.border='1px solid rgba(34,197,94,0.3)'; b.disabled=true; }
+    function showCompleted() { document.getElementById('complete-msg').textContent='✓ Module 02 marked complete. Great work.'; const b=document.getElementById('btn-complete'); b.textContent='✓ Complete'; b.style.background='rgba(0,229,80,0.15)'; b.style.color='#00e550'; b.style.border='1px solid rgba(34,197,94,0.3)'; b.disabled=true; }
     document.addEventListener('DOMContentLoaded', initProgress);
     function switchPhase(phase, btn) {
       document.querySelectorAll('.phase-panel').forEach(p => p.classList.remove('active'));
