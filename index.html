@@ -27,6 +27,13 @@
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
+    /* ── PAGE TRANSITIONS ── */
+    @keyframes pageFadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    body { animation: pageFadeIn 0.45s ease both; }
+
 
     body {
       background-color: var(--navy);
