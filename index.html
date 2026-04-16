@@ -1,10 +1,9 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>The Rarest Heart | Technology with a Heartbeat</title>
+  <title>The Rarest Heart | TheGERD — Local AI for IT Teams</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet" />
   <style>
@@ -18,1277 +17,1069 @@
       --accent-glow: rgba(74, 108, 247, 0.25);
       --pulse: #e84a6f;
       --pulse-glow: rgba(232, 74, 111, 0.2);
+      --green: #22c55e;
+      --green-glow: rgba(34, 197, 94, 0.2);
       --tier1: #4a6cf7;
       --tier2: #7c4af7;
-      --tier3: #e84a6f;
     }
 
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-html { scroll-behavior: smooth; }
-
-body {
-  background-color: var(--navy);
-  color: var(--white);
-  font-family: 'DM Sans', sans-serif;
-  font-weight: 300;
-  line-height: 1.7;
-  overflow-x: hidden;
-}
-
-/* ── NOISE OVERLAY ── */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-  pointer-events: none;
-  z-index: 0;
-  opacity: 0.4;
-}
-
-/* ── TYPOGRAPHY ── */
-h1, h2, h3, h4 { font-family: 'Syne', sans-serif; line-height: 1.1; }
-.mono { font-family: 'IBM Plex Mono', monospace; }
-
-/* ── NAV ── */
-nav {
-  position: fixed;
-  top: 0; left: 0; right: 0;
-  z-index: 100;
-  padding: 1.25rem 4rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: rgba(7, 8, 26, 0.85);
-  backdrop-filter: blur(16px);
-  border-bottom: 1px solid rgba(255,255,255,0.06);
-}
-
-.nav-logo {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  text-decoration: none;
-}
-
-.nav-logo-heart {
-  width: 96px;
-  height: 96px;
-}
-
-.nav-logo-text {
-  font-family: 'Syne', sans-serif;
-  font-weight: 800;
-  font-size: 1.3rem;
-  color: var(--white);
-  letter-spacing: -0.02em;
-}
-
-.nav-logo-text span {
-  color: var(--pulse);
-}
-
-.nav-links {
-  display: flex;
-  gap: 2.5rem;
-  list-style: none;
-}
-
-.nav-links a {
-  color: var(--off-white);
-  text-decoration: none;
-  font-size: 0.875rem;
-  font-weight: 400;
-  letter-spacing: 0.02em;
-  transition: color 0.2s;
-  position: relative;
-}
-
-.nav-links a::after {
-  content: '';
-  position: absolute;
-  bottom: -4px; left: 0;
-  width: 0; height: 1px;
-  background: var(--accent);
-  transition: width 0.3s;
-}
-
-.nav-links a:hover { color: var(--white); }
-.nav-links a:hover::after { width: 100%; }
-
-.nav-cta {
-  background: var(--accent);
-  color: var(--white) !important;
-  padding: 0.5rem 1.25rem;
-  border-radius: 4px;
-  font-weight: 500 !important;
-  transition: background 0.2s, transform 0.2s !important;
-}
-
-.nav-cta::after { display: none !important; }
-.nav-cta:hover { background: #3a5ce0 !important; transform: translateY(-1px); }
-
-/* ── HERO ── */
-.hero {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  position: relative;
-  padding: 11rem 4rem 4rem;
-  overflow: hidden;
-}
-
-.hero-grid-bg {
-  position: absolute;
-  inset: 0;
-  background-image:
-    linear-gradient(rgba(74,108,247,0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(74,108,247,0.05) 1px, transparent 1px);
-  background-size: 60px 60px;
-  mask-image: radial-gradient(ellipse 80% 60% at 50% 50%, black, transparent);
-}
-
-.hero-glow {
-  position: absolute;
-  width: 700px; height: 700px;
-  border-radius: 50%;
-  background: radial-gradient(circle, var(--pulse-glow) 0%, transparent 70%);
-  top: -200px; right: -200px;
-  pointer-events: none;
-}
-
-.hero-glow-2 {
-  position: absolute;
-  width: 500px; height: 500px;
-  border-radius: 50%;
-  background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
-  bottom: -100px; left: 10%;
-  pointer-events: none;
-}
-
-.hero-content {
-  position: relative;
-  z-index: 1;
-  max-width: 780px;
-}
-
-.hero-eyebrow {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.75rem;
-  letter-spacing: 0.15em;
-  color: var(--accent);
-  text-transform: uppercase;
-  margin-bottom: 1.5rem;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  opacity: 0;
-  animation: fadeUp 0.8s ease forwards 0.2s;
-}
-
-.hero-eyebrow::before {
-  content: '';
-  display: inline-block;
-  width: 32px; height: 1px;
-  background: var(--accent);
-}
-
-.hero-headline {
-  font-size: clamp(3rem, 7vw, 5.5rem);
-  font-weight: 800;
-  letter-spacing: -0.03em;
-  line-height: 1.0;
-  margin-bottom: 1.5rem;
-  opacity: 0;
-  animation: fadeUp 0.8s ease forwards 0.4s;
-}
-
-.hero-headline em {
-  font-style: normal;
-  color: var(--pulse);
-  position: relative;
-}
-
-.hero-headline em::after {
-  content: '';
-  position: absolute;
-  bottom: 4px; left: 0; right: 0;
-  height: 3px;
-  background: var(--pulse);
-  opacity: 0.4;
-  border-radius: 2px;
-}
-
-.hero-sub {
-  font-size: 1.15rem;
-  color: var(--off-white);
-  max-width: 560px;
-  margin-bottom: 2.5rem;
-  font-weight: 300;
-  opacity: 0;
-  animation: fadeUp 0.8s ease forwards 0.6s;
-}
-
-.hero-sub strong {
-  color: var(--white);
-  font-weight: 500;
-}
-
-.hero-actions {
-  display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
-  opacity: 0;
-  animation: fadeUp 0.8s ease forwards 0.8s;
-}
-
-.btn-primary {
-  background: var(--accent);
-  color: var(--white);
-  padding: 0.875rem 2rem;
-  border-radius: 4px;
-  text-decoration: none;
-  font-weight: 500;
-  font-size: 0.95rem;
-  letter-spacing: 0.01em;
-  transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.btn-primary:hover {
-  background: #3a5ce0;
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px var(--accent-glow);
-}
-
-.btn-secondary {
-  border: 1px solid rgba(255,255,255,0.2);
-  color: var(--white);
-  padding: 0.875rem 2rem;
-  border-radius: 4px;
-  text-decoration: none;
-  font-weight: 400;
-  font-size: 0.95rem;
-  transition: border-color 0.2s, background 0.2s, transform 0.2s;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.btn-secondary:hover {
-  border-color: rgba(255,255,255,0.5);
-  background: rgba(255,255,255,0.05);
-  transform: translateY(-2px);
-}
-
-/* Heartbeat line */
-.hero-heartbeat {
-  position: absolute;
-  bottom: 3rem;
-  left: 4rem; right: 4rem;
-  height: 40px;
-  opacity: 0;
-  animation: fadeUp 1s ease forwards 1.2s;
-}
-
-.hero-heartbeat svg {
-  width: 100%;
-  height: 100%;
-}
-
-.heartbeat-line {
-  stroke-dasharray: 2000;
-  stroke-dashoffset: 2000;
-  animation: drawLine 3s ease forwards 1.5s, pulse-opacity 2s ease-in-out infinite 4.5s;
-}
-
-@keyframes drawLine {
-  to { stroke-dashoffset: 0; }
-}
-
-@keyframes pulse-opacity {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.4; }
-}
-
-/* ── SECTION SHARED ── */
-section {
-  position: relative;
-  z-index: 1;
-}
-
-.section-inner {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 4rem;
-}
-
-.section-label {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.7rem;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--accent);
-  margin-bottom: 0.75rem;
-}
-
-.section-title {
-  font-size: clamp(2rem, 4vw, 3rem);
-  font-weight: 800;
-  letter-spacing: -0.02em;
-  margin-bottom: 1rem;
-}
-
-.section-desc {
-  font-size: 1.05rem;
-  color: var(--off-white);
-  max-width: 560px;
-  font-weight: 300;
-}
-
-/* ── THE GAP SECTION ── */
-.gap-section {
-  padding: 7rem 0;
-  background: var(--navy-mid);
-  border-top: 1px solid rgba(255,255,255,0.05);
-  border-bottom: 1px solid rgba(255,255,255,0.05);
-}
-
-.gap-layout {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 5rem;
-  align-items: center;
-}
-
-.gap-quote {
-  font-family: 'Syne', sans-serif;
-  font-size: clamp(1.5rem, 2.5vw, 2rem);
-  font-weight: 700;
-  line-height: 1.3;
-  letter-spacing: -0.02em;
-}
-
-.gap-quote .highlight {
-  color: var(--pulse);
-}
-
-.gap-stats {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
-}
-
-.stat-card {
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.07);
-  border-radius: 8px;
-  padding: 1.5rem;
-}
-
-.stat-number {
-  font-family: 'Syne', sans-serif;
-  font-size: 2.5rem;
-  font-weight: 800;
-  color: var(--accent);
-  letter-spacing: -0.03em;
-  line-height: 1;
-  margin-bottom: 0.4rem;
-}
-
-.stat-label {
-  font-size: 0.8rem;
-  color: var(--off-white);
-  line-height: 1.4;
-}
-
-/* ── HOW IT WORKS (Learn IT / Do IT / Apply IT) ── */
-.how-section {
-  padding: 8rem 0;
-}
-
-.how-header {
-  text-align: center;
-  margin-bottom: 5rem;
-}
-
-.how-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 2px;
-  background: rgba(255,255,255,0.05);
-  border-radius: 12px;
-  overflow: hidden;
-}
-
-.how-card {
-  background: var(--navy-mid);
-  padding: 3rem 2.5rem;
-  position: relative;
-  transition: background 0.3s;
-}
-
-.how-card:hover {
-  background: var(--navy-light);
-}
-
-.how-card-number {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.7rem;
-  letter-spacing: 0.15em;
-  color: var(--off-white);
-  opacity: 0.5;
-  margin-bottom: 1.5rem;
-}
-
-.how-card-icon {
-  width: 52px; height: 52px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 1.5rem;
-  font-size: 1.4rem;
-}
-
-.icon-learn { background: rgba(74, 108, 247, 0.15); }
-.icon-do    { background: rgba(124, 74, 247, 0.15); }
-.icon-apply { background: rgba(232, 74, 111, 0.15); }
-
-.how-card h3 {
-  font-size: 1.5rem;
-  font-weight: 800;
-  letter-spacing: -0.02em;
-  margin-bottom: 0.75rem;
-}
-
-.how-card h3 .it {
-  font-style: italic;
-  color: var(--accent);
-}
-
-.how-card-2 h3 .it { color: #7c4af7; }
-.how-card-3 h3 .it { color: var(--pulse); }
-
-.how-card p {
-  font-size: 0.9rem;
-  color: var(--off-white);
-  line-height: 1.7;
-}
-
-.how-card-tag {
-  display: inline-block;
-  margin-top: 1.5rem;
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.7rem;
-  padding: 0.3rem 0.75rem;
-  border-radius: 20px;
-  letter-spacing: 0.1em;
-}
-
-.tag-learn { background: rgba(74,108,247,0.15); color: #7a9eff; }
-.tag-do    { background: rgba(124,74,247,0.15); color: #b07aff; }
-.tag-apply { background: rgba(232,74,111,0.15); color: #ff7a9a; }
-
-/* ── TOPIC TRACKS ── */
-.tracks-section {
-  padding: 7rem 0;
-  background: var(--navy-mid);
-  border-top: 1px solid rgba(255,255,255,0.05);
-}
-
-.tracks-header {
-  margin-bottom: 3.5rem;
-}
-
-.tracks-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1.5rem;
-}
-
-.track-card {
-  background: rgba(255,255,255,0.02);
-  border: 1px solid rgba(255,255,255,0.06);
-  border-radius: 10px;
-  padding: 2rem;
-  display: flex;
-  gap: 1.5rem;
-  align-items: flex-start;
-  transition: border-color 0.3s, background 0.3s, transform 0.3s;
-  cursor: pointer;
-  text-decoration: none;
-  color: inherit;
-}
-
-.track-card:hover {
-  border-color: rgba(74,108,247,0.4);
-  background: rgba(74,108,247,0.05);
-  transform: translateY(-3px);
-}
-
-.track-icon {
-  font-size: 1.75rem;
-  flex-shrink: 0;
-  width: 52px; height: 52px;
-  background: rgba(255,255,255,0.04);
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.track-info h4 {
-  font-size: 1.05rem;
-  font-weight: 700;
-  letter-spacing: -0.01em;
-  margin-bottom: 0.4rem;
-}
-
-.track-info p {
-  font-size: 0.85rem;
-  color: var(--off-white);
-  line-height: 1.5;
-}
-
-.track-badge {
-  margin-top: 0.75rem;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.65rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-}
-
-.badge-t1 { color: var(--tier1); }
-.badge-t2 { color: var(--tier2); }
-
-.badge-dot {
-  width: 6px; height: 6px;
-  border-radius: 50%;
-  display: inline-block;
-}
-
-.dot-t1 { background: var(--tier1); }
-.dot-t2 { background: var(--tier2); }
-
-/* ── AI ASSISTANT SECTION ── */
-.ai-section {
-  padding: 8rem 0;
-  position: relative;
-  overflow: hidden;
-}
-
-.ai-glow {
-  position: absolute;
-  width: 600px; height: 600px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(74,108,247,0.12) 0%, transparent 70%);
-  right: -100px; top: 50%;
-  transform: translateY(-50%);
-  pointer-events: none;
-}
-
-.ai-layout {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 6rem;
-  align-items: center;
-}
-
-.ai-terminal {
-  background: var(--navy-light);
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 32px 80px rgba(0,0,0,0.4);
-}
-
-.terminal-bar {
-  background: rgba(255,255,255,0.04);
-  padding: 0.75rem 1.25rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  border-bottom: 1px solid rgba(255,255,255,0.06);
-}
-
-.terminal-dot {
-  width: 10px; height: 10px;
-  border-radius: 50%;
-}
-
-.dot-red   { background: #ff5f57; }
-.dot-yellow{ background: #febc2e; }
-.dot-green { background: #28c840; }
-
-.terminal-title {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.7rem;
-  color: var(--off-white);
-  opacity: 0.5;
-  margin-left: 0.5rem;
-}
-
-.terminal-body {
-  padding: 1.5rem;
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.8rem;
-  line-height: 1.9;
-}
-
-.t-prompt { color: var(--accent); }
-.t-user   { color: var(--white); }
-.t-ai     { color: #7affb8; }
-.t-dim    { color: var(--off-white); opacity: 0.5; }
-
-.cursor {
-  display: inline-block;
-  width: 7px; height: 13px;
-  background: var(--accent);
-  margin-left: 2px;
-  vertical-align: middle;
-  animation: blink 1s step-end infinite;
-}
-
-@keyframes blink {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: 0; }
-}
-
-/* ── VALUES STRIP ── */
-.values-section {
-  padding: 6rem 0;
-  background: var(--navy-mid);
-  border-top: 1px solid rgba(255,255,255,0.05);
-}
-
-.values-scroll {
-  display: flex;
-  gap: 1.5rem;
-  overflow-x: auto;
-  padding-bottom: 1rem;
-  scrollbar-width: none;
-}
-
-.values-scroll::-webkit-scrollbar { display: none; }
-
-.value-pill {
-  flex-shrink: 0;
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.07);
-  border-radius: 8px;
-  padding: 1.75rem 2rem;
-  min-width: 240px;
-}
-
-.value-pill-icon {
-  font-size: 1.5rem;
-  margin-bottom: 0.75rem;
-}
-
-.value-pill h4 {
-  font-size: 0.95rem;
-  font-weight: 700;
-  margin-bottom: 0.4rem;
-}
-
-.value-pill p {
-  font-size: 0.8rem;
-  color: var(--off-white);
-  line-height: 1.5;
-}
-
-/* ── CTA ── */
-.cta-section {
-  padding: 8rem 0;
-  text-align: center;
-  position: relative;
-  overflow: hidden;
-}
-
-.cta-glow {
-  position: absolute;
-  width: 800px; height: 400px;
-  border-radius: 50%;
-  background: radial-gradient(ellipse, rgba(232,74,111,0.1) 0%, transparent 70%);
-  top: 50%; left: 50%;
-  transform: translate(-50%, -50%);
-  pointer-events: none;
-}
-
-.cta-content {
-  position: relative;
-  z-index: 1;
-}
-
-.cta-content h2 {
-  font-size: clamp(2.5rem, 5vw, 4rem);
-  font-weight: 800;
-  letter-spacing: -0.03em;
-  margin-bottom: 1.25rem;
-}
-
-.cta-content p {
-  font-size: 1.3rem;
-  color: var(--off-white);
-  max-width: 500px;
-  margin: 0 auto 2.5rem;
-}
-
-.cta-content .btn-primary {
-  font-size: 1.05rem;
-  padding: 1rem 2.5rem;
-}
-
-/* ── FOOTER ── */
-footer {
-  border-top: 1px solid rgba(255,255,255,0.06);
-  padding: 3rem 4rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 1rem;
-}
-
-.footer-left {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.footer-copy {
-  font-size: 0.8rem;
-  color: var(--off-white);
-  opacity: 0.5;
-}
-
-.footer-links {
-  display: flex;
-  gap: 2rem;
-  list-style: none;
-}
-
-.footer-links a {
-  font-size: 0.8rem;
-  color: var(--off-white);
-  opacity: 0.5;
-  text-decoration: none;
-  transition: opacity 0.2s;
-}
-
-.footer-links a:hover { opacity: 1; }
-
-/* ── ANIMATIONS ── */
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-/* ── SCROLL REVEAL ── */
-.reveal {
-  opacity: 0;
-  transform: translateY(30px);
-  transition: opacity 0.7s ease, transform 0.7s ease;
-}
-
-.reveal.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* ── RESPONSIVE ── */
-@media (max-width: 900px) {
-  nav { padding: 1rem 1.5rem; }
-  .nav-links { display: none; }
-  .hero { padding: 6rem 1.5rem 3rem; }
-  .section-inner { padding: 0 1.5rem; }
-  .gap-layout, .ai-layout, .tracks-grid { grid-template-columns: 1fr; gap: 3rem; }
-  .how-grid { grid-template-columns: 1fr; gap: 2px; }
-  footer { padding: 2rem 1.5rem; flex-direction: column; align-items: flex-start; }
-}
-
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background-color: var(--navy);
+      color: var(--white);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.4;
+    }
+
+    h1, h2, h3, h4 { font-family: 'Syne', sans-serif; line-height: 1.1; }
+    .mono { font-family: 'IBM Plex Mono', monospace; }
+
+    /* NAV */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 1.25rem 4rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(7, 8, 26, 0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+    }
+
+    .nav-logo-heart { width: 96px; height: 96px; }
+
+    .nav-logo-text {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.3rem;
+      color: var(--white);
+      letter-spacing: -0.02em;
+    }
+
+    .nav-logo-text span { color: var(--pulse); }
+
+    .nav-links {
+      display: flex;
+      gap: 2.5rem;
+      list-style: none;
+      align-items: center;
+    }
+
+    .nav-links a {
+      color: var(--off-white);
+      text-decoration: none;
+      font-size: 0.875rem;
+      font-weight: 400;
+      letter-spacing: 0.02em;
+      transition: color 0.2s;
+      position: relative;
+    }
+
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -4px; left: 0;
+      width: 0; height: 1px;
+      background: var(--accent);
+      transition: width 0.3s;
+    }
+
+    .nav-links a:hover { color: var(--white); }
+    .nav-links a:hover::after { width: 100%; }
+
+    .nav-cta {
+      background: var(--accent);
+      color: var(--white) !important;
+      padding: 0.5rem 1.25rem;
+      border-radius: 4px;
+      font-weight: 500 !important;
+      transition: background 0.2s, transform 0.2s !important;
+    }
+
+    .nav-cta::after { display: none !important; }
+    .nav-cta:hover { background: #3a5ce0 !important; transform: translateY(-1px); }
+
+    /* HERO */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      position: relative;
+      padding: 11rem 4rem 4rem;
+      overflow: hidden;
+    }
+
+    .hero-grid-bg {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(74,108,247,0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(74,108,247,0.05) 1px, transparent 1px);
+      background-size: 60px 60px;
+      mask-image: radial-gradient(ellipse 80% 60% at 50% 50%, black, transparent);
+    }
+
+    .hero-glow {
+      position: absolute;
+      width: 700px; height: 700px;
+      border-radius: 50%;
+      background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+      top: -200px; right: -200px;
+      pointer-events: none;
+    }
+
+    .hero-glow-2 {
+      position: absolute;
+      width: 500px; height: 500px;
+      border-radius: 50%;
+      background: radial-gradient(circle, var(--pulse-glow) 0%, transparent 70%);
+      bottom: -100px; left: 10%;
+      pointer-events: none;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      max-width: 820px;
+    }
+
+    .hero-eyebrow {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.75rem;
+      letter-spacing: 0.15em;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      opacity: 0;
+      animation: fadeUp 0.8s ease forwards 0.2s;
+    }
+
+    .hero-eyebrow::before {
+      content: '';
+      display: inline-block;
+      width: 32px; height: 1px;
+      background: var(--accent);
+    }
+
+    .hero-headline {
+      font-size: clamp(3rem, 7vw, 5.5rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.0;
+      margin-bottom: 1.5rem;
+      opacity: 0;
+      animation: fadeUp 0.8s ease forwards 0.4s;
+    }
+
+    .hero-headline em {
+      font-style: normal;
+      color: var(--accent);
+      position: relative;
+    }
+
+    .hero-sub {
+      font-size: 1.15rem;
+      color: var(--off-white);
+      max-width: 600px;
+      margin-bottom: 2.5rem;
+      font-weight: 300;
+      opacity: 0;
+      animation: fadeUp 0.8s ease forwards 0.6s;
+    }
+
+    .hero-sub strong { color: var(--white); font-weight: 500; }
+
+    .hero-actions {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      opacity: 0;
+      animation: fadeUp 0.8s ease forwards 0.8s;
+    }
+
+    .hero-badges {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-top: 3rem;
+      opacity: 0;
+      animation: fadeUp 0.8s ease forwards 1s;
+    }
+
+    .hero-badge {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 0.35rem 0.85rem;
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,0.1);
+      color: var(--off-white);
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: var(--white);
+      padding: 0.875rem 2rem;
+      border-radius: 4px;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 0.95rem;
+      letter-spacing: 0.01em;
+      transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn-primary:hover {
+      background: #3a5ce0;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px var(--accent-glow);
+    }
+
+    .btn-secondary {
+      border: 1px solid rgba(255,255,255,0.2);
+      color: var(--white);
+      padding: 0.875rem 2rem;
+      border-radius: 4px;
+      text-decoration: none;
+      font-weight: 400;
+      font-size: 0.95rem;
+      transition: border-color 0.2s, background 0.2s, transform 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn-secondary:hover {
+      border-color: rgba(255,255,255,0.5);
+      background: rgba(255,255,255,0.05);
+      transform: translateY(-2px);
+    }
+
+    .hero-heartbeat {
+      position: absolute;
+      bottom: 3rem;
+      left: 4rem; right: 4rem;
+      height: 40px;
+      opacity: 0;
+      animation: fadeUp 1s ease forwards 1.2s;
+    }
+
+    .hero-heartbeat svg { width: 100%; height: 100%; }
+
+    .heartbeat-line {
+      stroke-dasharray: 2000;
+      stroke-dashoffset: 2000;
+      animation: drawLine 3s ease forwards 1.5s, pulse-opacity 2s ease-in-out infinite 4.5s;
+    }
+
+    @keyframes drawLine { to { stroke-dashoffset: 0; } }
+    @keyframes pulse-opacity {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    /* SECTION SHARED */
+    section { position: relative; z-index: 1; }
+
+    .section-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 4rem;
+    }
+
+    .section-label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 0.75rem;
+    }
+
+    .section-title {
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 1rem;
+    }
+
+    .section-desc {
+      font-size: 1.05rem;
+      color: var(--off-white);
+      max-width: 560px;
+      font-weight: 300;
+    }
+
+    /* ABOUT / FOUNDER */
+    .about-section {
+      padding: 8rem 0;
+      background: var(--navy-mid);
+      border-top: 1px solid rgba(255,255,255,0.05);
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .about-layout {
+      display: grid;
+      grid-template-columns: 1fr 1.4fr;
+      gap: 6rem;
+      align-items: start;
+    }
+
+    .founder-card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .founder-photo {
+      width: 100%;
+      aspect-ratio: 4/3;
+      background: linear-gradient(135deg, rgba(74,108,247,0.15) 0%, rgba(232,74,111,0.1) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      color: var(--off-white);
+      opacity: 0.5;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .founder-info {
+      padding: 1.5rem;
+    }
+
+    .founder-name {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.2rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.25rem;
+    }
+
+    .founder-title {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1rem;
+    }
+
+    .founder-creds {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .founder-cred {
+      font-size: 0.8rem;
+      color: var(--off-white);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .founder-cred::before {
+      content: '▸';
+      color: var(--accent);
+      font-size: 0.65rem;
+    }
+
+    .story-blocks {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .story-block {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-left: 3px solid var(--accent);
+      border-radius: 0 8px 8px 0;
+      padding: 1.25rem 1.5rem;
+    }
+
+    .story-block-phase {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 0.4rem;
+    }
+
+    .story-block p {
+      font-size: 0.9rem;
+      color: var(--off-white);
+      line-height: 1.7;
+    }
+
+    .story-block p strong { color: var(--white); }
+
+    /* GERD OUTCOMES */
+    .outcomes-section {
+      padding: 8rem 0;
+    }
+
+    .outcomes-header {
+      text-align: center;
+      margin-bottom: 5rem;
+    }
+
+    .outcomes-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+      margin-bottom: 3rem;
+    }
+
+    .outcome-card {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 12px;
+      padding: 2rem;
+      transition: border-color 0.3s, background 0.3s, transform 0.3s;
+    }
+
+    .outcome-card:hover {
+      border-color: rgba(74,108,247,0.4);
+      background: rgba(74,108,247,0.05);
+      transform: translateY(-3px);
+    }
+
+    .outcome-icon {
+      font-size: 1.75rem;
+      margin-bottom: 1rem;
+    }
+
+    .outcome-card h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      margin-bottom: 0.5rem;
+    }
+
+    .outcome-card p {
+      font-size: 0.85rem;
+      color: var(--off-white);
+      line-height: 1.6;
+    }
+
+    .no-cloud-bar {
+      background: rgba(34,197,94,0.06);
+      border: 1px solid rgba(34,197,94,0.2);
+      border-radius: 10px;
+      padding: 1.5rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .no-cloud-items {
+      display: flex;
+      gap: 2.5rem;
+      flex-wrap: wrap;
+    }
+
+    .no-cloud-item {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+    }
+
+    .no-cloud-item .check {
+      color: #4ade80;
+      font-size: 1rem;
+    }
+
+    /* INDUSTRIES */
+    .industries-section {
+      padding: 7rem 0;
+      background: var(--navy-mid);
+      border-top: 1px solid rgba(255,255,255,0.05);
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .industries-header {
+      margin-bottom: 3.5rem;
+    }
+
+    .industries-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 1rem;
+    }
+
+    .industry-card {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 10px;
+      padding: 1.75rem 1.25rem;
+      text-align: center;
+      transition: border-color 0.3s, background 0.3s, transform 0.3s;
+    }
+
+    .industry-card:hover {
+      border-color: rgba(74,108,247,0.35);
+      background: rgba(74,108,247,0.05);
+      transform: translateY(-3px);
+    }
+
+    .industry-icon {
+      font-size: 2rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .industry-card h4 {
+      font-size: 0.85rem;
+      font-weight: 700;
+      margin-bottom: 0.4rem;
+      letter-spacing: -0.01em;
+    }
+
+    .industry-card p {
+      font-size: 0.75rem;
+      color: var(--off-white);
+      line-height: 1.5;
+    }
+
+    /* DEMO FORM */
+    .demo-section {
+      padding: 8rem 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .demo-glow {
+      position: absolute;
+      width: 600px; height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+      right: -100px; top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none;
+    }
+
+    .demo-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6rem;
+      align-items: start;
+    }
+
+    .demo-copy h2 { margin-bottom: 1rem; }
+
+    .demo-copy p {
+      font-size: 0.95rem;
+      color: var(--off-white);
+      line-height: 1.8;
+      margin-bottom: 2rem;
+    }
+
+    .demo-points {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .demo-point {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 0.875rem;
+      color: var(--off-white);
+    }
+
+    .demo-point .check { color: var(--accent); font-size: 1rem; }
+
+    .demo-form {
+      background: var(--navy-light);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      padding: 2.5rem;
+    }
+
+    .demo-form h3 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-bottom: 0.4rem;
+    }
+
+    .demo-form-sub {
+      font-size: 0.8rem;
+      color: var(--off-white);
+      margin-bottom: 1.75rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+
+    .form-group label {
+      display: block;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--off-white);
+      margin-bottom: 0.4rem;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      width: 100%;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 6px;
+      padding: 0.75rem 1rem;
+      color: var(--white);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      transition: border-color 0.2s;
+      outline: none;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus {
+      border-color: rgba(74,108,247,0.6);
+    }
+
+    .form-group textarea { resize: vertical; min-height: 100px; }
+    .form-group select option { background: var(--navy-light); }
+
+    .form-submit {
+      width: 100%;
+      background: var(--accent);
+      color: var(--white);
+      border: none;
+      padding: 0.875rem 2rem;
+      border-radius: 6px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.2s;
+      margin-top: 0.5rem;
+    }
+
+    .form-submit:hover {
+      background: #3a5ce0;
+      transform: translateY(-1px);
+    }
+
+    #form-success {
+      display: none;
+      text-align: center;
+      padding: 2rem;
+    }
+
+    #form-success .success-icon { font-size: 2.5rem; margin-bottom: 1rem; }
+
+    #form-success h4 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    #form-success p {
+      font-size: 0.85rem;
+      color: var(--off-white);
+    }
+
+    /* TRAINING CALLOUT */
+    .training-section {
+      padding: 5rem 0;
+      background: var(--navy-mid);
+      border-top: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .training-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .training-inner h3 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 0.3rem;
+    }
+
+    .training-inner p {
+      font-size: 0.9rem;
+      color: var(--off-white);
+    }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid rgba(255,255,255,0.06);
+      padding: 3rem 4rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .footer-copy { font-size: 0.8rem; color: var(--off-white); opacity: 0.5; }
+
+    .footer-links { display: flex; gap: 2rem; list-style: none; }
+
+    .footer-links a {
+      font-size: 0.8rem;
+      color: var(--off-white);
+      opacity: 0.5;
+      text-decoration: none;
+      transition: opacity 0.2s;
+    }
+
+    .footer-links a:hover { opacity: 1; }
+
+    /* ANIMATIONS */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* RESPONSIVE */
+    @media (max-width: 900px) {
+      nav { padding: 1rem 1.5rem; }
+      .nav-links { display: none; }
+      .hero { padding: 7rem 1.5rem 3rem; }
+      .section-inner { padding: 0 1.5rem; }
+      .about-layout, .demo-layout { grid-template-columns: 1fr; gap: 3rem; }
+      .outcomes-grid { grid-template-columns: 1fr; }
+      .industries-grid { grid-template-columns: repeat(2, 1fr); }
+      footer { padding: 2rem 1.5rem; flex-direction: column; align-items: flex-start; }
+    }
   </style>
 </head>
 <body>
 
   <!-- NAV -->
-
   <nav>
-    <!-- ============================================================
-         NAV LOGO — links back to homepage from any page
-         When you build other pages, copy this nav and keep href="index.html"
-         ============================================================ -->
     <a href="index.html" class="nav-logo">
       <img src="images/trhlogo.svg" alt="The Rarest Heart" class="nav-logo-heart" width="96" height="96">
       <span class="nav-logo-text">The Rarest <span>Heart</span></span>
     </a>
-
-<!-- ============================================================
-     NAV LINKS — update each href as you build out the pages
-     Each comment tells you what page to create and when
-     ============================================================ -->
-<ul class="nav-links">
-
-  <!-- BUILT ✓ — learn.html exists, drop it in root alongside index.html -->
-  <li><a href="learn.html">Learn IT</a></li>
-
-  <!-- BUILD NEXT — do.html — the hands-on lab / SOP execution page
-       This is Phase 2 of every module (Do IT)
-       Template: same structure as learn.html, focused on step-by-step SOPs -->
-  <li><a href="do.html">Do IT</a></li>
-
-  <!-- BUILD AFTER — apply.html — resume bullets + interview prep page
-       This is Phase 3 of every module (Apply IT)
-       Template: scenario practice, ticket documentation, interview Q&A -->
-  <li><a href="apply.html">Apply IT</a></li>
-
-  <!-- BUILD LATER — topics.html — full topic library / index page
-       Lists all modules by tier with links to each module page
-       Can pull from the tracks grid already on this homepage -->
-  <li><a href="topics.html">Topics</a></li>
-
-  <!-- BUILD IN PHASE 2 — assistant.html — local AI assistant interface
-       Connects to your local LLM / RAG system (see TRH AI docs)
-       Keep href="#assistant" until the page is actually built -->
-  <li><a href="#assistant">AI Assistant</a></li>
-
-  <!-- BUILD WHEN READY — contact.html — get support / contact form
-       For small business clients and students needing help
-       Add Calendly embed or a simple contact form here -->
-  <li><a href="members.html">My Progress</a></li>
-  <li><a href="contact.html" class="nav-cta">Start Here</a></li>
-
-</ul>
-
+    <ul class="nav-links">
+      <li><a href="#gerd">TheGERD</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#industries">Industries</a></li>
+      <li><a href="learn.html">Training</a></li>
+      <li><a href="#demo" class="nav-cta">Request a Demo</a></li>
+    </ul>
   </nav>
 
   <!-- HERO -->
-
   <section class="hero">
     <div class="hero-grid-bg"></div>
     <div class="hero-glow"></div>
     <div class="hero-glow-2"></div>
 
-<div class="hero-content">
-  <p class="hero-eyebrow">therarestheart.io &nbsp;·&nbsp; Technology with a Heartbeat</p>
+    <div class="hero-content">
+      <p class="hero-eyebrow">therarestheart.io &nbsp;·&nbsp; Introducing TheGERD</p>
 
-  <h1 class="hero-headline">
-    IT explained<br />
-    for the <em>rest of us.</em>
-  </h1>
+      <h1 class="hero-headline">
+        Your Knowledge.<br />
+        Your Hardware.<br />
+        <em>Your AI.</em>
+      </h1>
 
-  <p class="hero-sub">
-    There's a gap between experience and entry-level. <strong>TRH exists to close it.</strong>
-    Real IT knowledge — Tier 1 to Tier 2 — explained without gatekeeping,
-    built for the people who were told to "just figure it out."
-  </p>
+      <p class="hero-sub">
+        <strong>TheGERD</strong> is a local AI operations platform for IT teams — built for environments
+        where cloud tools are not an option. Your data stays on your hardware. Always.
+      </p>
 
-  <!-- ============================================================
-       HERO BUTTONS
-       "Start Learning" → learn.html (your /learn page — BUILT ✓)
-       "Browse Topics"  → topics.html (build this later as a full index)
-                          For now you can keep it pointing to #topics
-                          which scrolls down to the topics section below
-       ============================================================ -->
-  <div class="hero-actions">
-    <a href="learn.html" class="btn-primary">
-      <span>Start Learning</span>
-      <span>→</span>
-    </a>
-    <a href="#topics" class="btn-secondary">
-      <span>Browse Topics</span>
-    </a>
-  </div>
-</div>
+      <div class="hero-actions">
+        <a href="#demo" class="btn-primary">Request a Demo →</a>
+        <a href="#gerd" class="btn-secondary">See What It Does</a>
+      </div>
 
-<div class="hero-heartbeat">
-  <svg viewBox="0 0 1200 40" fill="none" preserveAspectRatio="none">
-    <path class="heartbeat-line"
-      d="M0 20 L200 20 L240 20 L260 5 L280 35 L300 2 L320 38 L340 20 L380 20 L500 20 L540 20 L560 10 L575 30 L590 8 L605 32 L620 20 L660 20 L800 20 L840 20 L855 12 L870 28 L885 15 L900 25 L915 20 L960 20 L1200 20"
-      stroke="rgba(232,74,111,0.5)"
-      stroke-width="1.5"
-      fill="none"
-    />
-  </svg>
-</div>
+      <div class="hero-badges">
+        <span class="hero-badge">No Cloud</span>
+        <span class="hero-badge">No Subscription</span>
+        <span class="hero-badge">No Data Leaving Your Building</span>
+        <span class="hero-badge">Security+ Backed</span>
+      </div>
+    </div>
 
+    <div class="hero-heartbeat">
+      <svg viewBox="0 0 1200 40" fill="none" preserveAspectRatio="none">
+        <path class="heartbeat-line"
+          d="M0 20 L200 20 L240 20 L260 5 L280 35 L300 2 L320 38 L340 20 L380 20 L500 20 L540 20 L560 10 L575 30 L590 8 L605 32 L620 20 L660 20 L800 20 L840 20 L855 12 L870 28 L885 15 L900 25 L915 20 L960 20 L1200 20"
+          stroke="rgba(74,108,247,0.5)"
+          stroke-width="1.5"
+          fill="none"
+        />
+      </svg>
+    </div>
   </section>
 
-  <!-- THE GAP -->
-
-  <section class="gap-section">
+  <!-- ABOUT / FOUNDER -->
+  <section class="about-section" id="about">
     <div class="section-inner">
-      <div class="gap-layout reveal">
+      <div class="about-layout reveal">
         <div>
-          <p class="section-label">// why TRH exists</p>
-          <h2 class="gap-quote">
-            The tech world stopped <span class="highlight">teaching</span> and started <span class="highlight">gatekeeping.</span>
-            We're changing that narrative.
-          </h2>
-          <p style="margin-top:1.5rem; color: var(--off-white); font-size:0.95rem; max-width:480px;">
-            Whether you're aiming for Help Desk, IT Support, In-Field Technician, or a future in cybersecurity —
-            TRH gives you the knowledge, the labs, and the language to walk in confident.
-          </p>
-        </div>
-        <div class="gap-stats">
-          <div class="stat-card">
-            <div class="stat-number">T1</div>
-            <div class="stat-label">Tier 1 Help Desk — the foundation of every IT career</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-number">T2</div>
-            <div class="stat-label">Tier 2 Support — where technicians become problem-solvers</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-number">0→</div>
-            <div class="stat-label">No experience required. Curiosity is the only prerequisite</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-number">SOC</div>
-            <div class="stat-label">A clear path toward cybersecurity and beyond</div>
+          <p class="section-label">// the founder</p>
+          <div class="founder-card">
+            <div class="founder-photo">PHOTO COMING SOON</div>
+            <div class="founder-info">
+              <div class="founder-name">TheRarestHeart</div>
+              <div class="founder-title">Founder · The Rarest Heart</div>
+              <div class="founder-creds">
+                <div class="founder-cred">CompTIA Security+ Certified</div>
+                <div class="founder-cred">Network Technician</div>
+                <div class="founder-cred">IT Support Specialist</div>
+                <div class="founder-cred">12-Year Professional Athlete</div>
+                <div class="founder-cred">Self-Taught Developer</div>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
-  </section>
 
-  <!-- HOW IT WORKS -->
-
-  <section class="how-section" id="learn">
-    <div class="section-inner">
-      <div class="how-header reveal">
-        <p class="section-label">// the TRH method</p>
-        <h2 class="section-title">Every topic. Three ways in.</h2>
-        <p class="section-desc">Information Technology isn't just a label — it's the promise. We make IT make sense.</p>
-      </div>
-
-  <!-- ============================================================
-       HOW IT WORKS — "Every topic. Three ways in."
-       Each card below maps to a page you will build:
-
-       CARD 1 — Learn IT → learn.html (BUILT ✓)
-         The concept, context, and knowledge section of every module
-         When someone clicks "Learn IT" in the nav, this is where they go
-
-       CARD 2 — Do IT → do.html (BUILD NEXT)
-         Step-by-step SOP execution, screenshots, lab practice
-         Each module's Phase 2 lives here
-
-       CARD 3 — Apply IT → apply.html (BUILD AFTER)
-         Scenarios, ticket documentation, resume bullets, interview prep
-         Each module's Phase 3 lives here
-       ============================================================ -->
-  <div class="how-grid reveal">
-    <div class="how-card how-card-1">
-      <div class="how-card-number">01 ——</div>
-      <div class="how-card-icon icon-learn">🧠</div>
-      <h3>Learn <span class="it">IT</span></h3>
-      <p>The concept, explained like a human being. No jargon walls. No assumed knowledge. We start with <em>why it exists</em> before we tell you how it works. Plain language, real analogies, and the context that makes everything click.</p>
-      <span class="how-card-tag tag-learn">CONCEPT + CONTEXT</span>
-    </div>
-
-    <div class="how-card how-card-2" id="do">
-      <div class="how-card-number">02 ——</div>
-      <div class="how-card-icon icon-do">🛠</div>
-      <h3>Do <span class="it">IT</span></h3>
-      <p>Hands-on. Step by step. Screenshots of what it actually looks like — including what happens when it goes wrong. Labs designed to be broken on purpose, because that's how real field technicians learn.</p>
-      <span class="how-card-tag tag-do">LAB + HANDS-ON</span>
-    </div>
-
-    <div class="how-card how-card-3" id="apply">
-      <div class="how-card-number">03 ——</div>
-      <div class="how-card-icon icon-apply">🎯</div>
-      <h3>Apply <span class="it">IT</span></h3>
-      <p>Turn what you did into how you talk about it. Resume bullets. Interview framing. The exact language hiring managers want to hear. Because knowing how to do the work and knowing how to communicate the work are both required.</p>
-      <span class="how-card-tag tag-apply">RESUME + INTERVIEW</span>
-    </div>
-  </div>
-</div>
-
-  </section>
-
-  <!-- TOPICS -->
-
-  <section class="tracks-section" id="topics">
-    <div class="section-inner">
-      <div class="tracks-header reveal">
-        <p class="section-label">// topic library</p>
-        <h2 class="section-title">What we cover</h2>
-        <p class="section-desc">Structured around real IT roles. Every topic links to an SOP, a lab, and a use case.</p>
-      </div>
-
-  <!-- ============================================================
-       TOPIC CARDS — "What we cover"
-       Each track-card below links to an individual module page.
-       File structure to build:
-         modules/01-password-resets.html    ← Module 1 (content already written)
-         modules/02-software-install.html
-         modules/03-wifi-connectivity.html
-         modules/04-malware-removal.html
-         modules/05-performance.html
-         modules/06-active-directory.html
-         modules/07-cabling.html
-         modules/08-security-hardening.html
-
-       UPDATE each href="#" below to point to the correct module file
-       as you build them out. Start with Module 01.
-       ============================================================ -->
-  <div class="tracks-grid reveal">
-    <!-- MODULE 01 — Password Resets (content already written in Module1 doc) -->
-    <a class="track-card" href="modules/01-password-resets.html">
-      <div class="track-icon">🔑</div>
-      <div class="track-info">
-        <h4>Password Resets & Account Lockouts</h4>
-        <p>Local accounts, Microsoft 365, Active Directory. The most common ticket — done right every time.</p>
-        <div class="track-badge badge-t1"><span class="badge-dot dot-t1"></span> TIER 1</div>
-      </div>
-    </a>
-
-    <!-- MODULE 02 — Wi-Fi & Network Connectivity -->
-    <a class="track-card" href="modules/03-wifi-connectivity.html">
-      <div class="track-icon">📶</div>
-      <div class="track-info">
-        <h4>Wi-Fi & Network Connectivity</h4>
-        <p>From "is it plugged in" to ipconfig, ping tests, and DHCP troubleshooting. The full picture.</p>
-        <div class="track-badge badge-t1"><span class="badge-dot dot-t1"></span> TIER 1</div>
-      </div>
-    </a>
-
-    <!-- MODULE 03 — Software Installation & Errors -->
-    <a class="track-card" href="modules/02-software-install.html">
-      <div class="track-icon">💾</div>
-      <div class="track-info">
-        <h4>Software Installation & Errors</h4>
-        <p>Permissions, system requirements, licensing, and what to do when the installer fails.</p>
-        <div class="track-badge badge-t1"><span class="badge-dot dot-t1"></span> TIER 1</div>
-      </div>
-    </a>
-
-    <!-- MODULE 04 — Malware Detection & Removal (Tier 2) -->
-    <a class="track-card" href="modules/06-malware-removal.html">
-      <div class="track-icon">🦠</div>
-      <div class="track-info">
-        <h4>Malware Detection & Removal</h4>
-        <p>Windows Defender, Malwarebytes, full scans, quarantine, and post-removal verification.</p>
-        <div class="track-badge badge-t2"><span class="badge-dot dot-t2"></span> TIER 2</div>
-      </div>
-    </a>
-
-    <!-- MODULE 05 — Windows Performance Diagnostics (Tier 2) -->
-    <a class="track-card" href="modules/07-performance.html">
-      <div class="track-icon">⚡</div>
-      <div class="track-info">
-        <h4>Windows Performance Diagnostics</h4>
-        <p>Task Manager, Event Viewer, sfc /scannow, DISM — reading what the system is telling you.</p>
-        <div class="track-badge badge-t2"><span class="badge-dot dot-t2"></span> TIER 2</div>
-      </div>
-    </a>
-
-    <!-- MODULE 06 — Active Directory User Support (Tier 2) -->
-    <a class="track-card" href="modules/08-active-directory.html">
-      <div class="track-icon">🏢</div>
-      <div class="track-info">
-        <h4>Active Directory User Support</h4>
-        <p>Account unlocks, password resets, OU placement, and Group Policy fundamentals for field techs.</p>
-        <div class="track-badge badge-t2"><span class="badge-dot dot-t2"></span> TIER 2</div>
-      </div>
-    </a>
-
-    <!-- MODULE 07 — Cabling & Physical Layer -->
-    <a class="track-card" href="modules/05-cabling.html">
-      <div class="track-icon">🔌</div>
-      <div class="track-info">
-        <h4>Cabling & Physical Layer</h4>
-        <p>Cat6, RJ45, T568B, crimping, testing, and what "no link light" actually means.</p>
-        <div class="track-badge badge-t1"><span class="badge-dot dot-t1"></span> TIER 1</div>
-      </div>
-    </a>
-
-    <!-- MODULE 08 — Security Hardening Basics (Tier 2) -->
-    <a class="track-card" href="modules/09-security-hardening.html">
-      <div class="track-icon">🛡</div>
-      <div class="track-info">
-        <h4>Security Hardening Basics</h4>
-        <p>Firewall, Defender, least privilege, MFA — the foundation every technician needs before SOC.</p>
-        <div class="track-badge badge-t2"><span class="badge-dot dot-t2"></span> TIER 2</div>
-      </div>
-    </a>
-  </div>
-</div>
-
-  </section>
-
-  <!-- ============================================================
-       AI ASSISTANT SECTION — "Your IT knowledge base. On demand."
-       This section previews the TRH local AI assistant (Phase 2).
-       When you build it:
-         1. Create assistant.html with the full chat interface
-         2. Update the nav link above from href="#assistant" to href="assistant.html"
-         3. Add a button here linking to assistant.html
-       See TRH AI doc (TRH_The_Rarest_Heart.pdf) for the LLM/RAG architecture
-       ============================================================ -->
-  <section class="ai-section" id="assistant">
-    <div class="ai-glow"></div>
-    <div class="section-inner">
-      <div class="ai-layout reveal">
         <div>
-          <p class="section-label">// TRH AI assistant</p>
-          <h2 class="section-title">Your IT knowledge base. On demand.</h2>
-          <p style="color: var(--off-white); font-size: 0.95rem; margin: 1.25rem 0 2rem; max-width: 460px; line-height: 1.8;">
-            A local AI assistant trained on TRH's SOPs, labs, and documentation.
-            Ask it a question, get a source-backed answer — no sending your data to a third party.
-            Built for people who need answers fast without feeling judged for not knowing.
-          </p>
-          <div style="display:flex; flex-direction:column; gap:0.75rem;">
-            <div style="display:flex; align-items:center; gap:0.75rem; font-size:0.875rem; color:var(--off-white);">
-              <span style="color:var(--accent); font-size:1rem;">✓</span> Answers pulled from your actual SOPs
+          <h2 class="section-title" style="margin-bottom:1.5rem;">Built by someone who lived the problem.</h2>
+          <div class="story-blocks">
+            <div class="story-block">
+              <div class="story-block-phase">// chapter 01 — the athlete</div>
+              <p>Twelve years as a professional athlete. Discipline, performance under pressure, and the understanding that <strong>preparation determines outcomes.</strong> Technology was always a passion — but a formal path never came.</p>
             </div>
-            <div style="display:flex; align-items:center; gap:0.75rem; font-size:0.875rem; color:var(--off-white);">
-              <span style="color:var(--accent); font-size:1rem;">✓</span> Runs locally — your data stays yours
+            <div class="story-block">
+              <div class="story-block-phase">// chapter 02 — the technician</div>
+              <p>A new career in IT. Expected to perform at a level he hadn't yet fully trained for. The systems were real, the tickets were live, and <strong>the pressure to know — without showing what you didn't know — was constant.</strong></p>
             </div>
-            <div style="display:flex; align-items:center; gap:0.75rem; font-size:0.875rem; color:var(--off-white);">
-              <span style="color:var(--accent); font-size:1rem;">✓</span> No one watching over your shoulder
+            <div class="story-block">
+              <div class="story-block-phase">// chapter 03 — the builder</div>
+              <p>So he built the answer. <strong>TheGERD</strong> was created to solve the exact problem he was living: how do I access the right knowledge, right now, without sending sensitive data to the cloud? Self-taught, certified, and shipping.</p>
             </div>
-            <div style="display:flex; align-items:center; gap:0.75rem; font-size:0.875rem; color:var(--off-white);">
-              <span style="color:var(--accent); font-size:1rem;">✓</span> Coming in Phase 2
+            <div class="story-block" style="border-left-color: var(--pulse);">
+              <div class="story-block-phase" style="color: var(--pulse);">// chapter 04 — the mission</div>
+              <p>Founded The Rarest Heart because that is who he is — the person who shows up and helps, even when it is hard. <strong>Technology should close gaps, not widen them.</strong></p>
             </div>
           </div>
         </div>
-
-    <div class="ai-terminal">
-      <div class="terminal-bar">
-        <div class="terminal-dot dot-red"></div>
-        <div class="terminal-dot dot-yellow"></div>
-        <div class="terminal-dot dot-green"></div>
-        <span class="terminal-title">TRH Assistant — Local Mode</span>
       </div>
-      <div class="terminal-body">
-        <div><span class="t-prompt">user@trh:~$</span></div>
-        <div style="margin-top:0.5rem;">
-          <span class="t-dim">// asking the assistant</span>
+    </div>
+  </section>
+
+  <!-- THEGERD OUTCOMES -->
+  <section class="outcomes-section" id="gerd">
+    <div class="section-inner">
+      <div class="outcomes-header reveal">
+        <p class="section-label">// what TheGERD delivers</p>
+        <h2 class="section-title">Outcomes. Not features.</h2>
+        <p class="section-desc">We show you what changes — not how the engine runs.</p>
+      </div>
+
+      <div class="outcomes-grid reveal">
+        <div class="outcome-card">
+          <div class="outcome-icon">⚡</div>
+          <h3>Fast Onboarding</h3>
+          <p>New IT technicians onboarding in days, not weeks. Institutional knowledge available the moment they need it.</p>
         </div>
-        <div style="margin-top:0.5rem;">
-          <span class="t-user">A user can't log in. Where do I start?</span>
+        <div class="outcome-card">
+          <div class="outcome-icon">🔍</div>
+          <h3>Instant Documentation Search</h3>
+          <p>Compliance documentation, SOPs, and runbooks searchable in seconds. No more digging through shared drives.</p>
         </div>
-        <div style="margin-top:1rem;">
-          <span class="t-ai">TRH&gt;</span> <span style="color:var(--white);">Start with the obvious:</span>
+        <div class="outcome-card">
+          <div class="outcome-icon">🔔</div>
+          <h3>Real-Time Device Alerts</h3>
+          <p>Push alerts the moment a device goes offline. Your team knows before the user calls.</p>
         </div>
-        <div style="padding-left:1.5rem; margin-top:0.25rem;">
-          <span class="t-ai">1.</span> <span style="color:var(--off-white);">Caps Lock, correct username</span>
+        <div class="outcome-card">
+          <div class="outcome-icon">📊</div>
+          <h3>Executive-Ready Reports</h3>
+          <p>One-click status reports formatted for executives, clients, and contractors — no manual assembly required.</p>
         </div>
-        <div style="padding-left:1.5rem;">
-          <span class="t-ai">2.</span> <span style="color:var(--off-white);">Check if account is locked in AD</span>
+        <div class="outcome-card">
+          <div class="outcome-icon">🏥</div>
+          <h3>Compliance-Ready</h3>
+          <p>Built for environments with strict data requirements. HIPAA, FedRAMP, and internal governance in mind from day one.</p>
         </div>
-        <div style="padding-left:1.5rem;">
-          <span class="t-ai">3.</span> <span style="color:var(--off-white);">Verify network/domain connection</span>
+        <div class="outcome-card">
+          <div class="outcome-icon">🔒</div>
+          <h3>Full Operational Control</h3>
+          <p>You decide what runs, what it accesses, and who sees what. No vendor lock-in. No usage caps. No surprises on a bill.</p>
         </div>
-        <div style="padding-left:1.5rem;">
-          <span class="t-ai">4.</span> <span style="color:var(--off-white);">Check system clock — time skew</span>
+      </div>
+
+      <div class="no-cloud-bar reveal">
+        <div class="no-cloud-items">
+          <div class="no-cloud-item"><span class="check">✓</span> No Cloud</div>
+          <div class="no-cloud-item"><span class="check">✓</span> No Subscription</div>
+          <div class="no-cloud-item"><span class="check">✓</span> No Data Leaving Your Building</div>
+          <div class="no-cloud-item"><span class="check">✓</span> Runs on Your Hardware</div>
         </div>
-        <div style="padding-left:1.5rem; margin-bottom:0.5rem;">
-          <span class="t-ai">↳</span> <span style="color:#7affb8; font-size:0.75rem;">Source: SOP-002 · Troubleshoot Login Problems</span>
+        <a href="#demo" class="btn-primary" style="flex-shrink:0;">Request a Demo →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- INDUSTRIES -->
+  <section class="industries-section" id="industries">
+    <div class="section-inner">
+      <div class="industries-header reveal">
+        <p class="section-label">// who we serve</p>
+        <h2 class="section-title">Built for regulated, high-stakes environments.</h2>
+        <p class="section-desc">If your industry can't afford data leaks, TheGERD was built for you.</p>
+      </div>
+
+      <div class="industries-grid reveal">
+        <div class="industry-card">
+          <div class="industry-icon">🏥</div>
+          <h4>Healthcare</h4>
+          <p>HIPAA-conscious. Patient data stays on-premises — always.</p>
         </div>
+        <div class="industry-card">
+          <div class="industry-icon">🏛</div>
+          <h4>Government Contractors</h4>
+          <p>Classified and sensitive workloads require air-gapped solutions. TheGERD delivers.</p>
+        </div>
+        <div class="industry-card">
+          <div class="industry-icon">🖥</div>
+          <h4>MSPs</h4>
+          <p>Manage multiple client environments with a single deployable platform you actually control.</p>
+        </div>
+        <div class="industry-card">
+          <div class="industry-icon">⚖</div>
+          <h4>Legal Firms</h4>
+          <p>Attorney-client privilege extends to your AI. Keep case data where it belongs.</p>
+        </div>
+        <div class="industry-card">
+          <div class="industry-icon">🔬</div>
+          <h4>Research Institutions</h4>
+          <p>Proprietary research doesn't leave your lab. Full stop.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DEMO REQUEST -->
+  <section class="demo-section" id="demo">
+    <div class="demo-glow"></div>
+    <div class="section-inner">
+      <div class="demo-layout reveal">
+        <div class="demo-copy">
+          <p class="section-label">// get in touch</p>
+          <h2 class="section-title">Ready to see TheGERD in action?</h2>
+          <p>Tell us about your environment and what you're trying to solve. We'll get back to you directly — no sales funnel, no automated follow-ups.</p>
+          <div class="demo-points">
+            <div class="demo-point"><span class="check">✓</span> Direct response from the founder</div>
+            <div class="demo-point"><span class="check">✓</span> No commitment required</div>
+            <div class="demo-point"><span class="check">✓</span> We come to you — live demo on your hardware</div>
+            <div class="demo-point"><span class="check">✓</span> NDA available on request</div>
+          </div>
+        </div>
+
+        <div class="demo-form">
+          <div id="form-fields">
+            <h3>Request a Demo</h3>
+            <p class="demo-form-sub">We'll reach out within 24 hours.</p>
+
+            <div class="form-group">
+              <label>Your Name</label>
+              <input type="text" id="f-name" placeholder="Jane Smith" />
+            </div>
+            <div class="form-group">
+              <label>Work Email</label>
+              <input type="email" id="f-email" placeholder="jane@yourorg.com" />
+            </div>
+            <div class="form-group">
+              <label>Organization</label>
+              <input type="text" id="f-org" placeholder="Your Company or Agency" />
+            </div>
+            <div class="form-group">
+              <label>What are you trying to solve?</label>
+              <textarea id="f-msg" placeholder="Describe your environment, the problem you're facing, or what you're hoping TheGERD can do for your team."></textarea>
+            </div>
+            <button class="form-submit" onclick="submitDemo()">Send Request →</button>
+          </div>
+
+          <div id="form-success">
+            <div class="success-icon">✅</div>
+            <h4>Request received.</h4>
+            <p>We'll be in touch within 24 hours. Keep an eye on your inbox — the founder responds personally.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TRAINING CALLOUT -->
+  <section class="training-section">
+    <div class="section-inner">
+      <div class="training-inner reveal">
         <div>
-          <span class="t-prompt">user@trh:~$</span> <span class="cursor"></span>
+          <h3>Not here for TheGERD?</h3>
+          <p>The Rarest Heart also offers free IT training — Tier 1 to Tier 2 — for technicians and career changers.</p>
         </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-  </section>
-
-  <!-- VALUES -->
-
-  <section class="values-section">
-    <div class="section-inner">
-      <div class="reveal" style="margin-bottom:2.5rem;">
-        <p class="section-label">// what we stand on</p>
-        <h2 class="section-title">Technology with care.</h2>
-      </div>
-      <div class="values-scroll reveal">
-        <div class="value-pill">
-          <div class="value-pill-icon">🤝</div>
-          <h4>Empathy First</h4>
-          <p>IT issues are stressful. We lead with patience, not judgment.</p>
-        </div>
-        <div class="value-pill">
-          <div class="value-pill-icon">🔐</div>
-          <h4>Security & Responsibility</h4>
-          <p>Security isn't an add-on. It's woven into everything we teach.</p>
-        </div>
-        <div class="value-pill">
-          <div class="value-pill-icon">🧪</div>
-          <h4>Education Through Experience</h4>
-          <p>Real systems. Real problems. Real solutions. Not just theory.</p>
-        </div>
-        <div class="value-pill">
-          <div class="value-pill-icon">📐</div>
-          <h4>Integrity in Craft</h4>
-          <p>Honest communication, clear documentation, built to last.</p>
-        </div>
-        <div class="value-pill">
-          <div class="value-pill-icon">🌱</div>
-          <h4>Growth & Opportunity</h4>
-          <p>For ourselves, our clients, and the community we serve.</p>
-        </div>
-        <div class="value-pill">
-          <div class="value-pill-icon">🌍</div>
-          <h4>Community Impact</h4>
-          <p>Technology should close gaps — not widen them.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- CTA -->
-
-  <section class="cta-section" id="start">
-    <div class="cta-glow"></div>
-    <div class="section-inner">
-      <div class="cta-content reveal">
-        <h2>You belong in tech.<br />Start here.</h2>
-        <p>No gatekeeping. No shame. Just real IT knowledge explained by someone who remembers what it felt like not to know.</p>
-  <!-- ============================================================
-       BOTTOM CTA SECTION — "You belong in tech. Start here."
-       This button is the second main entry point to the learn page.
-       Points to learn.html same as the hero button above.
-       ============================================================ -->
-      <a href="learn.html" class="btn-primary">Begin with Tier 1 →</a>
+        <a href="learn.html" class="btn-secondary">Explore IT Training →</a>
       </div>
     </div>
   </section>
 
   <!-- FOOTER -->
-
   <footer>
-    <div class="footer-left">
-      <span class="footer-copy">© 2026 The Rarest Heart · therarestheart.io</span>
-    </div>
+    <span class="footer-copy">© 2026 The Rarest Heart · therarestheart.io</span>
     <ul class="footer-links">
-  <!-- ============================================================
-       FOOTER LINKS — update each as you build the pages
-       GitHub  → your actual GitHub repo URL
-       SOPs    → sops.html (build alongside or after learn.html)
-       Labs    → labs.html (links out to GitHub repo or internal lab page)
-       Contact → contact.html (support / contact form page)
-       ============================================================ -->
-      <li><a href="https://github.com/therarestheart" target="_blank">GitHub</a></li>
+      <li><a href="learn.html">Training</a></li>
       <li><a href="sops.html">SOPs</a></li>
-      <li><a href="labs.html">Labs</a></li>
+      <li><a href="members.html">My Progress</a></li>
       <li><a href="contact.html">Contact</a></li>
     </ul>
   </footer>
 
   <script>
-    // Scroll reveal
     const reveals = document.querySelectorAll('.reveal');
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry, i) => {
@@ -1297,16 +1088,25 @@ footer {
         }
       });
     }, { threshold: 0.1 });
-
     reveals.forEach(el => observer.observe(el));
 
-    // Nav scroll effect
     const nav = document.querySelector('nav');
     window.addEventListener('scroll', () => {
       nav.style.borderBottomColor = window.scrollY > 40
         ? 'rgba(255,255,255,0.08)'
         : 'rgba(255,255,255,0.04)';
     });
+
+    function submitDemo() {
+      const name = document.getElementById('f-name').value.trim();
+      const email = document.getElementById('f-email').value.trim();
+      if (!name || !email) {
+        alert('Please enter your name and email.');
+        return;
+      }
+      document.getElementById('form-fields').style.display = 'none';
+      document.getElementById('form-success').style.display = 'block';
+    }
   </script>
 
 </body>
