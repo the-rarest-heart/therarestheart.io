@@ -726,28 +726,87 @@
       color: var(--off-white);
     }
 
-    /* TRAINING CALLOUT */
+    /* TRAINING SECTION */
     .training-section {
-      padding: 5rem 0;
+      padding: 8rem 0;
       background: var(--navy-mid);
-      border-top: 1px solid rgba(255,255,255,0.05);
+      border-top: 1px solid rgba(196,165,90,0.15);
+      border-bottom: 1px solid rgba(196,165,90,0.15);
     }
 
-    .training-inner {
+    .training-header {
+      text-align: center;
+      margin-bottom: 4rem;
+    }
+
+    .training-header .section-label { color: var(--gold); }
+
+    .training-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+      margin-bottom: 3rem;
+    }
+
+    .training-card {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(196,165,90,0.15);
+      border-top: 3px solid var(--gold);
+      border-radius: 0 0 10px 10px;
+      padding: 2rem;
+      transition: border-color 0.3s, background 0.3s, transform 0.3s;
+      text-decoration: none;
+      color: inherit;
+      display: block;
+    }
+
+    .training-card:hover {
+      border-color: rgba(0,229,80,0.4);
+      border-top-color: var(--accent);
+      background: rgba(0,229,80,0.04);
+      transform: translateY(-3px);
+    }
+
+    .training-card-num {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.15em;
+      color: var(--gold);
+      margin-bottom: 1rem;
+    }
+
+    .training-card-icon {
+      font-size: 1.75rem;
+      margin-bottom: 1rem;
+    }
+
+    .training-card h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.5rem;
+    }
+
+    .training-card h3 em {
+      font-style: normal;
+      color: var(--accent);
+    }
+
+    .training-card p {
+      font-size: 0.85rem;
+      color: var(--off-white);
+      line-height: 1.6;
+    }
+
+    .training-cta {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      gap: 2rem;
+      justify-content: center;
+      gap: 1.5rem;
       flex-wrap: wrap;
     }
 
-    .training-inner h3 {
-      font-size: 1.3rem;
-      font-weight: 700;
-      margin-bottom: 0.3rem;
-    }
-
-    .training-inner p {
+    .training-cta p {
       font-size: 0.9rem;
       color: var(--off-white);
     }
@@ -798,7 +857,7 @@
       .hero { padding: 7rem 1.5rem 3rem; }
       .section-inner { padding: 0 1.5rem; }
       .about-layout, .demo-layout { grid-template-columns: 1fr; gap: 3rem; }
-      .outcomes-grid { grid-template-columns: 1fr; }
+      .outcomes-grid, .training-grid { grid-template-columns: 1fr; }
       .industries-grid { grid-template-columns: repeat(2, 1fr); }
       footer { padding: 2rem 1.5rem; flex-direction: column; align-items: flex-start; }
     }
@@ -858,7 +917,7 @@
       <svg viewBox="0 0 1200 40" fill="none" preserveAspectRatio="none">
         <path class="heartbeat-line"
           d="M0 20 L200 20 L240 20 L260 5 L280 35 L300 2 L320 38 L340 20 L380 20 L500 20 L540 20 L560 10 L575 30 L590 8 L605 32 L620 20 L660 20 L800 20 L840 20 L855 12 L870 28 L885 15 L900 25 L915 20 L960 20 L1200 20"
-          stroke="rgba(74,108,247,0.5)"
+          stroke="rgba(196,165,90,0.7)"
           stroke-width="1.5"
           fill="none"
         />
@@ -1057,15 +1116,39 @@
     </div>
   </section>
 
-  <!-- TRAINING CALLOUT -->
+  <!-- TRAINING -->
   <section class="training-section">
     <div class="section-inner">
-      <div class="training-inner reveal">
-        <div>
-          <h3>Not here for TheGERD?</h3>
-          <p>The Rarest Heart also offers free IT training — Tier 1 to Tier 2 — for technicians and career changers.</p>
-        </div>
-        <a href="learn.html" class="btn-secondary">Explore IT Training →</a>
+      <div class="training-header reveal">
+        <p class="section-label">// the curriculum</p>
+        <h2 class="section-title">TheGERD is built on real IT knowledge.</h2>
+        <p class="section-desc" style="margin:0 auto;">The same training that powers TheGERD's knowledge base is available free — Tier 1 to Tier 2, explained without gatekeeping.</p>
+      </div>
+
+      <div class="training-grid reveal">
+        <a href="learn.html" class="training-card">
+          <div class="training-card-num">01 ——</div>
+          <div class="training-card-icon">🧠</div>
+          <h3>Learn <em>IT</em></h3>
+          <p>The concept, explained like a human being. No jargon walls. No assumed knowledge. Real context that makes everything click.</p>
+        </a>
+        <a href="do.html" class="training-card">
+          <div class="training-card-num">02 ——</div>
+          <div class="training-card-icon">🛠</div>
+          <h3>Do <em>IT</em></h3>
+          <p>Hands-on. Step by step. Labs designed to be broken on purpose — because that's how real field technicians learn.</p>
+        </a>
+        <a href="apply.html" class="training-card">
+          <div class="training-card-num">03 ——</div>
+          <div class="training-card-icon">🎯</div>
+          <h3>Apply <em>IT</em></h3>
+          <p>Resume bullets. Interview framing. The exact language hiring managers want to hear. Know how to do it and say it.</p>
+        </a>
+      </div>
+
+      <div class="training-cta reveal">
+        <p>9 modules · Tier 1 to Tier 2 · Free access · No account required</p>
+        <a href="learn.html" class="btn-primary">Start Training →</a>
       </div>
     </div>
   </section>
