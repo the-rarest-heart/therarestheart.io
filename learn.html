@@ -232,8 +232,8 @@
       position: absolute;
       inset: 0;
       background-image:
-        linear-gradient(rgba(74,108,247,0.04) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(74,108,247,0.04) 1px, transparent 1px);
+        linear-gradient(rgba(0,229,80,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,229,80,0.04) 1px, transparent 1px);
       background-size: 60px 60px;
       mask-image: radial-gradient(ellipse 80% 60% at 50% 50%, black, transparent);
     }
@@ -320,9 +320,9 @@
       gap: 0.4rem;
     }
 
-    .chip-t1 { background: rgba(0,229,80,0.12); color: #5dffa0; border: 1px solid rgba(0,229,80,0.25); }
-    .chip-t2 { background: rgba(124,74,247,0.12); color: #d4b06a; border: 1px solid rgba(124,74,247,0.25); }
-    .chip-t3 { background: rgba(232,74,111,0.12); color: #ff7a9a; border: 1px solid rgba(232,74,111,0.25); }
+    .chip-t1 { background: rgba(0,229,80,0.12); color: #00e550; border: 1px solid rgba(0,229,80,0.25); }
+    .chip-t2 { background: rgba(196,165,90,0.12); color: #c4a55a; border: 1px solid rgba(196,165,90,0.25); }
+    .chip-t3 { background: rgba(196,165,90,0.12); color: #c4a55a; border: 1px solid rgba(196,165,90,0.25); }
 
     .chip-dot {
       width: 5px; height: 5px;
@@ -367,7 +367,7 @@
 
     .path-card.active-path {
       border-color: rgba(0,229,80,0.5);
-      background: rgba(74,108,247,0.08);
+      background: rgba(0,229,80,0.08);
     }
 
     .path-icon {
@@ -518,10 +518,10 @@
       border-radius: 20px;
     }
 
-    .m-tag-t1 { background: rgba(0,229,80,0.12); color: #5dffa0; border: 1px solid rgba(0,229,80,0.2); }
-    .m-tag-t2 { background: rgba(124,74,247,0.12); color: #d4b06a; border: 1px solid rgba(124,74,247,0.2); }
+    .m-tag-t1 { background: rgba(0,229,80,0.12); color: #00e550; border: 1px solid rgba(0,229,80,0.2); }
+    .m-tag-t2 { background: rgba(196,165,90,0.12); color: #c4a55a; border: 1px solid rgba(196,165,90,0.2); }
     .m-tag-sop { background: rgba(255,255,255,0.05); color: var(--off-white); border: 1px solid rgba(255,255,255,0.1); }
-    .m-tag-new { background: rgba(232,74,111,0.12); color: #ff7a9a; border: 1px solid rgba(196,165,90,0.2); }
+    .m-tag-new { background: rgba(196,165,90,0.12); color: #c4a55a; border: 1px solid rgba(196,165,90,0.2); }
 
     .module-title {
       font-size: 1.15rem;
@@ -660,7 +660,7 @@
     }
 
     /* Tier 2 hover accent */
-    .module-card.tier2:hover { border-color: rgba(124,74,247,0.35); }
+    .module-card.tier2:hover { border-color: rgba(196,165,90,0.35); }
     .module-card.tier2 .module-num { color: var(--tier2); }
     .module-card.tier2 .btn-start { background: var(--tier2); }
     .module-card.tier2 .btn-start:hover { background: #6a3ae0; }
@@ -709,7 +709,7 @@
     }
 
     .m-icon-learn { background: rgba(0,229,80,0.15); }
-    .m-icon-do    { background: rgba(124,74,247,0.15); }
+    .m-icon-do    { background: rgba(196,165,90,0.15); }
     .m-icon-apply { background: rgba(196,165,90,0.15); }
 
     .method-card h3 {
@@ -739,9 +739,9 @@
       letter-spacing: 0.1em;
     }
 
-    .tag-learn { background: rgba(0,229,80,0.15); color: #5dffa0; }
-    .tag-do    { background: rgba(124,74,247,0.15); color: #d4b06a; }
-    .tag-apply { background: rgba(196,165,90,0.15); color: #ff7a9a; }
+    .tag-learn { background: rgba(0,229,80,0.15); color: #00e550; }
+    .tag-do    { background: rgba(196,165,90,0.15); color: #c4a55a; }
+    .tag-apply { background: rgba(196,165,90,0.15); color: #c4a55a; }
 
     /* ── CTA ── */
     .cta-section {
@@ -1433,7 +1433,7 @@
       document.querySelectorAll('.module-status[data-module]').forEach(el => {
         const s = trhGetStatus(el.dataset.module);
         el.textContent = labels[s] || labels.not_started;
-        el.style.color = s === 'complete' ? '#4ade80' : s === 'in_progress' ? '#5dffa0' : '';
+        el.style.color = s === 'complete' ? '#00e550' : s === 'in_progress' ? '#00e550' : '';
       });
     }
     document.addEventListener('DOMContentLoaded', updateLearnStatuses);

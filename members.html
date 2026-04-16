@@ -48,8 +48,8 @@
     .hero-stat { text-align: center; }
     .hero-stat-num { font-family: 'Syne', sans-serif; font-size: 2.5rem; font-weight: 800; letter-spacing: -0.04em; line-height: 1; }
     .hero-stat-num.green { color: var(--green); }
-    .hero-stat-num.accent { color: #5dffa0; }
-    .hero-stat-num.purple { color: #d4b06a; }
+    .hero-stat-num.accent { color: #00e550; }
+    .hero-stat-num.purple { color: #c4a55a; }
     .hero-stat-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(200,200,196,0.5); margin-top: 0.25rem; }
 
     /* Main progress bar */
@@ -63,8 +63,8 @@
     .tier-bar-wrap { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.07); border-radius: 8px; padding: 1rem 1.25rem; }
     .tier-bar-top { display: flex; justify-content: space-between; margin-bottom: 0.5rem; }
     .tier-bar-name { font-family: 'IBM Plex Mono', monospace; font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase; }
-    .tier-bar-name.t1 { color: #5dffa0; }
-    .tier-bar-name.t2 { color: #d4b06a; }
+    .tier-bar-name.t1 { color: #00e550; }
+    .tier-bar-name.t2 { color: #c4a55a; }
     .tier-bar-count { font-family: 'IBM Plex Mono', monospace; font-size: 0.62rem; color: rgba(200,200,196,0.4); }
     .tier-bar-track { height: 4px; background: rgba(255,255,255,0.07); border-radius: 4px; overflow: hidden; }
     .tier-bar-fill-t1 { height: 100%; border-radius: 4px; background: var(--tier1); transition: width 0.8s cubic-bezier(0.25,1,0.5,1); }
@@ -76,31 +76,31 @@
     .section-eyebrow::before { content: ''; display: inline-block; width: 16px; height: 1px; background: var(--accent); }
     .tier-block { margin-bottom: 3rem; }
     .tier-block-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.62rem; letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.6rem; }
-    .tier-block-label.t1 { color: #5dffa0; }
-    .tier-block-label.t2 { color: #d4b06a; }
+    .tier-block-label.t1 { color: #00e550; }
+    .tier-block-label.t2 { color: #c4a55a; }
     .tier-block-label::before { content: ''; display: inline-block; width: 14px; height: 1px; }
-    .tier-block-label.t1::before { background: #5dffa0; }
-    .tier-block-label.t2::before { background: #d4b06a; }
+    .tier-block-label.t1::before { background: #00e550; }
+    .tier-block-label.t2::before { background: #c4a55a; }
     .module-row { display: grid; grid-template-columns: 44px 1fr auto auto; gap: 1rem; align-items: center; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; padding: 1.1rem 1.5rem; margin-bottom: 0.75rem; transition: border-color 0.2s; }
     .module-row.status-complete { border-color: rgba(34,197,94,0.25); background: rgba(34,197,94,0.03); }
-    .module-row.status-in_progress { border-color: rgba(0,229,80,0.25); background: rgba(74,108,247,0.03); }
+    .module-row.status-in_progress { border-color: rgba(0,229,80,0.25); background: rgba(0,229,80,0.03); }
     .module-row:hover { border-color: rgba(255,255,255,0.14); }
     .module-row.status-complete:hover { border-color: rgba(34,197,94,0.4); }
     .module-row-check { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; border: 1.5px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.03); transition: all 0.25s; }
     .module-row.status-complete .module-row-check { background: rgba(34,197,94,0.15); border-color: rgba(34,197,94,0.4); color: var(--green); }
-    .module-row.status-in_progress .module-row-check { background: rgba(0,229,80,0.12); border-color: rgba(0,229,80,0.35); color: #5dffa0; }
+    .module-row.status-in_progress .module-row-check { background: rgba(0,229,80,0.12); border-color: rgba(0,229,80,0.35); color: #00e550; }
     .module-row-body h4 { font-size: 0.95rem; font-weight: 600; letter-spacing: -0.01em; margin-bottom: 0.15rem; }
     .module-row-body p { font-size: 0.78rem; color: var(--off-white); margin: 0; }
     .module-row-sop { font-family: 'IBM Plex Mono', monospace; font-size: 0.6rem; letter-spacing: 0.08em; color: rgba(200,200,196,0.35); }
     .status-pill { font-family: 'IBM Plex Mono', monospace; font-size: 0.58rem; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.2rem 0.65rem; border-radius: 20px; white-space: nowrap; }
     .status-pill.not_started { background: rgba(255,255,255,0.05); color: rgba(200,200,196,0.4); border: 1px solid rgba(255,255,255,0.08); }
-    .status-pill.in_progress { background: rgba(0,229,80,0.1); color: #5dffa0; border: 1px solid rgba(0,229,80,0.25); }
-    .status-pill.complete { background: rgba(34,197,94,0.1); color: #4ade80; border: 1px solid rgba(34,197,94,0.25); }
+    .status-pill.in_progress { background: rgba(0,229,80,0.1); color: #00e550; border: 1px solid rgba(0,229,80,0.25); }
+    .status-pill.complete { background: rgba(34,197,94,0.1); color: #00e550; border: 1px solid rgba(34,197,94,0.25); }
     .module-row-action a { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; letter-spacing: 0.08em; color: var(--accent); text-decoration: none; white-space: nowrap; }
     .module-row-action a:hover { text-decoration: underline; }
 
     /* Continue CTA */
-    .continue-cta { background: rgba(74,108,247,0.06); border: 1px solid rgba(0,229,80,0.2); border-radius: 12px; padding: 1.75rem 2rem; display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; margin-bottom: 3rem; flex-wrap: wrap; }
+    .continue-cta { background: rgba(0,229,80,0.06); border: 1px solid rgba(0,229,80,0.2); border-radius: 12px; padding: 1.75rem 2rem; display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; margin-bottom: 3rem; flex-wrap: wrap; }
     .continue-cta-body p { font-size: 0.75rem; font-family: 'IBM Plex Mono', monospace; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.35rem; }
     .continue-cta-body h3 { font-size: 1.15rem; font-weight: 700; letter-spacing: -0.01em; }
     .continue-cta-body span { font-size: 0.82rem; color: var(--off-white); }
