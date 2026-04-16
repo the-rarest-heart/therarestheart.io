@@ -8,19 +8,21 @@
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --navy: #07081a;
-      --navy-mid: #0d0f28;
-      --navy-light: #131535;
+      --navy: #080809;
+      --navy-mid: #0e0e0f;
+      --navy-light: #151516;
       --white: #f4f4f0;
       --off-white: #c8c8c4;
-      --accent: #4a6cf7;
-      --accent-glow: rgba(74, 108, 247, 0.25);
-      --pulse: #e84a6f;
-      --pulse-glow: rgba(232, 74, 111, 0.2);
-      --green: #22c55e;
-      --green-glow: rgba(34, 197, 94, 0.2);
-      --tier1: #4a6cf7;
-      --tier2: #7c4af7;
+      --accent: #00e550;
+      --accent-glow: rgba(0, 229, 80, 0.22);
+      --gold: #c4a55a;
+      --gold-glow: rgba(196, 165, 90, 0.22);
+      --pulse: #c4a55a;
+      --pulse-glow: rgba(196, 165, 90, 0.22);
+      --green: #00e550;
+      --green-glow: rgba(0, 229, 80, 0.22);
+      --tier1: #00e550;
+      --tier2: #c4a55a;
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -57,7 +59,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      background: rgba(7, 8, 26, 0.85);
+      background: rgba(8, 8, 9, 0.9);
       backdrop-filter: blur(16px);
       border-bottom: 1px solid rgba(255,255,255,0.06);
     }
@@ -112,7 +114,7 @@
 
     .nav-cta {
       background: var(--accent);
-      color: var(--white) !important;
+      color: #080809 !important;
       padding: 0.5rem 1.25rem;
       border-radius: 4px;
       font-weight: 500 !important;
@@ -120,7 +122,7 @@
     }
 
     .nav-cta::after { display: none !important; }
-    .nav-cta:hover { background: #3a5ce0 !important; transform: translateY(-1px); }
+    .nav-cta:hover { background: #00c444 !important; transform: translateY(-1px); }
 
     /* HERO */
     .hero {
@@ -136,8 +138,8 @@
       position: absolute;
       inset: 0;
       background-image:
-        linear-gradient(rgba(74,108,247,0.05) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(74,108,247,0.05) 1px, transparent 1px);
+        linear-gradient(rgba(0,229,80,0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,229,80,0.05) 1px, transparent 1px);
       background-size: 60px 60px;
       mask-image: radial-gradient(ellipse 80% 60% at 50% 50%, black, transparent);
     }
@@ -245,7 +247,7 @@
 
     .btn-primary {
       background: var(--accent);
-      color: var(--white);
+      color: #080809;
       padding: 0.875rem 2rem;
       border-radius: 4px;
       text-decoration: none;
@@ -259,7 +261,7 @@
     }
 
     .btn-primary:hover {
-      background: #3a5ce0;
+      background: #00c444;
       transform: translateY(-2px);
       box-shadow: 0 8px 24px var(--accent-glow);
     }
@@ -364,7 +366,7 @@
     .founder-photo {
       width: 100%;
       aspect-ratio: 4/3;
-      background: linear-gradient(135deg, rgba(74,108,247,0.15) 0%, rgba(232,74,111,0.1) 100%);
+      background: linear-gradient(135deg, rgba(0,229,80,0.15) 0%, rgba(196,165,90,0.1) 100%);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -474,8 +476,8 @@
     }
 
     .outcome-card:hover {
-      border-color: rgba(74,108,247,0.4);
-      background: rgba(74,108,247,0.05);
+      border-color: rgba(0,229,80,0.4);
+      background: rgba(0,229,80,0.05);
       transform: translateY(-3px);
     }
 
@@ -556,8 +558,8 @@
     }
 
     .industry-card:hover {
-      border-color: rgba(74,108,247,0.35);
-      background: rgba(74,108,247,0.05);
+      border-color: rgba(0,229,80,0.35);
+      background: rgba(0,229,80,0.05);
       transform: translateY(-3px);
     }
 
@@ -679,7 +681,7 @@
     .form-group input:focus,
     .form-group textarea:focus,
     .form-group select:focus {
-      border-color: rgba(74,108,247,0.6);
+      border-color: rgba(0,229,80,0.6);
     }
 
     .form-group textarea { resize: vertical; min-height: 100px; }
@@ -688,7 +690,7 @@
     .form-submit {
       width: 100%;
       background: var(--accent);
-      color: var(--white);
+      color: #080809;
       border: none;
       padding: 0.875rem 2rem;
       border-radius: 6px;
@@ -701,7 +703,7 @@
     }
 
     .form-submit:hover {
-      background: #3a5ce0;
+      background: #00c444;
       transform: translateY(-1px);
     }
 
