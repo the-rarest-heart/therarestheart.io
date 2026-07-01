@@ -733,91 +733,6 @@
       color: var(--off-white);
     }
 
-    /* TRAINING SECTION */
-    .training-section {
-      padding: 8rem 0;
-      background: var(--navy-mid);
-      border-top: 1px solid rgba(196,165,90,0.15);
-      border-bottom: 1px solid rgba(196,165,90,0.15);
-    }
-
-    .training-header {
-      text-align: center;
-      margin-bottom: 4rem;
-    }
-
-    .training-header .section-label { color: var(--gold); }
-
-    .training-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1.5rem;
-      margin-bottom: 3rem;
-    }
-
-    .training-card {
-      background: rgba(255,255,255,0.02);
-      border: 1px solid rgba(196,165,90,0.15);
-      border-top: 3px solid var(--gold);
-      border-radius: 0 0 10px 10px;
-      padding: 2rem;
-      transition: border-color 0.3s, background 0.3s, transform 0.3s;
-      text-decoration: none;
-      color: inherit;
-      display: block;
-    }
-
-    .training-card:hover {
-      border-color: rgba(0,229,80,0.4);
-      border-top-color: var(--accent);
-      background: rgba(0,229,80,0.04);
-      transform: translateY(-3px);
-    }
-
-    .training-card-num {
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 0.65rem;
-      letter-spacing: 0.15em;
-      color: var(--gold);
-      margin-bottom: 1rem;
-    }
-
-    .training-card-icon {
-      font-size: 1.75rem;
-      margin-bottom: 1rem;
-    }
-
-    .training-card h3 {
-      font-size: 1.1rem;
-      font-weight: 700;
-      letter-spacing: -0.02em;
-      margin-bottom: 0.5rem;
-    }
-
-    .training-card h3 em {
-      font-style: normal;
-      color: var(--accent);
-    }
-
-    .training-card p {
-      font-size: 0.85rem;
-      color: var(--off-white);
-      line-height: 1.6;
-    }
-
-    .training-cta {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 1.5rem;
-      flex-wrap: wrap;
-    }
-
-    .training-cta p {
-      font-size: 0.9rem;
-      color: var(--off-white);
-    }
-
     /* FOOTER */
     footer {
       border-top: 1px solid rgba(255,255,255,0.06);
@@ -864,9 +779,305 @@
       .hero { padding: 7rem 1.5rem 3rem; }
       .section-inner { padding: 0 1.5rem; }
       .about-layout, .demo-layout { grid-template-columns: 1fr; gap: 3rem; }
-      .outcomes-grid, .training-grid { grid-template-columns: 1fr; }
+      .outcomes-grid { grid-template-columns: 1fr; }
       .industries-grid { grid-template-columns: repeat(2, 1fr); }
       footer { padding: 2rem 1.5rem; flex-direction: column; align-items: flex-start; }
+    }
+
+    /* ── SEE IT WORK ── */
+    .see-it-work {
+      padding: 7rem 0;
+      background: var(--navy);
+      border-top: 1px solid rgba(255,255,255,0.05);
+    }
+    .siw-header { margin-bottom: 3.5rem; }
+
+    .siw-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(265px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .siw-card {
+      background: var(--navy-light);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 8px;
+      overflow: hidden;
+      transition: border-color 0.25s, box-shadow 0.25s;
+    }
+    .siw-card:hover {
+      border-color: rgba(0,229,80,0.3);
+      box-shadow: 0 0 24px rgba(0,229,80,0.07);
+    }
+
+    .siw-screen {
+      aspect-ratio: 16/10;
+      background: #0e0f13;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .siw-topbar {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 28px;
+      background: #0a0b0d;
+      border-bottom: 1px solid #1a1b1e;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 12px;
+      z-index: 10;
+      font-size: 10px;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 500;
+      color: #d8d8e0;
+    }
+
+    .siw-tb-right {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 8px;
+      color: #555;
+    }
+
+    .siw-dot {
+      width: 6px; height: 6px;
+      background: var(--accent);
+      border-radius: 50%;
+    }
+
+    .siw-inner {
+      position: absolute;
+      top: 28px; left: 0; right: 0; bottom: 0;
+      overflow: hidden;
+    }
+
+    .siw-state {
+      position: absolute;
+      inset: 0;
+      padding: 10px;
+      opacity: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    @keyframes siw-s1-anim {
+      0%    { opacity: 1; }
+      27%   { opacity: 1; }
+      33%   { opacity: 0; }
+      95%   { opacity: 0; }
+      100%  { opacity: 1; }
+    }
+    @keyframes siw-s2-anim {
+      0%    { opacity: 0; }
+      27%   { opacity: 0; }
+      33%   { opacity: 1; }
+      60%   { opacity: 1; }
+      66%   { opacity: 0; }
+      100%  { opacity: 0; }
+    }
+    @keyframes siw-s3-anim {
+      0%    { opacity: 0; }
+      60%   { opacity: 0; }
+      66%   { opacity: 1; }
+      95%   { opacity: 1; }
+      100%  { opacity: 0; }
+    }
+
+    .siw-s1 { animation: siw-s1-anim 9s ease-in-out infinite; }
+    .siw-s2 { animation: siw-s2-anim 9s ease-in-out infinite; }
+    .siw-s3 { animation: siw-s3-anim 9s ease-in-out infinite; }
+
+    /* Mini GERD UI components */
+    .gm-lbl {
+      font-size: 7px;
+      color: #555;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      font-family: 'IBM Plex Mono', monospace;
+    }
+    .gm-input {
+      background: #1a1c21;
+      border: 1px solid #2c2e34;
+      border-radius: 3px;
+      padding: 5px 8px;
+      font-size: 9px;
+      color: #d8d8e0;
+      font-family: 'DM Sans', sans-serif;
+      line-height: 1.4;
+    }
+    .gm-input.on { border-color: var(--accent); }
+
+    .gm-btn {
+      display: inline-flex;
+      align-items: center;
+      background: var(--accent);
+      color: #000;
+      border-radius: 3px;
+      padding: 4px 10px;
+      font-size: 9px;
+      font-weight: 600;
+      font-family: 'DM Sans', sans-serif;
+      cursor: default;
+      width: fit-content;
+    }
+    .gm-btn-out {
+      display: inline-flex;
+      align-items: center;
+      background: transparent;
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      border-radius: 3px;
+      padding: 4px 10px;
+      font-size: 9px;
+      font-weight: 600;
+      font-family: 'DM Sans', sans-serif;
+      cursor: default;
+      width: fit-content;
+    }
+    .gm-tag {
+      display: inline-block;
+      border: 1px solid #444;
+      color: #777;
+      border-radius: 20px;
+      padding: 2px 7px;
+      font-size: 8px;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .gm-tag.on { border-color: var(--gold); color: var(--gold); background: rgba(196,165,90,0.1); }
+    .gm-pill {
+      display: inline-block;
+      background: #1a1c21;
+      border: 1px solid #2c2e34;
+      color: #555;
+      border-radius: 20px;
+      padding: 2px 7px;
+      font-size: 8px;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .gm-out {
+      background: #1a1c21;
+      border: 1px solid #2c2e34;
+      border-radius: 3px;
+      padding: 7px 9px;
+      font-size: 8.5px;
+      color: #b8b8c0;
+      line-height: 1.5;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .gm-out.dim { color: #444; font-style: italic; }
+    .gm-gold { color: var(--gold); font-size: 9px; font-weight: 600; font-family: 'Syne', sans-serif; }
+    .gm-hd   { font-size: 8px; color: #777; font-family: 'DM Sans', sans-serif; font-weight: 500; }
+
+    /* Quiz */
+    .gm-q    { font-size: 8.5px; color: #d8d8e0; font-weight: 500; line-height: 1.4; font-family: 'DM Sans', sans-serif; }
+    .gm-opts { display: flex; flex-direction: column; gap: 3px; }
+    .gm-opt  {
+      display: flex; align-items: center; gap: 5px;
+      background: #1a1c21; border: 1px solid #2c2e34; border-radius: 3px;
+      padding: 3px 7px; font-size: 8px; color: #777; font-family: 'DM Sans', sans-serif;
+    }
+    .gm-radio { width: 6px; height: 6px; border: 1px solid #444; border-radius: 50%; flex-shrink: 0; }
+    .gm-opt.wrong { border-color: #e55050; background: rgba(229,80,80,0.08); color: #e55050; }
+    .gm-opt.wrong .gm-radio { background: #e55050; border-color: #e55050; }
+    .gm-opt.right { border-color: var(--accent); background: rgba(0,229,80,0.08); color: var(--accent); }
+    .gm-opt.right .gm-radio { background: var(--accent); border-color: var(--accent); }
+
+    /* Devices */
+    .gm-dev-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; flex: 1; }
+    .gm-dev {
+      background: #1a1c21; border: 1px solid #2c2e34; border-radius: 4px;
+      padding: 5px 4px; text-align: center;
+      display: flex; flex-direction: column; align-items: center; gap: 2px;
+    }
+    .gm-dev-name { font-size: 7px; color: #d8d8e0; font-weight: 500; font-family: 'DM Sans', sans-serif; }
+    .gm-status {
+      display: inline-block; border-radius: 10px;
+      padding: 1px 5px; font-size: 6.5px; font-weight: 600; font-family: 'DM Sans', sans-serif;
+    }
+    .gm-status.on  { background: rgba(0,229,80,0.12); color: var(--accent); }
+    .gm-status.off { background: rgba(229,80,80,0.12); color: #e55050; }
+
+    @keyframes siw-border-pulse {
+      0%,100% { border-color: rgba(229,80,80,0.8); }
+      50%     { border-color: rgba(229,80,80,0.2); }
+    }
+    .gm-dev.alert { animation: siw-border-pulse 1.1s ease-in-out infinite; }
+
+    /* Incident rows */
+    .gm-inc-row {
+      display: flex; align-items: center; justify-content: space-between;
+      background: #1a1c21; border: 1px solid #2c2e34; border-radius: 3px; padding: 5px 8px;
+    }
+    .gm-inc-title { font-size: 8px; color: #d8d8e0; font-family: 'DM Sans', sans-serif; line-height: 1.3; max-width: 140px; }
+    .gm-inc-date  { font-size: 6.5px; color: #444; font-family: 'IBM Plex Mono', monospace; margin-top: 2px; }
+    .gm-badge { font-size: 6.5px; font-weight: 700; padding: 2px 5px; border-radius: 3px; font-family: 'DM Sans', sans-serif; flex-shrink: 0; }
+    .gm-badge.hi { background: rgba(229,80,80,0.15); color: #e55050; }
+    .gm-badge.lo { background: rgba(100,100,120,0.2); color: #666; }
+    .gm-badge.md { background: rgba(196,165,90,0.15); color: var(--gold); }
+
+    /* App icon */
+    .gm-app-icon {
+      width: 52px; height: 52px;
+      background: linear-gradient(135deg,#1e1f24 0%,#131417 100%);
+      border-radius: 12px; border: 1px solid #2c2e34;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Syne', sans-serif; font-weight: 800; font-size: 24px; color: var(--accent);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.5), 0 0 28px rgba(0,229,80,0.18);
+    }
+
+    @keyframes siw-bounce {
+      0%,100% { transform: scale(1) translateY(0); }
+      20%     { transform: scale(0.9) translateY(3px); }
+      55%     { transform: scale(1.08) translateY(-4px); }
+      80%     { transform: scale(1) translateY(0); }
+    }
+    @keyframes siw-fade-pulse {
+      0%,100% { opacity: 1; }
+      50%     { opacity: 0.35; }
+    }
+
+    /* Mini dashboard */
+    .gm-dash { position: absolute; inset: 0; background: #0a0b0d; display: flex; }
+    .gm-dash-sb {
+      width: 75px; background: #080a0c; border-right: 1px solid #1a1b1e;
+      padding: 9px 7px; flex-shrink: 0;
+    }
+    .gm-dash-logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 10px; color: var(--accent); letter-spacing: -0.02em; }
+    .gm-dash-sub  { font-size: 5px; color: #333; letter-spacing: 0.06em; margin-bottom: 9px; }
+    .gm-dash-sec  { font-size: 5.5px; color: #333; letter-spacing: 0.1em; text-transform: uppercase; margin: 5px 0 2px; font-family: 'IBM Plex Mono', monospace; }
+    .gm-dash-item { font-size: 7.5px; color: #555; padding: 2px 3px; border-radius: 2px; font-family: 'DM Sans', sans-serif; }
+    .gm-dash-item.on { color: var(--accent); background: rgba(0,229,80,0.07); }
+    .gm-dash-main { flex: 1; padding: 10px; display: flex; flex-direction: column; gap: 4px; }
+    .gm-dash-welcome { font-size: 10px; color: #d8d8e0; font-weight: 700; font-family: 'Syne', sans-serif; }
+    .gm-dash-hint { font-size: 7.5px; color: #444; font-family: 'DM Sans', sans-serif; }
+    .gm-dash-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-top: 5px; }
+    .gm-dash-stat { background: #1a1c21; border: 1px solid #2c2e34; border-radius: 3px; padding: 5px; text-align: center; }
+    .gm-dash-val  { font-size: 15px; font-weight: 800; color: var(--accent); font-family: 'Syne', sans-serif; }
+    .gm-dash-lbl  { font-size: 6px; color: #444; font-family: 'DM Sans', sans-serif; }
+
+    .thinking-dots span {
+      animation: siw-fade-pulse 1.2s ease-in-out infinite;
+      color: var(--accent);
+    }
+    .thinking-dots span:nth-child(2) { animation-delay: 0.2s; }
+    .thinking-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+    .siw-caption {
+      padding: 10px 14px 14px;
+      font-size: 0.82rem;
+      color: #888a90;
+      line-height: 1.45;
+    }
+
+    @media (max-width: 900px) {
+      .siw-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 500px) {
+      .siw-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -882,7 +1093,6 @@
       <li><a href="#gerd">TheGERD</a></li>
       <li><a href="#about">About</a></li>
       <li><a href="#industries">Industries</a></li>
-      <li><a href="learn.html">Training</a></li>
       <li><a href="#demo" class="nav-cta">Request a Demo</a></li>
     </ul>
   </nav>
@@ -1072,6 +1282,288 @@
     </div>
   </section>
 
+  <!-- SEE IT WORK -->
+  <section class="see-it-work" id="see-it-work">
+    <div class="section-inner">
+      <div class="siw-header reveal">
+        <p class="section-label">// see it work</p>
+        <h2 class="section-title">Private AI, doing real work — on local hardware.</h2>
+        <p class="section-desc">Every demo below runs with no internet connection. Your data never left the machine.</p>
+      </div>
+
+      <div class="siw-grid reveal">
+
+        <!-- 1: Ask TheGERD -->
+        <figure class="siw-card">
+          <div class="siw-screen">
+            <div class="siw-topbar">Ask TheGERD <div class="siw-tb-right"><div class="siw-dot"></div>mistral:latest</div></div>
+            <div class="siw-inner">
+              <div class="siw-state siw-s1">
+                <div class="gm-lbl">Module Filter · All Knowledge</div>
+                <div class="gm-input on">"What's our HIPAA audit log retention?"</div>
+                <div class="gm-btn" style="align-self:flex-end">Ask</div>
+              </div>
+              <div class="siw-state siw-s2">
+                <div class="gm-lbl">Module Filter · All Knowledge</div>
+                <div class="gm-input on">"What's our HIPAA audit log retention?"</div>
+                <div class="gm-out dim">TheGERD is thinking<span class="thinking-dots"><span>.</span><span>.</span><span>.</span></span></div>
+              </div>
+              <div class="siw-state siw-s3">
+                <div class="gm-out" style="flex:1">HIPAA requires audit logs to be retained for a minimum of <strong style="color:var(--accent)">six years</strong> from the date of creation or when no longer needed for operations. Consult your EHR/DMS vendor for client-specific requirements.</div>
+                <div class="gm-btn-out" style="font-size:7px;padding:3px 8px">Save as Incident</div>
+              </div>
+            </div>
+          </div>
+          <figcaption class="siw-caption">Ask in plain language — answered from your own documents.</figcaption>
+        </figure>
+
+        <!-- 2: Training Quiz -->
+        <figure class="siw-card">
+          <div class="siw-screen">
+            <div class="siw-topbar">Training — COMPLIANCE <div class="siw-tb-right"><div class="siw-dot"></div>mistral</div></div>
+            <div class="siw-inner">
+              <div class="siw-state siw-s1">
+                <div class="gm-hd">Quiz &amp; Completion</div>
+                <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:4px">
+                  <div class="gm-btn-out">Generate Quiz</div>
+                  <div class="gm-pill">Mark Complete ✓</div>
+                </div>
+                <div style="font-size:7.5px;color:#444;margin-top:5px">compliance-hipaa.md · compliance-nist.md</div>
+              </div>
+              <div class="siw-state siw-s2">
+                <div class="gm-q">Q1. Which of the following is a HIPAA PHI identifier?</div>
+                <div class="gm-opts">
+                  <div class="gm-opt"><div class="gm-radio"></div>A) Phone numbers</div>
+                  <div class="gm-opt"><div class="gm-radio"></div>B) Vehicle identifiers</div>
+                  <div class="gm-opt"><div class="gm-radio"></div>C) City names</div>
+                  <div class="gm-opt"><div class="gm-radio"></div>D) Account numbers</div>
+                </div>
+              </div>
+              <div class="siw-state siw-s3">
+                <div class="gm-q">Q1. Which of the following is a HIPAA PHI identifier?</div>
+                <div class="gm-opts">
+                  <div class="gm-opt wrong"><div class="gm-radio"></div>A) Phone numbers — your answer</div>
+                  <div class="gm-opt right"><div class="gm-radio"></div>D) Account numbers — correct</div>
+                </div>
+                <div style="font-size:7px;color:#e55050;margin-top:4px">✕ Incorrect · <strong style="color:var(--accent)">Correct: D) Account numbers</strong></div>
+              </div>
+            </div>
+          </div>
+          <figcaption class="siw-caption">Turn your docs into staff training with AI-generated quizzes.</figcaption>
+        </figure>
+
+        <!-- 3: Rewrite Tool -->
+        <figure class="siw-card">
+          <div class="siw-screen">
+            <div class="siw-topbar">Rewrite Tool <div class="siw-tb-right"><div class="siw-dot"></div>mistral</div></div>
+            <div class="siw-inner">
+              <div class="siw-state siw-s1">
+                <div style="display:flex;flex-wrap:wrap;gap:3px;margin-bottom:5px">
+                  <div class="gm-tag on">professional</div>
+                  <div class="gm-pill">formal</div>
+                  <div class="gm-pill">friendly</div>
+                  <div class="gm-pill">executive</div>
+                </div>
+                <div class="gm-lbl">Original Text</div>
+                <div class="gm-input" style="color:#555;font-style:italic">Hey, Can you correct the policy agreement and send Tim the notes from the meeting yesterdy...</div>
+              </div>
+              <div class="siw-state siw-s2">
+                <div class="gm-input" style="color:#555;font-style:italic">Hey, Can you correct the policy agreement and send Tim the notes from the meeting yesterdy...</div>
+                <div class="gm-btn">Rewrite</div>
+                <div class="gm-out dim">Rewriting<span class="thinking-dots"><span>.</span><span>.</span><span>.</span></span></div>
+              </div>
+              <div class="siw-state siw-s3">
+                <div class="gm-gold">Rewritten</div>
+                <div class="gm-out" style="flex:1;font-size:8px">Subject: Request for Correction on Policy Agreement and Meeting Details<br><br>Dear [Recipient's Name], I hope this message finds you well. I am writing to request your assistance regarding the policy agreement and the upcoming meeting notes...</div>
+              </div>
+            </div>
+          </div>
+          <figcaption class="siw-caption">Rough notes become polished reports, emails, and SOPs.</figcaption>
+        </figure>
+
+        <!-- 4: Incident Log -->
+        <figure class="siw-card">
+          <div class="siw-screen">
+            <div class="siw-topbar">Incident Log <div class="siw-tb-right"><div class="gm-btn" style="font-size:7px;padding:2px 7px">+ Log Incident</div></div></div>
+            <div class="siw-inner">
+              <div class="siw-state siw-s1">
+                <div class="gm-inc-row">
+                  <div><div class="gm-inc-title">Salesforce down — VPN SSL cert expired</div><div class="gm-inc-date">2026-04-03 14:09</div></div>
+                  <div class="gm-badge hi">HIGH</div>
+                </div>
+                <div class="gm-inc-row" style="margin-top:4px">
+                  <div><div class="gm-inc-title">TheGERD macOS setup complete</div><div class="gm-inc-date">2026-03-26 22:03</div></div>
+                  <div class="gm-badge lo">Low</div>
+                </div>
+              </div>
+              <div class="siw-state siw-s2">
+                <div class="gm-gold" style="font-size:8px">Log Resolved Incident</div>
+                <div class="gm-lbl">Title</div>
+                <div class="gm-input on">Printer offline — Driver corrupted</div>
+                <div style="display:flex;gap:5px;margin-top:3px">
+                  <div style="flex:1"><div class="gm-lbl">Category</div><div class="gm-input">Hardware</div></div>
+                  <div style="flex:1"><div class="gm-lbl">Priority</div><div class="gm-input">MEDIUM</div></div>
+                </div>
+              </div>
+              <div class="siw-state siw-s3">
+                <div style="font-size:8.5px;font-weight:600;color:#d8d8e0;margin-bottom:4px">Salesforce down — VPN SSL cert expired</div>
+                <div class="gm-out" style="flex:1;font-size:7.5px"><strong>## Problem</strong><br>At 2:00 PM the sales team lost access. VPN cert validation failed.<br><br><strong>## Resolution</strong><br>Expired SSL cert identified and renewed via CA vendor within 3 hrs.</div>
+              </div>
+            </div>
+          </div>
+          <figcaption class="siw-caption">Every resolved issue becomes a searchable record.</figcaption>
+        </figure>
+
+        <!-- 5: Status Report -->
+        <figure class="siw-card">
+          <div class="siw-screen">
+            <div class="siw-topbar">Status Report <div class="siw-tb-right"><div class="siw-dot"></div>mistral</div></div>
+            <div class="siw-inner">
+              <div class="siw-state siw-s1">
+                <div class="gm-hd">Status Report Generator</div>
+                <div class="gm-lbl" style="margin-top:4px">Audience</div>
+                <div style="display:flex;gap:4px;margin-bottom:8px">
+                  <div class="gm-tag on">executive</div>
+                  <div class="gm-pill">technical</div>
+                  <div class="gm-pill">contracting</div>
+                </div>
+                <div class="gm-btn">Generate Report</div>
+              </div>
+              <div class="siw-state siw-s2">
+                <div style="display:flex;justify-content:space-between;align-items:center">
+                  <div class="gm-gold">Generated Report</div>
+                  <div style="display:flex;gap:3px"><div class="gm-pill" style="font-size:7px">Copy</div><div class="gm-pill" style="font-size:7px">Export .txt</div></div>
+                </div>
+                <div class="gm-out dim" style="flex:1;margin-top:3px">Generating report<span class="thinking-dots"><span>.</span><span>.</span><span>.</span></span></div>
+              </div>
+              <div class="siw-state siw-s3">
+                <div style="display:flex;justify-content:space-between;align-items:center">
+                  <div class="gm-gold">Generated Report</div>
+                  <div style="display:flex;gap:3px"><div class="gm-pill" style="font-size:7px">Copy</div><div class="gm-pill" style="font-size:7px">Export .txt</div></div>
+                </div>
+                <div class="gm-out" style="flex:1;font-size:7.5px;margin-top:3px"><strong>**Executive Summary**</strong><br><br>Operations running smoothly. macOS onboarding completed successfully. Salesforce outage resolved in 3 hrs.<br><br><strong>**KB Health (205 docs)**</strong> — All documents current.</div>
+              </div>
+            </div>
+          </div>
+          <figcaption class="siw-caption">One click turns activity into an executive-ready briefing.</figcaption>
+        </figure>
+
+        <!-- 6: Network Devices -->
+        <figure class="siw-card">
+          <div class="siw-screen">
+            <div class="siw-topbar">Network Devices <div class="siw-tb-right"><div class="siw-dot" style="animation:siw-fade-pulse 2s infinite"></div>Auto-Monitor</div></div>
+            <div class="siw-inner">
+              <div class="siw-state siw-s1">
+                <div class="gm-dev-grid">
+                  <div class="gm-dev"><div style="font-size:11px">✅</div><div class="gm-dev-name">Spectrum Router</div><div class="gm-status on">online</div></div>
+                  <div class="gm-dev"><div style="font-size:11px">✅</div><div class="gm-dev-name">MacBook Pro</div><div class="gm-status on">online</div></div>
+                  <div class="gm-dev"><div style="font-size:11px">✅</div><div class="gm-dev-name">Windows PC</div><div class="gm-status on">online</div></div>
+                  <div class="gm-dev"><div style="font-size:11px">✅</div><div class="gm-dev-name">Raspberry Pi 5</div><div class="gm-status on">online</div></div>
+                </div>
+              </div>
+              <div class="siw-state siw-s2">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
+                  <div style="font-size:7.5px;color:#444">Last check: 20:12:35</div>
+                  <div style="text-align:right"><div style="font-size:14px;font-weight:800;color:var(--gold);font-family:'Syne',sans-serif;line-height:1">1m 26s</div><div style="font-size:6px;color:#444;letter-spacing:.08em;font-family:'IBM Plex Mono',monospace">NEXT CHECK</div></div>
+                </div>
+                <div class="gm-dev-grid">
+                  <div class="gm-dev"><div style="font-size:11px">✅</div><div class="gm-dev-name">Spectrum Router</div><div class="gm-status on">online</div></div>
+                  <div class="gm-dev"><div style="font-size:11px;opacity:.4">⟳</div><div class="gm-dev-name">Raspberry Pi 5</div><div class="gm-status" style="background:#1a1c21;color:#444">checking</div></div>
+                  <div class="gm-dev"><div style="font-size:11px;opacity:.4">⟳</div><div class="gm-dev-name">Windows PC</div><div class="gm-status" style="background:#1a1c21;color:#444">checking</div></div>
+                  <div class="gm-dev"><div style="font-size:11px">✅</div><div class="gm-dev-name">MacBook Pro</div><div class="gm-status on">online</div></div>
+                </div>
+              </div>
+              <div class="siw-state siw-s3">
+                <div class="gm-dev-grid">
+                  <div class="gm-dev"><div style="font-size:11px">✅</div><div class="gm-dev-name">Spectrum Router</div><div class="gm-status on">online</div></div>
+                  <div class="gm-dev alert"><div style="font-size:11px">❌</div><div class="gm-dev-name">Raspberry Pi 5</div><div class="gm-status off">offline</div></div>
+                  <div class="gm-dev alert"><div style="font-size:11px">❌</div><div class="gm-dev-name">Windows PC</div><div class="gm-status off">offline</div></div>
+                  <div class="gm-dev"><div style="font-size:11px">✅</div><div class="gm-dev-name">MacBook Pro</div><div class="gm-status on">online</div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <figcaption class="siw-caption">Watches devices; alerts your phone the moment one drops.</figcaption>
+        </figure>
+
+        <!-- 7: KB Upload -->
+        <figure class="siw-card">
+          <div class="siw-screen">
+            <div class="siw-topbar">File → Knowledge Base <div class="siw-tb-right"><div class="siw-dot"></div>Admin</div></div>
+            <div class="siw-inner">
+              <div class="siw-state siw-s1">
+                <div class="gm-gold" style="margin-bottom:4px">Single File (PDF or DOCX)</div>
+                <div class="gm-lbl">File</div>
+                <div class="gm-input" style="color:#444">No file chosen</div>
+                <div class="gm-lbl" style="margin-top:4px">Target Module</div>
+                <div class="gm-input">General Knowledge (root)</div>
+              </div>
+              <div class="siw-state siw-s2">
+                <div class="gm-gold" style="margin-bottom:4px">Single File (PDF or DOCX)</div>
+                <div class="gm-lbl">File</div>
+                <div class="gm-input on">📄 hipaa-audit-policy.pdf</div>
+                <div class="gm-lbl" style="margin-top:4px">Target Module</div>
+                <div class="gm-input">General Knowledge (root)</div>
+                <div class="gm-btn" style="margin-top:5px">Convert &amp; Add to KB</div>
+              </div>
+              <div class="siw-state siw-s3">
+                <div style="display:flex;align-items:center;gap:5px;color:var(--accent);font-size:9px;font-weight:600;font-family:'DM Sans',sans-serif;margin-bottom:6px"><span style="font-size:15px">✅</span> Document Indexed</div>
+                <div class="gm-out" style="font-size:8px">hipaa-audit-policy.pdf<br><span style="color:#444">→ Added to General Knowledge (root)</span><br><br><span style="color:var(--accent)">✓ 1 document processed successfully</span></div>
+              </div>
+            </div>
+          </div>
+          <figcaption class="siw-caption">Drop in PDFs and docs — single or in bulk.</figcaption>
+        </figure>
+
+        <!-- 8: Desktop App Launch -->
+        <figure class="siw-card">
+          <div class="siw-screen" style="background:#06060a">
+            <div class="siw-topbar" style="background:#04040a;border-color:#111">
+              <span style="color:#333">macOS Desktop</span>
+              <div class="siw-tb-right" style="color:#2a2a2a">No terminal. No setup screen.</div>
+            </div>
+            <div class="siw-inner" style="background:#06060a">
+              <div class="siw-state siw-s1" style="align-items:center;justify-content:center;background:#06060a">
+                <div class="gm-app-icon">G</div>
+                <div style="font-size:8px;color:#555;margin-top:5px;font-family:'DM Sans',sans-serif">TheGERD</div>
+              </div>
+              <div class="siw-state siw-s2" style="align-items:center;justify-content:center;background:#06060a">
+                <div class="gm-app-icon" style="animation:siw-bounce 0.7s ease-in-out infinite">G</div>
+                <div style="font-size:8px;color:#444;margin-top:5px;font-family:'DM Sans',sans-serif">Opening<span class="thinking-dots"><span>.</span><span>.</span><span>.</span></span></div>
+              </div>
+              <div class="siw-state siw-s3" style="padding:0">
+                <div class="gm-dash">
+                  <div class="gm-dash-sb">
+                    <div class="gm-dash-logo">TheGERD</div>
+                    <div class="gm-dash-sub">THE RAREST HEART LLC</div>
+                    <div class="gm-dash-sec">Dashboard</div>
+                    <div class="gm-dash-item on">⌂ Home</div>
+                    <div class="gm-dash-sec">Intelligence</div>
+                    <div class="gm-dash-item">◉ Ask TheGERD</div>
+                    <div class="gm-dash-item">✎ Rewrite Tool</div>
+                    <div class="gm-dash-sec">Operations</div>
+                    <div class="gm-dash-item">⚡ Incidents</div>
+                    <div class="gm-dash-item">✓ Action Items</div>
+                  </div>
+                  <div class="gm-dash-main">
+                    <div class="gm-dash-welcome">Welcome, Admin</div>
+                    <div class="gm-dash-hint">Client Configuration — TheGERD</div>
+                    <div class="gm-dash-stats">
+                      <div class="gm-dash-stat"><div class="gm-dash-val">205</div><div class="gm-dash-lbl">KB Documents</div></div>
+                      <div class="gm-dash-stat"><div class="gm-dash-val">4</div><div class="gm-dash-lbl">Devices Online</div></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <figcaption class="siw-caption">Opens like any app. No terminal, no setup screen.</figcaption>
+        </figure>
+
+      </div>
+    </div>
+  </section>
+
   <!-- DEMO REQUEST -->
   <section class="demo-section" id="demo">
     <div class="demo-glow"></div>
@@ -1123,50 +1615,10 @@
     </div>
   </section>
 
-  <!-- TRAINING -->
-  <section class="training-section">
-    <div class="section-inner">
-      <div class="training-header reveal">
-        <p class="section-label">// the curriculum</p>
-        <h2 class="section-title">TheGERD is built on real IT knowledge.</h2>
-        <p class="section-desc" style="margin:0 auto;">The same training that powers TheGERD's knowledge base is available free — Tier 1 to Tier 2, explained without gatekeeping.</p>
-      </div>
-
-      <div class="training-grid reveal">
-        <a href="learn.html" class="training-card">
-          <div class="training-card-num">01 ——</div>
-          <div class="training-card-icon">🧠</div>
-          <h3>Learn <em>IT</em></h3>
-          <p>The concept, explained like a human being. No jargon walls. No assumed knowledge. Real context that makes everything click.</p>
-        </a>
-        <a href="do.html" class="training-card">
-          <div class="training-card-num">02 ——</div>
-          <div class="training-card-icon">🛠</div>
-          <h3>Do <em>IT</em></h3>
-          <p>Hands-on. Step by step. Labs designed to be broken on purpose — because that's how real field technicians learn.</p>
-        </a>
-        <a href="apply.html" class="training-card">
-          <div class="training-card-num">03 ——</div>
-          <div class="training-card-icon">🎯</div>
-          <h3>Apply <em>IT</em></h3>
-          <p>Resume bullets. Interview framing. The exact language hiring managers want to hear. Know how to do it and say it.</p>
-        </a>
-      </div>
-
-      <div class="training-cta reveal">
-        <p>9 modules · Tier 1 to Tier 2 · Free access · No account required</p>
-        <a href="learn.html" class="btn-primary">Start Training →</a>
-      </div>
-    </div>
-  </section>
-
   <!-- FOOTER -->
   <footer>
     <span class="footer-copy">© 2026 The Rarest Heart · therarestheart.io</span>
     <ul class="footer-links">
-      <li><a href="learn.html">Training</a></li>
-      <li><a href="sops.html">SOPs</a></li>
-      <li><a href="members.html">My Progress</a></li>
       <li><a href="contact.html">Contact</a></li>
     </ul>
   </footer>
@@ -1189,15 +1641,49 @@
         : 'rgba(255,255,255,0.04)';
     });
 
-    function submitDemo() {
-      const name = document.getElementById('f-name').value.trim();
+    async function submitDemo() {
+      const name  = document.getElementById('f-name').value.trim();
       const email = document.getElementById('f-email').value.trim();
+      const org   = document.getElementById('f-org').value.trim();
+      const msg   = document.getElementById('f-msg').value.trim();
+
       if (!name || !email) {
         alert('Please enter your name and email.');
         return;
       }
-      document.getElementById('form-fields').style.display = 'none';
-      document.getElementById('form-success').style.display = 'block';
+
+      const btn = document.querySelector('.form-submit');
+      btn.textContent = 'Sending…';
+      btn.disabled = true;
+
+      try {
+        const res = await fetch('https://formspree.io/f/mwvdreqz', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify({
+            name,
+            email,
+            organization: org || '(not provided)',
+            message: msg || '(no message)',
+            _subject: 'TheGERD Demo Request — ' + name
+          })
+        });
+
+        const data = await res.json();
+
+        if (data.ok) {
+          document.getElementById('form-fields').style.display = 'none';
+          document.getElementById('form-success').style.display = 'block';
+        } else {
+          alert('Something went wrong. Please email therarestheart@gmail.com directly.');
+          btn.textContent = 'Send Request →';
+          btn.disabled = false;
+        }
+      } catch (e) {
+        alert('Something went wrong. Please email therarestheart@gmail.com directly.');
+        btn.textContent = 'Send Request →';
+        btn.disabled = false;
+      }
     }
   </script>
 
