@@ -374,17 +374,16 @@
 
     .founder-photo {
       width: 100%;
-      aspect-ratio: 4/3;
-      background: linear-gradient(135deg, rgba(0,229,80,0.15) 0%, rgba(196,165,90,0.1) 100%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 0.7rem;
-      letter-spacing: 0.15em;
-      color: var(--off-white);
-      opacity: 0.5;
+      aspect-ratio: 3/4;
+      overflow: hidden;
       border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .founder-photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center top;
+      display: block;
     }
 
     .founder-info {
@@ -1151,16 +1150,16 @@
         <div>
           <p class="section-label">// the founder</p>
           <div class="founder-card">
-            <div class="founder-photo">PHOTO COMING SOON</div>
+            <div class="founder-photo">
+              <img src="images/founder.jpg" alt="Kelvin Martin — Founder & CEO, The Rarest Heart">
+            </div>
             <div class="founder-info">
-              <div class="founder-name">TheRarestHeart</div>
-              <div class="founder-title">Founder · The Rarest Heart</div>
+              <div class="founder-name">Kelvin Martin</div>
+              <div class="founder-title">Founder & CEO · The Rarest Heart</div>
               <div class="founder-creds">
-                <div class="founder-cred">CompTIA Security+ Certified</div>
-                <div class="founder-cred">Network Technician</div>
-                <div class="founder-cred">IT Support Specialist</div>
-                <div class="founder-cred">12-Year Professional Athlete</div>
-                <div class="founder-cred">Self-Taught Developer</div>
+                <div class="founder-cred">CompTIA SEC+ Certified</div>
+                <div class="founder-cred">Field Technician</div>
+                <div class="founder-cred">12-Year Pro Athlete → AI-Powered Builder</div>
               </div>
             </div>
           </div>
