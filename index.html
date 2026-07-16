@@ -370,13 +370,17 @@
       border: 1px solid rgba(255,255,255,0.07);
       border-radius: 12px;
       overflow: hidden;
+      display: flex;
+      flex-direction: row;
+      align-items: stretch;
+      gap: 0;
     }
 
     .founder-photo {
-      width: 100%;
-      aspect-ratio: 3/4;
+      width: 140px;
+      flex-shrink: 0;
       overflow: hidden;
-      border-bottom: 1px solid rgba(255,255,255,0.06);
+      border-right: 1px solid rgba(255,255,255,0.06);
     }
     .founder-photo img {
       width: 100%;
@@ -387,7 +391,8 @@
     }
 
     .founder-info {
-      padding: 1.5rem;
+      padding: 1.25rem;
+      flex: 1;
     }
 
     .founder-name {
@@ -1163,10 +1168,10 @@
               </div>
             </div>
           </div>
+          <h2 class="section-title" style="margin-top:1.75rem;margin-bottom:0;">Built by someone who lived the problem.</h2>
         </div>
 
         <div>
-          <h2 class="section-title" style="margin-bottom:1.5rem;">Built by someone who lived the problem.</h2>
           <div class="story-blocks">
             <div class="story-block">
               <div class="story-block-phase">// chapter 01 — the athlete</div>
