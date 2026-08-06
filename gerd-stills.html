@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TheGERD — 6 Feature Stills</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Syne:wght@700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --accent: #00e550;
+    --gold:   #c4a55a;
+    --navy:   #080809;
+    --card:   #0e0f13;
+    --panel:  #1a1c21;
+    --border: #2c2e34;
+    --text:   #d8d8e0;
+    --dim:    #555;
+    --red:    #e55050;
+    --white:  #ffffff;
+  }
+
+  html { scroll-snap-type: y mandatory; overflow-y: scroll; }
+
+  body {
+    background: var(--navy);
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text);
+  }
+
+  /* ── SLIDE WRAPPER ─────────────────────────────── */
+  .slide {
+    width: 100%;
+    min-height: 100dvh;
+    scroll-snap-align: start;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* ── CHROME: STATUS BAR ─────────────────────────── */
+  .chrome-bar {
+    background: #0a0b0d;
+    border-bottom: 1px solid #1a1b1e;
+    padding: 10px 16px 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+  .chrome-left {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 13px;
+    color: var(--accent);
+    letter-spacing: -0.02em;
+  }
+  .chrome-right {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    color: var(--dim);
+  }
+  .dot-on  { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); }
+  .dot-off { width: 7px; height: 7px; border-radius: 50%; background: var(--red); }
+
+  /* ── NAV TABS ───────────────────────────────────── */
+  .nav-tabs {
+    display: flex;
+    background: #0a0b0d;
+    border-bottom: 1px solid #1a1b1e;
+    flex-shrink: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .nav-tabs::-webkit-scrollbar { display: none; }
+  .tab {
+    padding: 8px 14px;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--dim);
+    white-space: nowrap;
+    letter-spacing: 0.02em;
+    border-bottom: 2px solid transparent;
+    flex-shrink: 0;
+  }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  /* ── CONTENT AREA ───────────────────────────────── */
+  .content {
+    flex: 1;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    overflow: hidden;
+  }
+
+  /* ── SLIDE BADGE ────────────────────────────────── */
+  .slide-badge {
+    position: absolute;
+    bottom: 14px;
+    right: 14px;
+    background: rgba(0,229,80,0.1);
+    border: 1px solid rgba(0,229,80,0.25);
+    border-radius: 20px;
+    padding: 4px 10px;
+    font-size: 9px;
+    font-weight: 600;
+    color: var(--accent);
+    font-family: 'IBM Plex Mono', monospace;
+    letter-spacing: 0.08em;
+  }
+
+  /* ── SHARED COMPONENTS ──────────────────────────── */
+  .lbl {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 8px;
+    color: var(--dim);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  .sec-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 15px;
+    color: var(--white);
+    letter-spacing: -0.02em;
+    margin-bottom: 2px;
+  }
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 11px 13px;
+  }
+  .card.focus { border-color: var(--accent); }
+  .card.alert-card { border-color: var(--red); background: rgba(229,80,80,0.04); }
+
+  .row { display: flex; align-items: center; gap: 8px; }
+  .row.sb { justify-content: space-between; }
+
+  .tag {
+    display: inline-block;
+    border: 1px solid #444;
+    color: #777;
+    border-radius: 20px;
+    padding: 2px 8px;
+    font-size: 9px;
+  }
+  .tag.gold { border-color: var(--gold); color: var(--gold); background: rgba(196,165,90,0.1); }
+  .tag.green { border-color: var(--accent); color: var(--accent); background: rgba(0,229,80,0.07); }
+  .tag.red { border-color: var(--red); color: var(--red); background: rgba(229,80,80,0.07); }
+
+  .btn {
+    background: var(--accent);
+    color: #000;
+    border-radius: 5px;
+    padding: 7px 16px;
+    font-size: 11px;
+    font-weight: 700;
+    display: inline-block;
+    width: fit-content;
+  }
+  .btn-out {
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    border-radius: 5px;
+    padding: 6px 14px;
+    font-size: 11px;
+    font-weight: 600;
+    display: inline-block;
+    width: fit-content;
+  }
+
+  .mono { font-family: 'IBM Plex Mono', monospace; }
+  .gold { color: var(--gold); }
+  .green { color: var(--accent); }
+  .dim { color: var(--dim); }
+  .red { color: var(--red); }
+  .sm { font-size: 11px; }
+  .xs { font-size: 9.5px; }
+  .xxs { font-size: 8px; }
+
+  /* ── SLIDE 1 · AI CHAT ──────────────────────────── */
+  .chat-bubble {
+    border-radius: 10px;
+    padding: 9px 12px;
+    font-size: 11.5px;
+    line-height: 1.5;
+    max-width: 88%;
+  }
+  .chat-user {
+    background: rgba(0,229,80,0.1);
+    border: 1px solid rgba(0,229,80,0.2);
+    color: var(--text);
+    align-self: flex-end;
+  }
+  .chat-gerd {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    color: var(--text);
+    align-self: flex-start;
+  }
+  .chat-label {
+    font-size: 8.5px;
+    font-family: 'IBM Plex Mono', monospace;
+    margin-bottom: 4px;
+  }
+  .chat-area {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex: 1;
+  }
+  .typing-row { display: flex; align-items: center; gap: 5px; }
+  .typing-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    opacity: 0.6;
+  }
+
+  /* ── SLIDE 2 · KNOWLEDGE BASE ──────────────────── */
+  .kb-result {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .kb-result-title { font-size: 12px; font-weight: 600; color: var(--text); }
+  .kb-result-meta  { font-size: 9px; color: var(--dim); font-family: 'IBM Plex Mono', monospace; }
+  .kb-result-snip  { font-size: 10.5px; color: #9898a8; line-height: 1.4; }
+  .kb-result-snip strong { color: var(--accent); font-weight: 600; }
+  .search-box {
+    background: var(--panel);
+    border: 1px solid var(--accent);
+    border-radius: 8px;
+    padding: 10px 13px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .search-text { font-size: 12px; color: var(--text); flex: 1; }
+  .search-icon { font-size: 13px; color: var(--accent); }
+
+  /* ── SLIDE 3 · DEVICE MONITOR ──────────────────── */
+  .dev-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .dev-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    align-items: flex-start;
+  }
+  .dev-card.offline { border-color: var(--red); background: rgba(229,80,80,0.04); }
+  .dev-name { font-size: 11px; font-weight: 600; color: var(--text); }
+  .dev-ip { font-size: 8.5px; color: var(--dim); font-family: 'IBM Plex Mono', monospace; }
+  .status-pill {
+    border-radius: 20px;
+    padding: 2px 8px;
+    font-size: 9px;
+    font-weight: 700;
+  }
+  .status-pill.on  { background: rgba(0,229,80,0.12); color: var(--accent); }
+  .status-pill.off { background: rgba(229,80,80,0.12); color: var(--red); }
+  .uptime { font-size: 8.5px; color: var(--dim); }
+
+  /* ── SLIDE 4 · QUIZ ─────────────────────────────── */
+  .quiz-q {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    line-height: 1.45;
+  }
+  .quiz-opts { display: flex; flex-direction: column; gap: 7px; }
+  .quiz-opt {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 9px 12px;
+    font-size: 11.5px;
+    color: #777;
+  }
+  .quiz-opt.correct  { border-color: var(--accent); background: rgba(0,229,80,0.07); color: var(--accent); }
+  .quiz-opt.incorrect { border-color: var(--red); background: rgba(229,80,80,0.07); color: var(--red); }
+  .quiz-radio {
+    width: 14px; height: 14px;
+    border: 1.5px solid #444;
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .quiz-radio.correct  { border-color: var(--accent); background: var(--accent); }
+  .quiz-radio.correct::after { content:''; width:5px; height:5px; border-radius:50%; background:#000; }
+  .quiz-radio.incorrect { border-color: var(--red); background: var(--red); }
+  .quiz-radio.incorrect::after { content:'×'; font-size:9px; color:#000; font-weight:800; line-height:1; }
+  .quiz-score {
+    background: rgba(0,229,80,0.08);
+    border: 1px solid rgba(0,229,80,0.2);
+    border-radius: 8px;
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  /* ── SLIDE 5 · INCIDENT LOG ─────────────────────── */
+  .inc-row {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .inc-row.high { border-left: 3px solid var(--red); }
+  .inc-row.med  { border-left: 3px solid var(--gold); }
+  .inc-row.low  { border-left: 3px solid #444; }
+  .inc-title { font-size: 11.5px; color: var(--text); font-weight: 500; line-height: 1.35; }
+  .inc-meta  { font-size: 8.5px; color: var(--dim); font-family: 'IBM Plex Mono', monospace; margin-top: 3px; }
+  .badge {
+    font-size: 8.5px;
+    font-weight: 700;
+    padding: 3px 7px;
+    border-radius: 4px;
+    flex-shrink: 0;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .badge.high { background: rgba(229,80,80,0.15); color: var(--red); }
+  .badge.med  { background: rgba(196,165,90,0.15); color: var(--gold); }
+  .badge.low  { background: rgba(80,80,100,0.2); color: #666; }
+
+  /* ── SLIDE 6 · SOP LOOKUP ───────────────────────── */
+  .sop-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 8px 8px 0;
+    padding: 10px 13px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .sop-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    font-size: 11px;
+    color: var(--text);
+    line-height: 1.4;
+  }
+  .step-num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    color: var(--accent);
+    font-weight: 500;
+    flex-shrink: 0;
+    margin-top: 1px;
+    min-width: 18px;
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════
+     SLIDE 1 — AI CHAT INTERFACE
+═══════════════════════════════════════════════════ -->
+<section class="slide">
+  <div class="chrome-bar">
+    <span class="chrome-left">TheGERD</span>
+    <div class="chrome-right">
+      <div class="dot-on"></div>
+      <span>ONLINE · LOCAL</span>
+    </div>
+  </div>
+  <div class="nav-tabs">
+    <div class="tab active">AI Assistant</div>
+    <div class="tab">Knowledge Base</div>
+    <div class="tab">Devices</div>
+    <div class="tab">Training</div>
+  </div>
+
+  <div class="content">
+    <div class="row sb">
+      <div>
+        <div class="lbl" style="margin-bottom:3px;">// active session</div>
+        <div class="sec-title">Ask TheGERD</div>
+      </div>
+      <div class="tag green">Private · No Cloud</div>
+    </div>
+
+    <div class="chat-area">
+      <div style="align-self:flex-end;">
+        <div class="chat-label dim">You</div>
+        <div class="chat-bubble chat-user">
+          How do I reset a domain user password in Active Directory without locking the account?
+        </div>
+      </div>
+
+      <div style="align-self:flex-start; max-width:92%;">
+        <div class="chat-label gold">TheGERD</div>
+        <div class="chat-bubble chat-gerd">
+          <strong style="color:var(--accent);">Domain Password Reset — AD</strong><br><br>
+          1. Open <span class="mono green">Active Directory Users &amp; Computers</span><br>
+          2. Right-click the user → <em>Reset Password</em><br>
+          3. Uncheck <strong>"User must change at next login"</strong> if you're resetting for them<br>
+          4. Confirm — account stays unlocked automatically<br><br>
+          <span class="xxs dim">⚠ Verify you have Domain Admin rights before proceeding.</span>
+        </div>
+      </div>
+
+      <div class="card" style="padding:8px 12px;">
+        <div class="lbl" style="margin-bottom:5px;">Related SOPs</div>
+        <div class="row" style="gap:6px; flex-wrap:wrap;">
+          <div class="tag">AD Account Lockout Policy</div>
+          <div class="tag">Password Complexity Rules</div>
+          <div class="tag">Help Desk Escalation</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card focus" style="padding:9px 12px;">
+      <div class="row">
+        <span style="color:var(--accent); font-size:14px;">✦</span>
+        <span class="xs dim" style="flex:1;">Ask a follow-up question…</span>
+        <div class="btn" style="padding:5px 12px; font-size:10px;">Send</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-badge">01 / 06 — AI Chat</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     SLIDE 2 — KNOWLEDGE BASE SEARCH
+═══════════════════════════════════════════════════ -->
+<section class="slide">
+  <div class="chrome-bar">
+    <span class="chrome-left">TheGERD</span>
+    <div class="chrome-right">
+      <div class="dot-on"></div>
+      <span>ONLINE · LOCAL</span>
+    </div>
+  </div>
+  <div class="nav-tabs">
+    <div class="tab">AI Assistant</div>
+    <div class="tab active">Knowledge Base</div>
+    <div class="tab">Devices</div>
+    <div class="tab">Training</div>
+  </div>
+
+  <div class="content">
+    <div>
+      <div class="lbl" style="margin-bottom:3px;">// document search</div>
+      <div class="sec-title">Knowledge Base</div>
+    </div>
+
+    <div class="search-box">
+      <span class="search-icon">⌕</span>
+      <span class="search-text">wifi connectivity troubleshooting</span>
+    </div>
+
+    <div class="row" style="gap:6px; flex-wrap:wrap;">
+      <div class="tag gold">SOPs</div>
+      <div class="tag green">Runbooks</div>
+      <div class="tag">Policies</div>
+      <div class="tag">All Files</div>
+    </div>
+
+    <div class="lbl">3 results — indexed locally</div>
+
+    <div class="kb-result">
+      <div class="row sb">
+        <div class="kb-result-title">Wi-Fi Connectivity SOP v2.1</div>
+        <div class="tag green">SOP</div>
+      </div>
+      <div class="kb-result-meta">Updated 2025-11-04 · 8 pages</div>
+      <div class="kb-result-snip">…verify <strong>SSID broadcast</strong> is enabled, check DHCP lease pool, confirm client supplicant matches <strong>WPA2-Enterprise</strong> config…</div>
+    </div>
+
+    <div class="kb-result">
+      <div class="row sb">
+        <div class="kb-result-title">Network Troubleshooting Runbook</div>
+        <div class="tag gold">Runbook</div>
+      </div>
+      <div class="kb-result-meta">Updated 2025-09-18 · 14 pages</div>
+      <div class="kb-result-snip">…use <strong>ping / tracert</strong> to isolate layer, check switch port status, verify <strong>VLAN tagging</strong> on access port…</div>
+    </div>
+
+    <div class="kb-result">
+      <div class="row sb">
+        <div class="kb-result-title">Help Desk Escalation Policy</div>
+        <div class="tag">Policy</div>
+      </div>
+      <div class="kb-result-meta">Updated 2025-07-02 · 3 pages</div>
+      <div class="kb-result-snip">…if client <strong>wireless issue persists</strong> after Tier 1 steps, escalate to Tier 2 with packet capture attached…</div>
+    </div>
+  </div>
+
+  <div class="slide-badge">02 / 06 — Knowledge Base</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     SLIDE 3 — DEVICE MONITOR
+═══════════════════════════════════════════════════ -->
+<section class="slide">
+  <div class="chrome-bar">
+    <span class="chrome-left">TheGERD</span>
+    <div class="chrome-right">
+      <div class="dot-off"></div>
+      <span>1 ALERT</span>
+    </div>
+  </div>
+  <div class="nav-tabs">
+    <div class="tab">AI Assistant</div>
+    <div class="tab">Knowledge Base</div>
+    <div class="tab active">Devices</div>
+    <div class="tab">Training</div>
+  </div>
+
+  <div class="content">
+    <div class="row sb">
+      <div>
+        <div class="lbl" style="margin-bottom:3px;">// live monitoring</div>
+        <div class="sec-title">Device Status</div>
+      </div>
+      <div class="tag red">1 Offline</div>
+    </div>
+
+    <div class="dev-grid">
+      <div class="dev-card">
+        <div class="status-pill on">ONLINE</div>
+        <div class="dev-name">WKSTN-001</div>
+        <div class="dev-ip">192.168.1.11</div>
+        <div class="uptime">Uptime 6d 14h</div>
+      </div>
+      <div class="dev-card offline">
+        <div class="status-pill off">OFFLINE</div>
+        <div class="dev-name">WKSTN-004</div>
+        <div class="dev-ip">192.168.1.14</div>
+        <div class="uptime red">Last seen 9m ago</div>
+      </div>
+      <div class="dev-card">
+        <div class="status-pill on">ONLINE</div>
+        <div class="dev-name">SERVER-DC1</div>
+        <div class="dev-ip">192.168.1.2</div>
+        <div class="uptime">Uptime 22d 3h</div>
+      </div>
+      <div class="dev-card">
+        <div class="status-pill on">ONLINE</div>
+        <div class="dev-name">PRINTER-01</div>
+        <div class="dev-ip">192.168.1.50</div>
+        <div class="uptime">Uptime 3d 9h</div>
+      </div>
+    </div>
+
+    <div class="card alert-card">
+      <div class="row sb" style="margin-bottom:6px;">
+        <span class="lbl red">// alert triggered</span>
+        <span class="xs mono dim">09:42:17</span>
+      </div>
+      <div class="sm" style="font-weight:600; margin-bottom:3px;">WKSTN-004 went offline</div>
+      <div class="xs dim">No ping response · Last user: jsmith@company.local</div>
+      <div style="margin-top:8px; display:flex; gap:8px;">
+        <div class="btn" style="padding:6px 13px; font-size:10px;">Create Ticket</div>
+        <div class="btn-out" style="padding:5px 12px; font-size:10px;">Dismiss</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-badge">03 / 06 — Device Monitor</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     SLIDE 4 — QUIZ / TRAINING MODULE
+═══════════════════════════════════════════════════ -->
+<section class="slide">
+  <div class="chrome-bar">
+    <span class="chrome-left">TheGERD</span>
+    <div class="chrome-right">
+      <div class="dot-on"></div>
+      <span>ONLINE · LOCAL</span>
+    </div>
+  </div>
+  <div class="nav-tabs">
+    <div class="tab">AI Assistant</div>
+    <div class="tab">Knowledge Base</div>
+    <div class="tab">Devices</div>
+    <div class="tab active">Training</div>
+  </div>
+
+  <div class="content">
+    <div class="row sb">
+      <div>
+        <div class="lbl" style="margin-bottom:3px;">// knowledge check</div>
+        <div class="sec-title">CompTIA A+ Quiz</div>
+      </div>
+      <div class="tag gold">Question 4 / 10</div>
+    </div>
+
+    <div class="quiz-score">
+      <span class="xs mono dim">Score so far</span>
+      <span style="font-family:'Syne',sans-serif; font-weight:800; font-size:18px; color:var(--accent);">3 / 3</span>
+    </div>
+
+    <div class="card">
+      <div class="lbl" style="margin-bottom:6px;">Question 4</div>
+      <div class="quiz-q">A user reports their laptop shows "Limited Connectivity" after connecting to the office Wi-Fi. Which is the FIRST step you should take?</div>
+    </div>
+
+    <div class="quiz-opts">
+      <div class="quiz-opt incorrect">
+        <div class="quiz-radio incorrect"></div>
+        Reinstall the wireless driver immediately
+      </div>
+      <div class="quiz-opt correct">
+        <div class="quiz-radio correct"></div>
+        Run <span class="mono" style="margin:0 3px;">ipconfig /release</span> then <span class="mono" style="margin-left:3px;">ipconfig /renew</span>
+      </div>
+      <div class="quiz-opt">
+        <div class="quiz-radio"></div>
+        Replace the wireless adapter
+      </div>
+      <div class="quiz-opt">
+        <div class="quiz-radio"></div>
+        Escalate to Tier 2 immediately
+      </div>
+    </div>
+
+    <div class="card" style="background:rgba(0,229,80,0.04); border-color:rgba(0,229,80,0.2);">
+      <div class="lbl green" style="margin-bottom:4px;">Explanation</div>
+      <div class="xs" style="line-height:1.5; color:#9898a8;">DHCP lease issues cause "Limited Connectivity." Releasing and renewing the IP is always the first diagnostic step before any hardware changes.</div>
+    </div>
+  </div>
+
+  <div class="slide-badge">04 / 06 — Training Quiz</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     SLIDE 5 — INCIDENT LOG
+═══════════════════════════════════════════════════ -->
+<section class="slide">
+  <div class="chrome-bar">
+    <span class="chrome-left">TheGERD</span>
+    <div class="chrome-right">
+      <div class="dot-on"></div>
+      <span>ONLINE · LOCAL</span>
+    </div>
+  </div>
+  <div class="nav-tabs">
+    <div class="tab">AI Assistant</div>
+    <div class="tab">Knowledge Base</div>
+    <div class="tab active">Incidents</div>
+    <div class="tab">Reports</div>
+  </div>
+
+  <div class="content">
+    <div class="row sb">
+      <div>
+        <div class="lbl" style="margin-bottom:3px;">// this week</div>
+        <div class="sec-title">Incident Log</div>
+      </div>
+      <div class="tag">5 Open</div>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:7px;">
+      <div class="inc-row high">
+        <div>
+          <div class="inc-title">Domain Controller unreachable — site-wide auth failure</div>
+          <div class="inc-meta">INC-0241 · 2h ago · Assigned: K. Martin</div>
+        </div>
+        <div class="badge high">HIGH</div>
+      </div>
+
+      <div class="inc-row med">
+        <div>
+          <div class="inc-title">Printer PRNT-02 offline — HR floor unresponsive</div>
+          <div class="inc-meta">INC-0240 · 4h ago · Assigned: Unassigned</div>
+        </div>
+        <div class="badge med">MED</div>
+      </div>
+
+      <div class="inc-row med">
+        <div>
+          <div class="inc-title">VPN timeout for remote staff — 3 users affected</div>
+          <div class="inc-meta">INC-0239 · Yesterday · Assigned: T. Williams</div>
+        </div>
+        <div class="badge med">MED</div>
+      </div>
+
+      <div class="inc-row low">
+        <div>
+          <div class="inc-title">Outlook signature missing after profile rebuild</div>
+          <div class="inc-meta">INC-0238 · Yesterday · Assigned: K. Martin</div>
+        </div>
+        <div class="badge low">LOW</div>
+      </div>
+
+      <div class="inc-row low">
+        <div>
+          <div class="inc-title">Software install permission denied — endpoint mgmt</div>
+          <div class="inc-meta">INC-0237 · 2 days ago · Resolved</div>
+        </div>
+        <div class="badge low">LOW</div>
+      </div>
+    </div>
+
+    <div class="btn" style="align-self:flex-start;">+ New Incident</div>
+  </div>
+
+  <div class="slide-badge">05 / 06 — Incident Log</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     SLIDE 6 — SOP STEP-BY-STEP LOOKUP
+═══════════════════════════════════════════════════ -->
+<section class="slide">
+  <div class="chrome-bar">
+    <span class="chrome-left">TheGERD</span>
+    <div class="chrome-right">
+      <div class="dot-on"></div>
+      <span>ONLINE · LOCAL</span>
+    </div>
+  </div>
+  <div class="nav-tabs">
+    <div class="tab">AI Assistant</div>
+    <div class="tab active">Knowledge Base</div>
+    <div class="tab">Devices</div>
+    <div class="tab">Training</div>
+  </div>
+
+  <div class="content">
+    <div class="row sb" style="align-items:flex-start;">
+      <div style="flex:1;">
+        <div class="lbl" style="margin-bottom:3px;">// SOP · INC-0241</div>
+        <div class="sec-title">Malware Removal</div>
+      </div>
+      <div class="tag gold">SOP-06</div>
+    </div>
+
+    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+      <div class="tag">CompTIA A+ Core 2</div>
+      <div class="tag green">In Progress</div>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:6px; flex:1;">
+      <div class="sop-card" style="border-left-color:var(--accent);">
+        <div class="sop-step">
+          <span class="step-num">01.</span>
+          <span>Isolate the infected machine from the network — disable NIC or pull cable.</span>
+        </div>
+      </div>
+      <div class="sop-card" style="border-left-color:var(--accent);">
+        <div class="sop-step">
+          <span class="step-num">02.</span>
+          <span>Boot into Safe Mode. Run offline AV scan using bootable USB (Malwarebytes / ESET).</span>
+        </div>
+      </div>
+      <div class="sop-card" style="border-left-color:var(--accent);">
+        <div class="sop-step">
+          <span class="step-num">03.</span>
+          <span>Quarantine and remove flagged files. Document all findings for the incident report.</span>
+        </div>
+      </div>
+      <div class="sop-card" style="border-left-color:#2c2e34; opacity:0.6;">
+        <div class="sop-step">
+          <span class="step-num" style="color:var(--dim);">04.</span>
+          <span style="color:var(--dim);">Reconnect to network. Run live scan. Confirm clean. Reset user credentials.</span>
+        </div>
+      </div>
+      <div class="sop-card" style="border-left-color:#2c2e34; opacity:0.6;">
+        <div class="sop-step">
+          <span class="step-num" style="color:var(--dim);">05.</span>
+          <span style="color:var(--dim);">File incident report in GERD. Close ticket and notify supervisor.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="padding:9px 12px;">
+      <div class="row sb">
+        <span class="xxs mono dim">Ask GERD about this SOP</span>
+        <div class="btn" style="padding:5px 12px; font-size:10px;">Ask AI ✦</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-badge">06 / 06 — SOP Lookup</div>
+</section>
+
+</body>
+</html>
