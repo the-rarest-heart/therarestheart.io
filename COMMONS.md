@@ -68,8 +68,14 @@ npx wrangler pages secret put IP_SALT --project-name therarestheart-io
 **5. Deploying.**
 
 Merge to `main`. Pages builds and publishes it. Pushing any other branch gives
-you a preview deployment at its own URL, with the same database and secrets,
-which is the safe way to try a change.
+you a preview deployment at its own URL, sharing the same D1 database.
+
+One catch: `wrangler pages secret put` only writes to the **production**
+environment — there is no CLI flag for preview. So on a preview deployment
+`ADMIN_TOKEN` is unset and `/admin.html` will refuse you, while posting and
+replying work normally. Set the preview copies by hand in the dashboard
+(Workers & Pages -> therarestheart-io -> Settings -> Variables and Secrets ->
+Preview) if you ever want to moderate from a preview.
 
 ---
 
