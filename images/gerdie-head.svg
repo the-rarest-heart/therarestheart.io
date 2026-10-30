@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <!-- Gerdie, head only. Same artwork as gerdie.svg, cropped frame - nothing redrawn.
-     Used anywhere under ~56px: the dock, article asides, avatars.
+     Used anywhere under ~60px: the dock, article asides, avatars.
      To regenerate after updating gerdie.svg, copy it here and swap the opening
-     <svg ...> tag for: <svg width="620" height="406" viewBox="493 470 620 406" -->
-<svg width="620" height="406" viewBox="493 470 620 406" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;">
+     <svg ...> tag for: <svg width="775" height="649" viewBox="492 486 775 649" -->
+<svg width="775" height="649" viewBox="492 486 775 649" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;">
     <g id="Love-Heart" serif:id="Love Heart" transform="matrix(4.166667,0,0,4.166667,161.516581,-658.142727)">
         <g transform="matrix(1,0,0,1,115.2364,489.5741)">
             <path d="M0,-102.708C-3.541,-100.394 -8.049,-96.944 -12.499,-91.994C-17.204,-86.762 -20.252,-81.624 -22.193,-77.709C-20.057,-74.057 -16.591,-69.056 -11.224,-64.19C-5.544,-59.04 0.101,-56.002 4.081,-54.241C6.802,-55.687 9.523,-57.132 12.244,-58.578L26.274,-48.374L13.265,-39.191C11.819,-27.627 10.374,-16.063 8.928,-4.499C22.733,-2.41 38.484,-0.822 55.864,-0.418C73.81,0 90.091,-0.923 104.331,-2.459C103.566,-14.703 102.8,-26.947 102.035,-39.191L80.608,-46.245L97.454,-57.302L105.606,-54.751C110.222,-56.591 115.911,-59.327 121.932,-63.424C128.076,-67.605 132.781,-71.988 136.217,-75.669C132.633,-81.363 128.265,-87.506 122.952,-93.78C120.206,-97.023 117.467,-99.994 114.79,-102.708C103.878,-94.697 86.925,-85.28 65.607,-84.143C57.568,-83.715 51.173,-84.585 47.272,-85.134C27.269,-87.954 11.302,-95.612 0,-102.708" style="fill:white;fill-rule:nonzero;"/>
