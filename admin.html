@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Moderation — The Commons</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" type="image/png" href="images/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/trh.css">
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav__inner">
+    <a class="nav__brand" href="index.html">
+      <img src="images/rh-logo.png" alt="The Rarest Heart - Innovation with Heart">
+      <span>The Rarest Heart</span>
+    </a>
+    <nav class="nav__links" aria-label="Main">
+      <a href="commons.html">The Commons</a>
+      <button class="btn btn--ghost" type="button" data-sign-out>Sign out</button>
+    </nav>
+  </div>
+</header>
+
+<main class="section">
+  <div class="wrap stack stack--lg">
+
+    <div class="stack stack--sm">
+      <p class="eyebrow">Moderation</p>
+      <h1 class="h-sect">The Commons, from the back.</h1>
+      <p class="muted">Hide, pin, edit or delete any thread. Hidden threads disappear from the public rooms but stay in the database until you delete them.</p>
+    </div>
+
+    <!-- ░░ GATE ░░ -->
+    <div class="panel" data-gate>
+      <form class="stack" data-gate-form>
+        <div class="stack stack--sm">
+          <p class="eyebrow">Admin token</p>
+          <p class="muted">The value you set with <code>wrangler secret put ADMIN_TOKEN</code>. It's kept for this tab only and never written to disk.</p>
+        </div>
+        <div class="field">
+          <label for="tok">Token</label>
+          <input id="tok" type="password" autocomplete="off" required>
+        </div>
+        <button class="btn btn--primary" type="submit">Unlock</button>
+      </form>
+    </div>
+
+    <!-- ░░ PANEL ░░ -->
+    <div class="stack stack--lg" data-mod hidden>
+      <div class="row" style="align-items: flex-end; gap: 20px">
+        <div class="row__main">
+          <div class="field" style="max-width: 20em">
+            <label for="room-filter">Room</label>
+            <select id="room-filter" data-room-filter>
+              <option value="all">Everything</option>
+              <option value="ask">Ask anything</option>
+              <option value="setup">Show your setup</option>
+              <option value="comply">Compliance corner</option>
+              <option value="wins">Wins &amp; warnings</option>
+              <option value="build">Build along</option>
+            </select>
+          </div>
+        </div>
+        <div class="row__side" style="flex: 0 0 auto">
+          <p class="muted" data-status aria-live="polite"></p>
+        </div>
+      </div>
+
+      <div class="stack" data-rows></div>
+    </div>
+
+  </div>
+</main>
+
+<script src="js/admin.js"></script>
+</body>
+</html>

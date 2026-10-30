@@ -1,5 +1,15 @@
 name = "therarestheart"
-compatibility_date = "2024-01-01"
+main = "worker/index.js"
+compatibility_date = "2026-10-01"
 
-[site]
-bucket = "."
+# The static site. The Worker handles /api/* and hands everything else to this.
+[assets]
+directory = "."
+binding = "ASSETS"
+
+# The Commons. Create it once with:  wrangler d1 create trh-commons
+# then paste the id it prints into database_id below.
+[[d1_databases]]
+binding = "DB"
+database_name = "trh-commons"
+database_id = "PASTE_THE_ID_FROM_WRANGLER_D1_CREATE"

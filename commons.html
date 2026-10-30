@@ -83,86 +83,77 @@
 
   <!-- ░░ ROOMS ░░ -->
   <section class="section section--paper" id="rooms">
-    <div class="wrap" data-filter-group="rooms" data-filter-nouns='{"all":"threads","ask":"questions","setup":"setups","comply":"compliance threads","wins":"wins and warnings","build":"build-along threads"}'>
+    <div class="wrap stack stack--lg">
 
       <div class="stack">
         <p class="eyebrow">Five rooms</p>
         <h2 class="h-sect">Five rooms, and that's the ceiling.</h2>
         <p class="lede">More rooms than people is how a community dies quietly. These five cover it.</p>
         <div class="pills" role="group" aria-label="Filter rooms" style="margin-top: 8px">
-          <button class="pill" type="button" data-filter="all" aria-pressed="true">Everything</button>
-          <button class="pill" type="button" data-filter="ask" aria-pressed="false">Ask anything</button>
-          <button class="pill" type="button" data-filter="setup" aria-pressed="false">Show your setup</button>
-          <button class="pill" type="button" data-filter="comply" aria-pressed="false">Compliance corner</button>
-          <button class="pill" type="button" data-filter="wins" aria-pressed="false">Wins &amp; warnings</button>
-          <button class="pill" type="button" data-filter="build" aria-pressed="false">Build along</button>
+          <button class="pill" type="button" data-commons-room="all" aria-pressed="true">Everything</button>
+          <button class="pill" type="button" data-commons-room="ask" aria-pressed="false">Ask anything</button>
+          <button class="pill" type="button" data-commons-room="setup" aria-pressed="false">Show your setup</button>
+          <button class="pill" type="button" data-commons-room="comply" aria-pressed="false">Compliance corner</button>
+          <button class="pill" type="button" data-commons-room="wins" aria-pressed="false">Wins &amp; warnings</button>
+          <button class="pill" type="button" data-commons-room="build" aria-pressed="false">Build along</button>
         </div>
-        <p class="muted" data-filter-count aria-live="polite">Showing 10 threads.</p>
+        <p class="muted" data-commons-count aria-live="polite">Loading&hellip;</p>
       </div>
 
-      <div class="grid grid--2" style="margin-top: 28px">
+      <div class="grid grid--2" data-commons-list></div>
 
-        <a class="thread" href="#" data-key="ask">
-          <div class="thread__meta"><span class="badge badge--new">New here</span><span>Ask anything</span></div>
-          <h3>Is it bad that I don't know what a VLAN is?</h3>
-          <p class="muted">Dana &middot; 6 replies &middot; Oct 29</p>
-        </a>
+      <!-- ░░ START A THREAD ░░ -->
+      <div class="panel" id="start">
+        <div class="stack">
+          <div class="stack stack--sm">
+            <p class="eyebrow">Start a thread</p>
+            <h3 class="h-sect">Ask the thing you're actually stuck on.</h3>
+            <p class="muted">No account. Your email stays private &mdash; it's only so I can reach you if a thread needs a real answer offline.</p>
+          </div>
 
-        <a class="thread" href="#" data-key="ask">
-          <div class="thread__meta"><span class="badge">Ask anything</span></div>
-          <h3>Our vendor says the data "never leaves the US." How do I check that?</h3>
-          <p class="muted">Marcus &middot; 12 replies &middot; Oct 28</p>
-        </a>
+          <form class="stack" data-new-thread>
+            <div class="form-row">
+              <div class="field">
+                <label for="t-author">What should people call you</label>
+                <input id="t-author" name="author" type="text" placeholder="First name is fine" required maxlength="60">
+              </div>
+              <div class="field">
+                <label for="t-email">Email (private)</label>
+                <input id="t-email" name="email" type="email" placeholder="you@example.com">
+              </div>
+              <div class="field">
+                <label for="t-room">Room</label>
+                <select id="t-room" name="room" required>
+                  <option value="ask">Ask anything</option>
+                  <option value="setup">Show your setup</option>
+                  <option value="comply">Compliance corner</option>
+                  <option value="wins">Wins &amp; warnings</option>
+                  <option value="build">Build along</option>
+                </select>
+              </div>
+            </div>
 
-        <a class="thread" href="#" data-key="comply">
-          <div class="thread__meta"><span class="badge badge--open">Open question</span><span>Compliance corner</span></div>
-          <h3>Auditor asked for our encryption policy. We don't have one written down.</h3>
-          <p class="muted">Priya &middot; 19 replies &middot; Oct 28</p>
-        </a>
+            <div class="field">
+              <label for="t-title">Title</label>
+              <input id="t-title" name="title" type="text" placeholder="Say it the way you'd say it out loud" required minlength="8" maxlength="140">
+            </div>
 
-        <a class="thread" href="#" data-key="comply">
-          <div class="thread__meta"><span class="badge">Compliance corner</span></div>
-          <h3>Does a BAA cover the backup provider too?</h3>
-          <p class="muted">Tomas &middot; 8 replies &middot; Oct 27</p>
-        </a>
+            <div class="field">
+              <label for="t-body">What's going on</label>
+              <textarea id="t-body" name="body" rows="6" placeholder="What did you try, and what happened?" required minlength="15" maxlength="6000"></textarea>
+            </div>
 
-        <a class="thread" href="#" data-key="setup">
-          <div class="thread__meta"><span class="badge">Show your setup</span></div>
-          <h3>Two-person practice, one server, no IT staff. Here's what we run.</h3>
-          <p class="muted">Renee &middot; 23 replies &middot; Oct 26</p>
-        </a>
+            <div class="honeypot" aria-hidden="true">
+              <label for="t-website">Leave this empty</label>
+              <input id="t-website" name="website" type="text" tabindex="-1" autocomplete="off">
+            </div>
 
-        <a class="thread" href="#" data-key="setup">
-          <div class="thread__meta"><span class="badge badge--new">New here</span><span>Show your setup</span></div>
-          <h3>Is a mini PC under the front desk a terrible idea?</h3>
-          <p class="muted">Ade &middot; 5 replies &middot; Oct 24</p>
-        </a>
-
-        <a class="thread" href="#" data-key="wins">
-          <div class="thread__meta"><span class="badge">Wins &amp; warnings</span></div>
-          <h3>Warning: our restore test failed and nobody had checked in a year</h3>
-          <p class="muted">Jo &middot; 31 replies &middot; Oct 23</p>
-        </a>
-
-        <a class="thread" href="#" data-key="wins">
-          <div class="thread__meta"><span class="badge">Wins &amp; warnings</span></div>
-          <h3>Win: cut our access list from 41 accounts to 12</h3>
-          <p class="muted">Keisha &middot; 14 replies &middot; Oct 21</p>
-        </a>
-
-        <a class="thread" href="#" data-key="build">
-          <div class="thread__meta"><span class="badge">Build along</span></div>
-          <h3>Following week 7 — my machine chokes on the bigger model</h3>
-          <p class="muted">Luis &middot; 9 replies &middot; Oct 20</p>
-        </a>
-
-        <a class="thread" href="#" data-key="build">
-          <div class="thread__meta"><span class="badge">Build along</span></div>
-          <h3>Anyone else running this on a refurbished box?</h3>
-          <p class="muted">Sam &middot; 7 replies &middot; Oct 18</p>
-        </a>
-
+            <button class="btn btn--primary" type="submit">Post it</button>
+            <p class="muted" data-form-note hidden></p>
+          </form>
+        </div>
       </div>
+
     </div>
   </section>
 
@@ -325,6 +316,7 @@
 </div>
 
 <script src="js/site.js"></script>
+<script src="js/commons.js"></script>
 <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
 </body>
 </html>
