@@ -1,9 +1,0 @@
-# Not part of the public site.
-worker/
-schema.sql
-wrangler.toml
-.assetsignore
-*.md
-update-context.sh
-.DS_Store
-.claude/
