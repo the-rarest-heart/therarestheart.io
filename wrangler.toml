@@ -12,4 +12,4 @@ binding = "ASSETS"
 [[d1_databases]]
 binding = "DB"
 database_name = "trh-commons"
-database_id = "PASTE_THE_ID_FROM_WRANGLER_D1_CREATE"
+database_id = "008751ed-6e40-4354-aa04-e1bd2caf8367"
