@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Commons — The Rarest Heart</title>
+<meta name="description" content="A community for people doing regulated IT work. Nothing to install, nobody to impress.">
+<link rel="icon" type="image/png" href="images/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/trh.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="nav">
+  <div class="nav__inner">
+    <a class="nav__brand" href="home.html">
+      <img src="images/trhlogo-ink.svg" alt="The Rarest Heart">
+      <span>The Rarest Heart<small>Innovation with Heart</small></span>
+    </a>
+    <button class="nav__toggle" type="button" data-nav-toggle aria-expanded="false" aria-label="Open menu">
+      <svg width="20" height="14" viewBox="0 0 20 14" aria-hidden="true"><g fill="#111114"><rect width="20" height="2.4" rx="1.2"/><rect y="5.8" width="20" height="2.4" rx="1.2"/><rect y="11.6" width="20" height="2.4" rx="1.2"/></g></svg>
+    </button>
+    <nav class="nav__links" data-nav-links aria-label="Main">
+      <a href="notes.html">Field Notes</a>
+      <a href="commons.html" aria-current="page">Community</a>
+      <a href="home.html#build">What we build</a>
+      <a href="home.html#about">About</a>
+      <a class="btn btn--primary" href="#join">Join the Commons</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- ░░ HERO ░░ -->
+  <section class="section section--ink">
+    <div class="wrap row">
+      <div class="row__main stack stack--lg">
+        <p class="eyebrow">The Commons</p>
+        <h1 class="h-hero">Nothing to install. Nobody to impress.</h1>
+        <p class="lede">Most communities ask you to join a chat app, learn its etiquette, and then feel behind for missing three days. This one lives on the pages you were already reading.</p>
+        <div class="pills">
+          <a class="btn btn--primary" href="#join">Join the Commons</a>
+          <a class="btn btn--outline-light" href="#rooms">See the rooms</a>
+        </div>
+      </div>
+      <div class="row__side">
+        <div class="panel panel--crimson stack stack--sm">
+          <p class="eyebrow">Why not Discord</p>
+          <p>Discord's real cost isn't the install. It's that a fast-moving channel makes falling behind feel like failing.</p>
+          <p>So there's no live chat here. One email on Friday, and threads that wait for you.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ░░ HOW IT WORKS ░░ -->
+  <section class="section">
+    <div class="wrap stack stack--lg">
+      <div class="stack stack--sm">
+        <p class="eyebrow">How this works</p>
+        <h2 class="h-sect">Three rules, and that's the whole system.</h2>
+      </div>
+      <div class="grid grid--3">
+        <div class="panel panel--paper stack stack--sm">
+          <h3 class="h-card">It lives where you read</h3>
+          <p class="muted">Every field note has a thread under it. No second app, no second password, no switching context to ask a question.</p>
+        </div>
+        <div class="panel panel--paper stack stack--sm">
+          <h3 class="h-card">One email on Friday</h3>
+          <p class="muted">What went up, and the one thread worth your time. Miss a week and you've missed nothing.</p>
+        </div>
+        <div class="panel panel--paper stack stack--sm">
+          <h3 class="h-card">Beginner questions go first</h3>
+          <p class="muted">A thread tagged "new here" sits at the top of its room until somebody answers it. That's a rule, not a vibe.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ░░ ROOMS ░░ -->
+  <section class="section section--paper" id="rooms">
+    <div class="wrap" data-filter-group="rooms" data-filter-nouns='{"all":"threads","ask":"questions","setup":"setups","comply":"compliance threads","wins":"wins and warnings","build":"build-along threads"}'>
+
+      <div class="stack">
+        <p class="eyebrow">Five rooms</p>
+        <h2 class="h-sect">Five rooms, and that's the ceiling.</h2>
+        <p class="lede">More rooms than people is how a community dies quietly. These five cover it.</p>
+        <div class="pills" role="group" aria-label="Filter rooms" style="margin-top: 8px">
+          <button class="pill" type="button" data-filter="all" aria-pressed="true">Everything</button>
+          <button class="pill" type="button" data-filter="ask" aria-pressed="false">Ask anything</button>
+          <button class="pill" type="button" data-filter="setup" aria-pressed="false">Show your setup</button>
+          <button class="pill" type="button" data-filter="comply" aria-pressed="false">Compliance corner</button>
+          <button class="pill" type="button" data-filter="wins" aria-pressed="false">Wins &amp; warnings</button>
+          <button class="pill" type="button" data-filter="build" aria-pressed="false">Build along</button>
+        </div>
+        <p class="muted" data-filter-count aria-live="polite">Showing 10 threads.</p>
+      </div>
+
+      <div class="grid grid--2" style="margin-top: 28px">
+
+        <a class="thread" href="#" data-key="ask">
+          <div class="thread__meta"><span class="badge badge--new">New here</span><span>Ask anything</span></div>
+          <h3>Is it bad that I don't know what a VLAN is?</h3>
+          <p class="muted">[MEMBER NAME] &middot; [N] replies &middot; [DATE]</p>
+        </a>
+
+        <a class="thread" href="#" data-key="ask">
+          <div class="thread__meta"><span class="badge">Ask anything</span></div>
+          <h3>Our vendor says the data "never leaves the US." How do I check that?</h3>
+          <p class="muted">[MEMBER NAME] &middot; [N] replies &middot; [DATE]</p>
+        </a>
+
+        <a class="thread" href="#" data-key="comply">
+          <div class="thread__meta"><span class="badge badge--open">Open question</span><span>Compliance corner</span></div>
+          <h3>Auditor asked for our encryption policy. We don't have one written down.</h3>
+          <p class="muted">[MEMBER NAME] &middot; [N] replies &middot; [DATE]</p>
+        </a>
+
+        <a class="thread" href="#" data-key="comply">
+          <div class="thread__meta"><span class="badge">Compliance corner</span></div>
+          <h3>Does a BAA cover the backup provider too?</h3>
+          <p class="muted">[MEMBER NAME] &middot; [N] replies &middot; [DATE]</p>
+        </a>
+
+        <a class="thread" href="#" data-key="setup">
+          <div class="thread__meta"><span class="badge">Show your setup</span></div>
+          <h3>Two-person practice, one server, no IT staff. Here's what we run.</h3>
+          <p class="muted">[MEMBER NAME] &middot; [N] replies &middot; [DATE]</p>
+        </a>
+
+        <a class="thread" href="#" data-key="setup">
+          <div class="thread__meta"><span class="badge badge--new">New here</span><span>Show your setup</span></div>
+          <h3>Is a mini PC under the front desk a terrible idea?</h3>
+          <p class="muted">[MEMBER NAME] &middot; [N] replies &middot; [DATE]</p>
+        </a>
+
+        <a class="thread" href="#" data-key="wins">
+          <div class="thread__meta"><span class="badge">Wins &amp; warnings</span></div>
+          <h3>Warning: our restore test failed and nobody had checked in a year</h3>
+          <p class="muted">[MEMBER NAME] &middot; [N] replies &middot; [DATE]</p>
+        </a>
+
+        <a class="thread" href="#" data-key="wins">
+          <div class="thread__meta"><span class="badge">Wins &amp; warnings</span></div>
+          <h3>Win: cut our access list from 41 accounts to 12</h3>
+          <p class="muted">[MEMBER NAME] &middot; [N] replies &middot; [DATE]</p>
+        </a>
+
+        <a class="thread" href="#" data-key="build">
+          <div class="thread__meta"><span class="badge">Build along</span></div>
+          <h3>Following week [N] — my machine chokes on the bigger model</h3>
+          <p class="muted">[MEMBER NAME] &middot; [N] replies &middot; [DATE]</p>
+        </a>
+
+        <a class="thread" href="#" data-key="build">
+          <div class="thread__meta"><span class="badge">Build along</span></div>
+          <h3>Anyone else running this on a refurbished box?</h3>
+          <p class="muted">[MEMBER NAME] &middot; [N] replies &middot; [DATE]</p>
+        </a>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ░░ MONDAY ░░ -->
+  <section class="section section--crimson">
+    <div class="wrap row" style="align-items: center">
+      <div class="row__side" style="flex: 0 0 auto">
+        <img src="images/gerdie.svg" alt="" width="132" aria-hidden="true">
+      </div>
+      <div class="row__main stack">
+        <p class="eyebrow">Every Monday</p>
+        <h2 class="h-sect">Gerdie asks one question.</h2>
+        <p class="lede">One question in Ask anything, every Monday, small enough that a beginner can answer it. He pins the "new here" threads, and he writes the Friday digest.</p>
+        <p class="muted">A quiet room is a dead room. This is the thing that keeps it from going quiet.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ░░ FRONT PORCHES ░░ -->
+  <section class="section">
+    <div class="wrap stack stack--lg">
+      <div class="stack stack--sm">
+        <p class="eyebrow">Social</p>
+        <h2 class="h-sect">The front porches.</h2>
+        <p class="lede">Social isn't the house. It's the porch — where strangers walk past and can start talking without being a member of anything. Every one links back to a single thread here. One post, four places, one conversation.</p>
+      </div>
+
+      <div class="grid grid--4">
+        <article class="card">
+          <div class="card__cap">Reddit</div>
+          <div class="card__body">
+            <h3 class="h-card">The open front door</h3>
+            <p class="muted">Long questions, no branding, strangers who owe you nothing. The best threads get mirrored in here with credit.</p>
+            <div class="card__foot"><a href="#">r/[SUBREDDIT] &rarr;</a></div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card__cap card__cap--build">LinkedIn</div>
+          <div class="card__body">
+            <h3 class="h-card">Where the decision-makers are</h3>
+            <p class="muted">Practice managers and MSP owners. The place a compliance post actually gets forwarded to a boss.</p>
+            <div class="card__foot"><a href="#">[PROFILE] &rarr;</a></div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card__cap card__cap--find">YouTube</div>
+          <div class="card__body">
+            <h3 class="h-card">The build, recorded</h3>
+            <p class="muted">Screen on, mistakes in. The long version of whatever the build log describes.</p>
+            <div class="card__foot"><a href="#">[CHANNEL] &rarr;</a></div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card__cap">TikTok &amp; Shorts</div>
+          <div class="card__body">
+            <h3 class="h-card">Sixty-second answers</h3>
+            <p class="muted">Gerdie answering one question from the Commons. The clip ends by pointing at the thread.</p>
+            <div class="card__foot"><a href="#">[HANDLE] &rarr;</a></div>
+          </div>
+        </article>
+      </div>
+
+      <div class="panel panel--paper">
+        <p><strong>Why it runs this way:</strong> platforms change their rules, their reach and their owners. If the conversation lives here and the porches only point at it, nothing you've built disappears when one of them turns the lights off.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ░░ JOIN ░░ -->
+  <section class="section section--ink" id="join">
+    <div class="wrap row">
+      <div class="row__main stack">
+        <p class="eyebrow">Join</p>
+        <h2 class="h-sect">Name and email. That's the whole barrier.</h2>
+        <p class="lede">No tiers, no badge grind, no reputation to earn before you're allowed to ask something basic.</p>
+        <p class="muted">You'll get the Friday email and nothing else. Leave any time.</p>
+      </div>
+      <div class="row__side">
+        <div class="panel stack">
+          <form class="stack" action="#" method="post">
+            <div class="field">
+              <label for="join-name">What should people call you</label>
+              <input id="join-name" type="text" name="name" placeholder="First name is fine" required>
+            </div>
+            <div class="field">
+              <label for="join-email">Email</label>
+              <input id="join-email" type="email" name="email" placeholder="you@example.com" required>
+            </div>
+            <button class="btn btn--primary btn--block" type="submit">Join the Commons</button>
+          </form>
+          <p class="muted">Not wired up to a mailing list yet.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <div class="wrap">
+    <div class="grid grid--4">
+      <div class="stack stack--sm">
+        <img src="images/trhlogo.svg" alt="The Rarest Heart" style="height: 46px; width: auto">
+        <p class="muted">Innovation with Heart.</p>
+      </div>
+      <div>
+        <h4>Field Notes</h4>
+        <div class="stack stack--sm">
+          <a href="notes.html">Everything</a>
+          <a href="notes.html">Writing</a>
+          <a href="notes.html">Builds</a>
+          <a href="notes.html">Research</a>
+        </div>
+      </div>
+      <div>
+        <h4>Company</h4>
+        <div class="stack stack--sm">
+          <a href="home.html#about">About</a>
+          <a href="commons.html">The Commons</a>
+          <a href="contact.html">Contact</a>
+        </div>
+      </div>
+      <div>
+        <h4>The Friday email</h4>
+        <div class="stack stack--sm">
+          <p class="muted">One email a week. What went up, and the one thread worth reading.</p>
+          <form class="stack stack--sm" action="#" method="post">
+            <div class="field">
+              <label for="nl-email">Email</label>
+              <input id="nl-email" type="email" name="email" placeholder="you@example.com" required>
+            </div>
+            <button class="btn btn--primary btn--block" type="submit">Send it to me</button>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <span>&copy; <span id="year">2026</span> The Rarest Heart LLC</span>
+      <span>Built in the open.</span>
+    </div>
+  </div>
+</footer>
+
+<button class="gerdie-dock" type="button" data-gerdie-dock aria-expanded="false" aria-label="Ask Gerdie">
+  <img src="images/gerdie-head.svg" alt="" aria-hidden="true">
+</button>
+<div class="gerdie-panel" data-gerdie-panel hidden role="dialog" aria-label="Ask Gerdie">
+  <button class="gerdie-panel__close" type="button" data-gerdie-close aria-label="Close">&times;</button>
+  <h4>New here?</h4>
+  <p class="muted">Ask anything is the room for questions you think are too basic. They aren't.</p>
+  <div class="stack stack--sm" style="margin-top: 14px">
+    <a class="btn btn--ghost btn--block" href="#rooms">Take me to Ask anything</a>
+  </div>
+</div>
+
+<script src="js/site.js"></script>
+<script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>
