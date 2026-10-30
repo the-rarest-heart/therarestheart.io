@@ -1,8 +1,15 @@
 # The Commons — how it runs
 
-Threads and replies live in a Cloudflare D1 database. A Worker serves the site
-and answers `/api/*`. No build step, no framework, no third-party community
-service: it stays yours.
+Threads and replies live in a Cloudflare D1 database.
+
+**This site runs on Cloudflare Pages**, project `therarestheart-io`, built
+automatically from the `main` branch of this repository. It is not a Worker —
+running `wrangler deploy` would create a separate Worker that does not serve
+the domain. Pushing to `main` is what deploys.
+
+`_worker.js` at the repository root puts Pages in advanced mode: it answers
+`/api/*` itself and hands every other request to the static files. No build
+step, no framework, no third-party community service: it stays yours.
 
 ---
 
@@ -10,9 +17,9 @@ service: it stays yours.
 
 | Path | What it is |
 | --- | --- |
-| `worker/index.js` | The Worker — the API, plus serving the static site |
+| `_worker.js` | The API, plus handing everything else to the static files |
 | `schema.sql` | The database tables |
-| `wrangler.toml` | Worker config and the D1 binding |
+| `wrangler.toml` | Pages config and the D1 binding |
 | `js/commons.js` | Room list, new-thread form, thread view, replies |
 | `js/admin.js` | Your moderation screen |
 | `admin.html` | `/admin.html` — hide, pin, edit, delete |
@@ -20,10 +27,9 @@ service: it stays yours.
 
 ---
 
-## First-time setup
+## Setup — already done
 
-Run these once, from this folder. Wrangler comes down with `npx`; you don't
-need to install anything globally.
+Recorded here so it can be redone. Nothing below needs running again.
 
 **1. Sign in.**
 
@@ -46,32 +52,31 @@ It prints a `database_id`. Paste it into `wrangler.toml`, replacing
 npx wrangler d1 execute trh-commons --remote --file=./schema.sql
 ```
 
-**4. Set the two secrets.**
+**4. Set the two secrets** — on the Pages project, not on a Worker.
 
-`ADMIN_TOKEN` is the password for `/admin.html`. Make it long and random.
-
-```bash
-npx wrangler secret put ADMIN_TOKEN
-```
-
-`IP_SALT` makes the rate-limiting hashes unguessable. Any long random string.
+`ADMIN_TOKEN` is the password for `/admin.html`. `IP_SALT` makes the
+rate-limiting hashes unguessable; you never type it anywhere.
 
 ```bash
-npx wrangler secret put IP_SALT
+npx wrangler pages secret put ADMIN_TOKEN --project-name therarestheart-io
 ```
-
-**5. Deploy.**
 
 ```bash
-npx wrangler deploy
+npx wrangler pages secret put IP_SALT --project-name therarestheart-io
 ```
+
+**5. Deploying.**
+
+Merge to `main`. Pages builds and publishes it. Pushing any other branch gives
+you a preview deployment at its own URL, with the same database and secrets,
+which is the safe way to try a change.
 
 ---
 
 ## Working on it locally
 
 ```bash
-npx wrangler dev --local
+npx wrangler pages dev
 ```
 
 Local runs read secrets from `.dev.vars`, which is gitignored and must never
@@ -114,8 +119,8 @@ Discord wrong for this. So instead:
 - **Everything is text.** Replies render as text nodes, never HTML, so pasted
   markup can't execute.
 
-If spam gets through anyway, lower `LIMITS.postsPerHour` in `worker/index.js`
-and redeploy.
+If spam gets through anyway, lower `LIMITS.postsPerHour` in `_worker.js` and
+push to `main`.
 
 ---
 

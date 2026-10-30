@@ -26,3 +26,6 @@ trh-agents/logs/
 
 # Local Worker secrets — never commit
 .dev.vars
+
+# Your admin token, written locally for you to move into a password manager
+admin-token.txt
