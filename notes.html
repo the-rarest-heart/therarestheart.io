@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Field Notes — The Rarest Heart</title>
+<meta name="description" content="Writing, build logs and research for people doing regulated IT work.">
+<link rel="icon" type="image/png" href="images/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/trh.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="nav">
+  <div class="nav__inner">
+    <a class="nav__brand" href="index.html">
+      <img src="images/rh-logo.png" alt="The Rarest Heart - Innovation with Heart">
+      <span>The Rarest Heart</span>
+    </a>
+    <button class="nav__toggle" type="button" data-nav-toggle aria-expanded="false" aria-label="Open menu">
+      <svg width="20" height="14" viewBox="0 0 20 14" aria-hidden="true"><g fill="#111114"><rect width="20" height="2.4" rx="1.2"/><rect y="5.8" width="20" height="2.4" rx="1.2"/><rect y="11.6" width="20" height="2.4" rx="1.2"/></g></svg>
+    </button>
+    <nav class="nav__links" data-nav-links aria-label="Main">
+      <a href="notes.html" aria-current="page">Field Notes</a>
+      <a href="commons.html">Community</a>
+      <a href="index.html#build">What we build</a>
+      <a href="index.html#about">About</a>
+      <a class="btn btn--primary" href="commons.html">Join the Commons</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+  <section class="section">
+    <div class="wrap stack stack--lg">
+      <div class="stack stack--sm">
+        <p class="eyebrow">Field notes</p>
+        <h1 class="h-hero">What I'm building, reading, and figuring out in public.</h1>
+        <p class="lede">Three kinds of thing. Essays that define one idea properly, build logs posted while the work is unfinished, and research worth stealing for your own workflow.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--tight" style="padding-top: 0">
+    <div class="wrap" data-filter-group="notes" data-filter-nouns='{"all":"notes","write":"essays","build":"build logs","find":"research notes"}'>
+
+      <div class="stack">
+        <div class="pills" role="group" aria-label="Filter notes">
+          <button class="pill" type="button" data-filter="all" aria-pressed="true">Everything</button>
+          <button class="pill" type="button" data-filter="write" aria-pressed="false">Writing</button>
+          <button class="pill" type="button" data-filter="build" aria-pressed="false">Builds</button>
+          <button class="pill" type="button" data-filter="find" aria-pressed="false">Research</button>
+        </div>
+        <p class="muted" data-filter-count aria-live="polite">Showing 9 notes.</p>
+      </div>
+
+      <div class="grid grid--3" style="margin-top: 30px">
+
+        <a class="card" href="#" data-key="build">
+          <div class="card__cap card__cap--build">Build log &middot; updated Oct 28<span>In progress</span></div>
+          <div class="card__body">
+            <h2 class="h-card">Week 7: teaching it to say "I don't know"</h2>
+            <p class="muted">A confident wrong answer about a retention rule is worse than no answer at all. What I changed, and what it cost.</p>
+            <div class="card__foot"><span>11 min</span><span>31 replies</span></div>
+          </div>
+        </a>
+
+        <a class="card" href="#" data-key="write">
+          <div class="card__cap">Writing &middot; 6 min</div>
+          <div class="card__body">
+            <h2 class="h-card">Nobody can tell you what "HIPAA compliant" means, and that's the problem.</h2>
+            <p class="muted">There is no certificate to hang on the wall. There's a set of questions you have to be able to answer.</p>
+            <div class="card__foot"><span>Oct 21</span><span>14 replies</span></div>
+          </div>
+        </a>
+
+        <a class="card" href="#" data-key="find">
+          <div class="card__cap card__cap--find">Research &middot; 4 min</div>
+          <div class="card__body">
+            <h2 class="h-card">The checklist buried in NIST SP 800-66 Rev. 2 that should be your onboarding doc</h2>
+            <p class="muted">Someone already wrote the thing you were going to write. Use theirs and spend the time elsewhere.</p>
+            <div class="card__foot"><span>Oct 24</span><span>9 replies</span></div>
+          </div>
+        </a>
+
+        <a class="card" href="#" data-key="write">
+          <div class="card__cap">Writing &middot; 7 min</div>
+          <div class="card__body">
+            <h2 class="h-card">"The cloud" is somebody else's computer, and that matters for your records</h2>
+            <p class="muted">Not a warning. A question you're allowed to ask your vendor out loud.</p>
+            <div class="card__foot"><span>Oct 14</span><span>6 replies</span></div>
+          </div>
+        </a>
+
+        <a class="card" href="#" data-key="build">
+          <div class="card__cap card__cap--build">Build log &middot; updated Oct 17<span>Shipped</span></div>
+          <div class="card__body">
+            <h2 class="h-card">Getting it running on hardware a clinic already owns</h2>
+            <p class="muted">What the machine under the front desk can actually do, measured instead of guessed.</p>
+            <div class="card__foot"><span>9 min</span><span>18 replies</span></div>
+          </div>
+        </a>
+
+        <a class="card" href="#" data-key="find">
+          <div class="card__cap card__cap--find">Research &middot; 5 min</div>
+          <div class="card__body">
+            <h2 class="h-card">A one-page incident form worth copying</h2>
+            <p class="muted">From CISA's Cyber Essentials. It fits on a page, which is the only reason anyone fills it in.</p>
+            <div class="card__foot"><span>Oct 9</span><span>4 replies</span></div>
+          </div>
+        </a>
+
+        <a class="card" href="#" data-key="write">
+          <div class="card__cap">Writing &middot; 8 min</div>
+          <div class="card__body">
+            <h2 class="h-card">You don't need to learn AI. You need to learn what to refuse.</h2>
+            <p class="muted">The skill isn't prompting. It's knowing which answers you're not allowed to trust.</p>
+            <div class="card__foot"><span>Oct 7</span><span>27 replies</span></div>
+          </div>
+        </a>
+
+        <a class="card" href="#" data-key="build">
+          <div class="card__cap card__cap--build">Build log &middot; updated Oct 2<span>In progress</span></div>
+          <div class="card__body">
+            <h2 class="h-card">Week 5: the backup restore that didn't restore</h2>
+            <p class="muted">The failure was mine and it was boring. Both of those are worth writing down.</p>
+            <div class="card__foot"><span>12 min</span><span>11 replies</span></div>
+          </div>
+        </a>
+
+        <a class="card" href="#" data-key="find">
+          <div class="card__cap card__cap--find">Research &middot; 6 min</div>
+          <div class="card__body">
+            <h2 class="h-card">The access-review habit that takes twenty minutes a quarter</h2>
+            <p class="muted">Who can still get in that shouldn't. Most places have never once asked.</p>
+            <div class="card__foot"><span>Sep 29</span><span>8 replies</span></div>
+          </div>
+        </a>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- example of Gerdie size 2, inside a note -->
+  <section class="section section--tight section--paper">
+    <div class="wrap">
+      <div class="panel">
+        <p class="eyebrow">What a note looks like inside</p>
+        <h2 class="h-sect" style="margin: 10px 0 14px">Gerdie translates, then gets out of the way.</h2>
+        <p>Jargon gets caught the first time it appears, in an aside you can skim past. Three of these per article, maximum.</p>
+        <div class="gerdie-aside">
+          <img src="images/gerdie-head.svg" alt="Gerdie">
+          <p><strong>"Encryption at rest"</strong> just means the files are scrambled while they're sitting still — on the drive, in the backup — not only while they're moving across the network.</p>
+        </div>
+        <p class="muted">He says nothing in the middle of a sentence, nothing on a legal point, and nothing that repeats the heading above him.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--crimson">
+    <div class="wrap row" style="align-items: center">
+      <div class="row__main stack">
+        <p class="eyebrow">The Commons</p>
+        <h2 class="h-sect">Don't just read it. Argue with it.</h2>
+        <p class="lede">Every note has a thread under it. No separate app, no second password — you're already on the page.</p>
+      </div>
+      <div class="row__side" style="flex: 0 0 auto">
+        <a class="btn btn--light" href="commons.html">Join the Commons</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <div class="wrap">
+    <div class="grid grid--4">
+      <div class="stack stack--sm">
+        <img class="footer__mark" src="images/rh-logo-light.png" alt="The Rarest Heart - Innovation with Heart">
+      </div>
+      <div>
+        <h4>Field Notes</h4>
+        <div class="stack stack--sm">
+          <a href="notes.html">Everything</a>
+          <a href="notes.html">Writing</a>
+          <a href="notes.html">Builds</a>
+          <a href="notes.html">Research</a>
+        </div>
+      </div>
+      <div>
+        <h4>Company</h4>
+        <div class="stack stack--sm">
+          <a href="index.html#about">About</a>
+          <a href="commons.html">The Commons</a>
+          <a href="contact.html">Contact</a>
+        </div>
+      </div>
+      <div>
+        <h4>The Friday email</h4>
+        <div class="stack stack--sm">
+          <p class="muted">One email a week. What went up, and the one thread worth reading.</p>
+          <form class="stack stack--sm" action="#" method="post">
+            <div class="field">
+              <label for="nl-email">Email</label>
+              <input id="nl-email" type="email" name="email" placeholder="you@example.com" required>
+            </div>
+            <button class="btn btn--primary btn--block" type="submit">Send it to me</button>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <span>&copy; <span id="year">2026</span> The Rarest Heart LLC</span>
+      <span>Built in the open.</span>
+    </div>
+  </div>
+</footer>
+
+<button class="gerdie-dock" type="button" data-gerdie-dock aria-expanded="false" aria-label="Ask Gerdie">
+  <img src="images/gerdie-head.svg" alt="" aria-hidden="true">
+</button>
+<div class="gerdie-panel" data-gerdie-panel hidden role="dialog" aria-label="Ask Gerdie">
+  <button class="gerdie-panel__close" type="button" data-gerdie-close aria-label="Close">&times;</button>
+  <h4>Looking for something?</h4>
+  <p class="muted">Tell me what you're stuck on and I'll point you at one note.</p>
+  <div class="stack stack--sm" style="margin-top: 14px">
+    <a class="btn btn--ghost btn--block" href="commons.html">Ask the Commons instead</a>
+  </div>
+</div>
+
+<script src="js/site.js"></script>
+<script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>

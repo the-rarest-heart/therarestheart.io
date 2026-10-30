@@ -1,0 +1,31 @@
+# Secrets — never commit these
+.env
+*.env
+.env.*
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+trh-agents/trh/          # virtual environment
+
+# Data — videos/clips can be huge; keep out of git
+trh-agents/data/videos/
+trh-agents/data/clips/
+trh-agents/data/transcripts/
+trh-agents/data/covers/
+trh-agents/data/packages/
+
+# macOS
+.DS_Store
+
+# Logs
+*.log
+trh-agents/logs/
+
+# Local Worker secrets — never commit
+.dev.vars
+
+# Your admin token, written locally for you to move into a password manager
+admin-token.txt
