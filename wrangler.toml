@@ -1,14 +1,15 @@
-name = "therarestheart"
-main = "worker/index.js"
+# therarestheart.io runs on Cloudflare Pages (project therarestheart-io),
+# built from the main branch of this repository. Not Workers — a `wrangler deploy`
+# here would create a separate Worker that does not serve the domain.
+#
+# _worker.js at the root puts Pages in advanced mode: it handles /api/* itself
+# and hands every other request to the static files via env.ASSETS.
+
+name = "therarestheart-io"
+pages_build_output_dir = "."
 compatibility_date = "2026-10-01"
 
-# The static site. The Worker handles /api/* and hands everything else to this.
-[assets]
-directory = "."
-binding = "ASSETS"
-
-# The Commons. Create it once with:  wrangler d1 create trh-commons
-# then paste the id it prints into database_id below.
+# The Commons. Created with:  wrangler d1 create trh-commons
 [[d1_databases]]
 binding = "DB"
 database_name = "trh-commons"
