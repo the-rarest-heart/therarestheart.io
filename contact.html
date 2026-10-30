@@ -1,266 +1,211 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Contact — The Rarest Heart</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet" />
-  <style>
-    :root { --navy: #080809; --navy-mid: #0e0e0f; --navy-light: #151516; --white: #f4f4f0; --off-white: #c8c8c4; --accent: #00e550; --accent-glow: rgba(0,229,80,0.22); --pulse: #c4a55a; --pulse-glow: rgba(196,165,90,0.22); --tier1: #00e550; --tier2: #c4a55a; --green: #00e550; }
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; }
-    /* ── PAGE TRANSITIONS ── */
-    @keyframes pageFadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-    body { animation: pageFadeIn 0.45s ease both; }
-
-    body { background-color: var(--navy); color: var(--white); font-family: 'DM Sans', sans-serif; font-weight: 300; line-height: 1.7; overflow-x: hidden; }
-    body::before { content: ''; position: fixed; inset: 0; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E"); pointer-events: none; z-index: 0; opacity: 0.4; }
-    h1, h2, h3, h4 { font-family: 'Syne', sans-serif; line-height: 1.15; }
-    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; padding: 1.25rem 4rem; display: flex; align-items: center; justify-content: space-between; background: rgba(8,8,9,0.9); backdrop-filter: blur(16px); border-bottom: 1px solid rgba(255,255,255,0.06); }
-    .nav-logo { display: flex; align-items: center; gap: 0.75rem; text-decoration: none; }
-    .nav-logo-heart { width: 96px; height: 96px; }
-    .nav-logo-text { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.3rem; color: var(--white); letter-spacing: -0.02em; }
-    .nav-logo-text span { color: var(--pulse); }
-    .nav-links { display: flex; gap: 2.5rem; list-style: none; }
-    .nav-links a { color: var(--off-white); text-decoration: none; font-size: 0.875rem; font-weight: 400; letter-spacing: 0.02em; transition: color 0.2s; position: relative; }
-    .nav-links a::after { content: ''; position: absolute; bottom: -4px; left: 0; width: 0; height: 1px; background: var(--accent); transition: width 0.3s; }
-    .nav-links a:hover { color: var(--white); } .nav-links a:hover::after { width: 100%; }
-    .nav-links a.active { color: var(--white); } .nav-links a.active::after { width: 100%; }
-    .nav-cta { background: var(--accent); color: #080809 !important; padding: 0.5rem 1.25rem; border-radius: 4px; font-weight: 500 !important; }
-    .nav-cta::after { display: none !important; } .nav-cta:hover { background: #00c444 !important; }
-    section { position: relative; z-index: 1; }
-    .page-wrap { max-width: 860px; margin: 0 auto; padding: 0 2rem; }
-    .page-hero { padding: 10rem 0 4rem; border-bottom: 1px solid rgba(255,255,255,0.06); position: relative; overflow: hidden; }
-    .page-hero-glow { position: absolute; width: 500px; height: 500px; border-radius: 50%; background: radial-gradient(circle, var(--pulse-glow) 0%, transparent 70%); top: -150px; right: -100px; pointer-events: none; }
-    .page-hero-inner { position: relative; z-index: 1; }
-    .page-eyebrow { font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--pulse); margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.75rem; opacity: 0; animation: fadeUp 0.7s ease forwards 0.1s; }
-    .page-eyebrow::before { content: ''; display: inline-block; width: 24px; height: 1px; background: var(--pulse); }
-    .page-title { font-size: clamp(2.5rem, 6vw, 4rem); font-weight: 800; letter-spacing: -0.03em; margin-bottom: 1rem; opacity: 0; animation: fadeUp 0.7s ease forwards 0.25s; }
-    .page-title em { font-style: normal; color: var(--pulse); }
-    .page-desc { font-size: 1.05rem; color: var(--off-white); max-width: 560px; font-weight: 300; line-height: 1.7; opacity: 0; animation: fadeUp 0.7s ease forwards 0.4s; }
-    .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; padding: 4rem 0; align-items: start; }
-    .contact-form-wrap { }
-    .section-eyebrow { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.6rem; }
-    .section-eyebrow::before { content: ''; display: inline-block; width: 16px; height: 1px; background: var(--accent); }
-    .contact-form-wrap h2, .contact-info-wrap h2 { font-size: 1.5rem; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 0.5rem; }
-    .contact-form-wrap p, .contact-info-wrap > p { font-size: 0.875rem; color: var(--off-white); margin-bottom: 1.75rem; line-height: 1.65; }
-    .form-group { margin-bottom: 1.25rem; }
-    .form-group label { display: block; font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--off-white); margin-bottom: 0.5rem; }
-    .form-group input, .form-group select, .form-group textarea { width: 100%; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 0.75rem 1rem; color: var(--white); font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 300; outline: none; transition: border-color 0.2s, background 0.2s; }
-    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: rgba(0,229,80,0.5); background: rgba(255,255,255,0.05); }
-    .form-group input::placeholder, .form-group textarea::placeholder { color: rgba(200,200,196,0.35); }
-    .form-group select option { background: var(--navy-mid); color: var(--white); }
-    .form-group textarea { resize: vertical; min-height: 130px; line-height: 1.6; }
-    .form-submit { display: inline-flex; align-items: center; gap: 0.6rem; background: var(--pulse); color: var(--white); border: none; border-radius: 6px; padding: 0.85rem 1.75rem; font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: background 0.2s, transform 0.15s; width: 100%; justify-content: center; }
-    .form-submit:hover { background: #d43e60; transform: translateY(-1px); }
-    .form-success { display: none; background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.25); border-radius: 8px; padding: 1.25rem 1.5rem; color: #00e550; font-size: 0.875rem; margin-top: 1rem; }
-    .contact-info-wrap { }
-    .contact-method { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; padding: 1.5rem; margin-bottom: 1rem; display: flex; gap: 1rem; align-items: flex-start; transition: border-color 0.2s; }
-    .contact-method:hover { border-color: rgba(0,229,80,0.3); }
-    .contact-method-icon { width: 40px; height: 40px; border-radius: 8px; background: rgba(0,229,80,0.1); border: 1px solid rgba(0,229,80,0.2); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 1rem; }
-    .contact-method-body h3 { font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; letter-spacing: -0.01em; }
-    .contact-method-body p { font-size: 0.8rem; color: var(--off-white); margin: 0; line-height: 1.6; }
-    .contact-method-body a { color: var(--accent); text-decoration: none; font-size: 0.8rem; }
-    .contact-method-body a:hover { text-decoration: underline; }
-    .faq-section { padding: 2rem 0 5rem; border-top: 1px solid rgba(255,255,255,0.06); }
-    .faq-section h2 { font-size: 1.5rem; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 0.5rem; }
-    .faq-section > p { font-size: 0.875rem; color: var(--off-white); margin-bottom: 2rem; }
-    .faq-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
-    .faq-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; padding: 1.5rem; }
-    .faq-card h4 { font-size: 0.95rem; font-weight: 700; margin-bottom: 0.6rem; letter-spacing: -0.01em; }
-    .faq-card p { font-size: 0.82rem; color: var(--off-white); line-height: 1.65; margin: 0; }
-    footer { border-top: 1px solid rgba(255,255,255,0.06); padding: 3rem 4rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
-    .footer-copy { font-size: 0.8rem; color: var(--off-white); opacity: 0.5; }
-    .footer-links { display: flex; gap: 2rem; list-style: none; }
-    .footer-links a { font-size: 0.8rem; color: var(--off-white); opacity: 0.5; text-decoration: none; transition: opacity 0.2s; }
-    .footer-links a:hover { opacity: 1; }
-    @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
-    .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.6s ease, transform 0.6s ease; }
-    .reveal.visible { opacity: 1; transform: translateY(0); }
-    @media (max-width: 900px) {
-      nav { padding: 1rem 1.5rem; } .nav-links { display: none; }
-      .page-wrap { padding: 0 1.25rem; } .page-hero { padding: 8.5rem 0 3rem; }
-      .contact-grid { grid-template-columns: 1fr; gap: 2.5rem; }
-      .faq-grid { grid-template-columns: 1fr; }
-      footer { padding: 2rem 1.5rem; flex-direction: column; align-items: flex-start; }
-    }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Contact — The Rarest Heart</title>
+<meta name="description" content="Get in touch with Kelvin Martin at The Rarest Heart. Questions, collaboration, or a pilot.">
+<link rel="icon" type="image/png" href="images/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/trh.css">
 </head>
 <body>
-  <nav>
-    <a href="index.html" class="nav-logo">
-      <img src="images/trhlogo.svg" alt="The Rarest Heart" class="nav-logo-heart" width="96" height="96">
-      <span class="nav-logo-text">The Rarest <span>Heart</span></span>
-    </a>
-    <ul class="nav-links">
-      <li><a href="index.html">Home</a></li>
-      <li><a href="learn.html">Learn IT</a></li>
-      <li><a href="do.html">Do IT</a></li>
-      <li><a href="apply.html">Apply IT</a></li>
-      <li><a href="topics.html">Topics</a></li>
-      <li><a href="contact.html" class="nav-cta active">Contact</a></li>
-    </ul>
-  </nav>
+<a class="skip" href="#main">Skip to content</a>
 
-  <section class="page-hero">
-    <div class="page-hero-glow"></div>
-    <div class="page-wrap page-hero-inner">
-      <div class="page-eyebrow">Get In Touch</div>
-      <h1 class="page-title">Say <em>Hello</em></h1>
-      <p class="page-desc">Have a question about the curriculum, want to collaborate, or just want to connect? Send a message and I'll get back to you.</p>
+<header class="nav">
+  <div class="nav__inner">
+    <a class="nav__brand" href="home.html">
+      <img src="images/rh-logo.png" alt="The Rarest Heart - Innovation with Heart">
+      <span>The Rarest Heart</span>
+    </a>
+    <button class="nav__toggle" type="button" data-nav-toggle aria-expanded="false" aria-label="Open menu">
+      <svg width="20" height="14" viewBox="0 0 20 14" aria-hidden="true"><g fill="#111114"><rect width="20" height="2.4" rx="1.2"/><rect y="5.8" width="20" height="2.4" rx="1.2"/><rect y="11.6" width="20" height="2.4" rx="1.2"/></g></svg>
+    </button>
+    <nav class="nav__links" data-nav-links aria-label="Main">
+      <a href="notes.html">Field Notes</a>
+      <a href="commons.html">Community</a>
+      <a href="home.html#build">What we build</a>
+      <a href="home.html#about">About</a>
+      <a class="btn btn--primary" href="commons.html">Join the Commons</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- ░░ HERO ░░ -->
+  <section class="section">
+    <div class="wrap row">
+      <div class="row__main stack stack--lg">
+        <p class="eyebrow">Contact</p>
+        <h1 class="h-hero">Say the thing you'd be embarrassed to ask.</h1>
+        <p class="lede">Nothing you send here is too basic. I'd rather answer the question you're actually stuck on than the polished version of it.</p>
+        <div class="pills">
+          <a class="btn btn--primary" href="mailto:info@therarestheart.io">info@therarestheart.io</a>
+          <a class="btn btn--ghost" href="commons.html">Ask in the Commons instead</a>
+        </div>
+      </div>
+      <div class="row__side">
+        <div class="panel panel--crimson">
+          <div class="gerdie-full">
+            <img src="images/gerdie.svg" alt="Gerdie, a cartoon heart character in a white tee">
+            <div class="gerdie-bubble">
+              <strong>One tip.</strong> Tell me what you tried and what happened. That's usually enough for me to be useful on the first reply.
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 
-  <section>
-    <div class="page-wrap">
-      <div class="contact-grid">
+  <!-- ░░ FORM ░░ -->
+  <section class="section section--paper">
+    <div class="wrap row">
+      <div class="row__main">
+        <div class="panel stack">
+          <div class="stack stack--sm">
+            <p class="eyebrow">Send a message</p>
+            <h2 class="h-sect">What's on your mind?</h2>
+            <p class="muted">This opens your own email app with the message filled in, so you keep a copy of what you sent.</p>
+          </div>
 
-        <!-- Form -->
-        <div class="contact-form-wrap reveal">
-          <div class="section-eyebrow">Send a Message</div>
-          <h2>What's on your mind?</h2>
-          <p>Fill out the form below and I'll respond as soon as possible — usually within 1–2 business days.</p>
+          <form class="stack" data-mailto-form data-mailto="info@therarestheart.io">
+            <div class="form-row">
+              <div class="field">
+                <label for="c-name">Your name</label>
+                <input id="c-name" name="name" type="text" placeholder="First name is fine" required>
+              </div>
+              <div class="field">
+                <label for="c-email">Your email</label>
+                <input id="c-email" name="email" type="email" placeholder="you@example.com" required>
+              </div>
+            </div>
 
-          <form id="contact-form" onsubmit="handleSubmit(event)">
-            <div class="form-group">
-              <label for="name">Your Name</label>
-              <input type="text" id="name" name="name" placeholder="First and last name" required />
-            </div>
-            <div class="form-group">
-              <label for="email">Email Address</label>
-              <input type="email" id="email" name="email" placeholder="you@example.com" required />
-            </div>
-            <div class="form-group">
-              <label for="subject">Subject</label>
-              <select id="subject" name="subject" required>
-                <option value="" disabled selected>Select a topic...</option>
-                <option value="curriculum">Curriculum Question</option>
-                <option value="collaboration">Collaboration / Content</option>
-                <option value="feedback">Site Feedback</option>
-                <option value="career">Career Advice</option>
-                <option value="other">Other</option>
+            <div class="field">
+              <label for="c-topic">What's this about</label>
+              <select id="c-topic" name="topic">
+                <option>A question about something I read</option>
+                <option>Compliance or an audit</option>
+                <option>A pilot for my organisation</option>
+                <option>Collaboration or speaking</option>
+                <option>Something's broken on this site</option>
+                <option>Other</option>
               </select>
             </div>
-            <div class="form-group">
-              <label for="message">Message</label>
-              <textarea id="message" name="message" placeholder="Tell me what's on your mind..." required></textarea>
+
+            <div class="field">
+              <label for="c-message">Message</label>
+              <textarea id="c-message" name="message" rows="7" placeholder="What did you try, and what happened?" required></textarea>
             </div>
-            <button type="submit" class="form-submit">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 8h12M10 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              Send Message
-            </button>
+
+            <button class="btn btn--primary" type="submit">Open it in my email app</button>
+            <p class="muted">Prefer to do it yourself? <a href="mailto:info@therarestheart.io">info@therarestheart.io</a></p>
           </form>
-          <div class="form-success" id="form-success">
-            Message sent — I'll be in touch soon. Thanks for reaching out!
-          </div>
         </div>
-
-        <!-- Contact Info -->
-        <div class="contact-info-wrap reveal">
-          <div class="section-eyebrow">Other Ways to Connect</div>
-          <h2>Find me here</h2>
-          <p>Whether you prefer social, email, or GitHub — pick your channel.</p>
-
-          <div class="contact-method">
-            <div class="contact-method-icon">✉</div>
-            <div class="contact-method-body">
-              <h3>Email</h3>
-              <p>Best for detailed questions or partnership inquiries.</p>
-              <a href="mailto:therarestheart@gmail.com">therarestheart@gmail.com</a>
-            </div>
-          </div>
-
-          <div class="contact-method">
-            <div class="contact-method-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </div>
-            <div class="contact-method-body">
-              <h3>GitHub</h3>
-              <p>Source for this site and lab environments. PRs welcome.</p>
-              <a href="https://github.com/the-rarest-heart" target="_blank" rel="noopener">github.com/the-rarest-heart</a>
-            </div>
-          </div>
-
-          <div class="contact-method">
-            <div class="contact-method-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="4" cy="4" r="2" stroke="currentColor" stroke-width="1.5"/></svg>
-            </div>
-            <div class="contact-method-body">
-              <h3>LinkedIn</h3>
-              <p>Connect professionally or follow along the journey.</p>
-              <a href="https://linkedin.com" target="_blank" rel="noopener">View Profile →</a>
-            </div>
-          </div>
-        </div>
-
       </div>
-    </div>
-  </section>
 
-  <!-- FAQ -->
-  <section class="faq-section">
-    <div class="page-wrap">
-      <div class="section-eyebrow reveal">Common Questions</div>
-      <h2 class="reveal">Frequently Asked</h2>
-      <p class="reveal">Quick answers to questions I get asked regularly.</p>
-
-      <div class="faq-grid">
-        <div class="faq-card reveal">
-          <h4>Is this curriculum free?</h4>
-          <p>Yes — everything on this site is free. The modules, SOPs, and practice scenarios are openly available to anyone working toward an IT career.</p>
+      <div class="row__side stack">
+        <div class="panel stack stack--sm">
+          <p class="eyebrow">Where I am</p>
+          <p><strong>Lexington, South Carolina.</strong></p>
+          <p class="muted">Originally from Adel, Georgia.</p>
         </div>
-        <div class="faq-card reveal">
-          <h4>What experience level is this for?</h4>
-          <p>Tier 1 modules (01–05) are designed for complete beginners. Tier 2 modules (06–09) assume basic help desk familiarity. No degree or prior experience required.</p>
+        <div class="panel stack stack--sm">
+          <p class="eyebrow">What to expect</p>
+          <p class="muted">One person reads these. If it's a question others would benefit from, I may answer it in the Commons with your name left off &mdash; tell me if you'd rather I didn't.</p>
         </div>
-        <div class="faq-card reveal">
-          <h4>Can I use this content to study for CompTIA A+?</h4>
-          <p>Absolutely. The topics covered — hardware, networking, OS troubleshooting, security, and Active Directory — map closely to A+ Core 1 and Core 2 exam objectives.</p>
-        </div>
-        <div class="faq-card reveal">
-          <h4>Are there hands-on labs?</h4>
-          <p>Lab environments are in progress. Each module's "Do IT" phase outlines the exact procedure — you can follow along in a Windows VM or TryHackMe room while they're being built out.</p>
-        </div>
-        <div class="faq-card reveal">
-          <h4>How often is new content added?</h4>
-          <p>New modules, labs, and scenario content are added as the curriculum is built out publicly. Follow on GitHub or check back — the site evolves alongside the learning journey.</p>
-        </div>
-        <div class="faq-card reveal">
-          <h4>Can I contribute or suggest a topic?</h4>
-          <p>Yes — open an issue on GitHub or send a message via the contact form. Topic suggestions, corrections, and pull requests are all welcome.</p>
+        <div class="panel panel--ink stack stack--sm">
+          <p class="eyebrow">Faster than email</p>
+          <p class="muted">A question posted in the Commons gets answered where other people can find it later. Email is better for anything you wouldn't want public.</p>
+          <a class="btn btn--outline-light" href="commons.html">Go to the Commons</a>
         </div>
       </div>
     </div>
   </section>
 
-  <footer>
-    <span class="footer-copy">© 2025 The Rarest Heart. Built in public.</span>
-    <ul class="footer-links">
-      <li><a href="topics.html">Topics</a></li>
-      <li><a href="learn.html">Learn IT</a></li>
-      <li><a href="do.html">Do IT</a></li>
-      <li><a href="apply.html">Apply IT</a></li>
-    </ul>
-  </footer>
+  <!-- ░░ ABOUT ░░ -->
+  <section class="section">
+    <div class="wrap row">
+      <div class="row__main stack">
+        <p class="eyebrow">Who you're writing to</p>
+        <h2 class="h-sect">Kelvin Martin.</h2>
+        <p class="lede">From Adel, Georgia, out of Lexington, South Carolina. I spent over twenty years in basketball: high school, college, and professionally.</p>
+        <p class="lede">Tech was the thing I kept coming back to since I was a kid, and I taught myself the rest as an adult. Nothing here assumes you came up through a computer science program, because I didn't either.</p>
+        <p class="lede">I build for the places that get skipped &mdash; small practices, small MSPs, teams carrying compliance without a compliance department.</p>
+        <p class="muted">The Rarest Heart LLC.</p>
+      </div>
+      <div class="row__side">
+        <div class="panel panel--paper stack stack--sm">
+          <p class="eyebrow">How I answer</p>
+          <p><strong>Never "obviously."</strong> If it were obvious you wouldn't be asking.</p>
+          <p><strong>Name the fear.</strong> The quiet worry gets said out loud, then answered.</p>
+          <p><strong>No invented numbers.</strong> If I don't know, I'll say I don't know.</p>
+        </div>
+      </div>
+    </div>
+  </section>
 
-  <script>
-    function handleSubmit(e) {
-      e.preventDefault();
-      document.getElementById('contact-form').style.display = 'none';
-      document.getElementById('form-success').style.display = 'block';
-    }
-    function triggerReveals() {
-      const reveals = document.querySelectorAll('.reveal');
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add('visible'); observer.unobserve(entry.target); } });
-      }, { threshold: 0.1 });
-      reveals.forEach(el => { if (!el.classList.contains('visible')) observer.observe(el); });
-    }
-    document.addEventListener('DOMContentLoaded', triggerReveals);
-  </script>
+</main>
+
+<footer class="footer">
+  <div class="wrap">
+    <div class="grid grid--4">
+      <div class="stack stack--sm">
+        <img class="footer__mark" src="images/rh-logo-light.png" alt="The Rarest Heart - Innovation with Heart">
+      </div>
+      <div>
+        <h4>Field Notes</h4>
+        <div class="stack stack--sm">
+          <a href="notes.html">Everything</a>
+          <a href="notes.html">Writing</a>
+          <a href="notes.html">Builds</a>
+          <a href="notes.html">Research</a>
+        </div>
+      </div>
+      <div>
+        <h4>Company</h4>
+        <div class="stack stack--sm">
+          <a href="home.html#about">About</a>
+          <a href="commons.html">The Commons</a>
+          <a href="contact.html">Contact</a>
+        </div>
+      </div>
+      <div>
+        <h4>The Friday email</h4>
+        <div class="stack stack--sm">
+          <p class="muted">One email a week. What went up, and the one thread worth reading.</p>
+          <form class="stack stack--sm" action="#" method="post">
+            <div class="field">
+              <label for="nl-email">Email</label>
+              <input id="nl-email" type="email" name="email" placeholder="you@example.com" required>
+            </div>
+            <button class="btn btn--primary btn--block" type="submit">Send it to me</button>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <span>&copy; <span id="year">2026</span> The Rarest Heart LLC</span>
+      <span>Built in the open.</span>
+    </div>
+  </div>
+</footer>
+
+<button class="gerdie-dock" type="button" data-gerdie-dock aria-expanded="false" aria-label="Ask Gerdie">
+  <img src="images/gerdie-head.svg" alt="" aria-hidden="true">
+</button>
+<div class="gerdie-panel" data-gerdie-panel hidden role="dialog" aria-label="Ask Gerdie">
+  <button class="gerdie-panel__close" type="button" data-gerdie-close aria-label="Close">&times;</button>
+  <h4>Not sure how to word it?</h4>
+  <p class="muted">Say what you tried and what happened. That's a complete question.</p>
+  <div class="stack stack--sm" style="margin-top: 14px">
+    <a class="btn btn--ghost btn--block" href="commons.html">Ask the Commons instead</a>
+  </div>
+</div>
+
+<script src="js/site.js"></script>
+<script>document.getElementById('year').textContent = new Date().getFullYear();</script>
 </body>
 </html>

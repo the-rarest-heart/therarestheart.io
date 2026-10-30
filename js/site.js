@@ -63,6 +63,33 @@
     apply(initial ? initial.getAttribute('data-filter') : 'all');
   });
 
+  /* ── mailto forms ─────────────────────────────────────────
+     No backend here, so the contact form composes the message
+     and hands it to the visitor's own mail app. They keep a copy
+     in their sent folder, which a POST to a form service doesn't
+     give them. Swap this for a real endpoint when there is one.
+     ─────────────────────────────────────────────────────── */
+  var mailForms = document.querySelectorAll('[data-mailto-form]');
+
+  Array.prototype.forEach.call(mailForms, function (form) {
+    form.addEventListener('submit', function (event) {
+      event.preventDefault();
+
+      var to = form.getAttribute('data-mailto');
+      var get = function (name) {
+        var el = form.querySelector('[name="' + name + '"]');
+        return el ? el.value : '';
+      };
+
+      var topic = get('topic') || 'Message from the site';
+      var body = get('message') + '\n\n---\n' + get('name') + '\n' + get('email');
+
+      window.location.href = 'mailto:' + to +
+        '?subject=' + encodeURIComponent(topic) +
+        '&body=' + encodeURIComponent(body);
+    });
+  });
+
   /* ── gerdie dock ──────────────────────────────────────────
      He never opens himself. One click to open, Escape or the
      close button to shut him up.

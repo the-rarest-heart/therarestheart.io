@@ -312,6 +312,13 @@ a.card:hover { border-color: var(--crimson); transform: translateY(-2px); color:
 .footer { background: var(--ink); color: var(--white); padding: 72px 0 40px; }
 .footer a { color: rgba(255, 255, 255, 0.82); text-decoration: none; font-size: 15px; }
 .footer a:hover { color: var(--white); text-decoration: underline; }
+.footer__mark {
+  align-self: flex-start;
+  height: 54px;
+  width: auto;
+  max-width: 100%;
+}
+
 .footer h4 {
   font-size: 11px;
   letter-spacing: 0.14em;
@@ -341,7 +348,9 @@ a.card:hover { border-color: var(--crimson); transform: translateY(-2px); color:
   letter-spacing: 0.1em;
   text-transform: uppercase;
 }
-.field input {
+.field input,
+.field select,
+.field textarea {
   min-height: 48px;
   padding: 12px 16px;
   border: 1.5px solid var(--line-strong);
@@ -350,8 +359,11 @@ a.card:hover { border-color: var(--crimson); transform: translateY(-2px); color:
   color: var(--ink);
   font-family: var(--body);
   font-size: 16px;
+  width: 100%;
 }
-.field input::placeholder { color: var(--grey); }
+.field textarea { resize: vertical; line-height: 1.55; }
+.field input::placeholder,
+.field textarea::placeholder { color: var(--grey); }
 .section--ink .field label, .panel--ink .field label { color: rgba(255, 255, 255, 0.9); }
 .form-row { display: flex; flex-wrap: wrap; gap: 14px; align-items: flex-end; }
 .form-row .field { flex: 1 1 200px; }
@@ -402,7 +414,7 @@ a.card:hover { border-color: var(--crimson); transform: translateY(-2px); color:
   overflow: hidden;
   box-shadow: 0 6px 22px rgba(17, 17, 20, 0.22);
 }
-.gerdie-dock img { width: 56px; height: auto; }  /* the head crop is near-square, so it sits whole in the ring */
+.gerdie-dock img { width: 44px; height: auto; }  /* small enough that the ring never clips his head */
 
 .gerdie-panel {
   position: fixed;
