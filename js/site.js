@@ -82,7 +82,27 @@
       };
 
       var topic = get('topic') || 'Message from the site';
-      var body = get('message') + '\n\n---\n' + get('name') + '\n' + get('email');
+      var rule = '\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500';
+
+      var body = [
+        rule,
+        'FROM THE RAREST HEART \u2014 CONTACT FORM',
+        rule,
+        '',
+        'TOPIC',
+        topic,
+        '',
+        rule,
+        '',
+        'MESSAGE',
+        get('message'),
+        '',
+        rule,
+        '',
+        'NAME   ' + get('name'),
+        'EMAIL  ' + get('email'),
+        rule
+      ].join('\n');
 
       window.location.href = 'mailto:' + to +
         '?subject=' + encodeURIComponent(topic) +

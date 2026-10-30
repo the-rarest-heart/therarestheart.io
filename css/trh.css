@@ -314,9 +314,13 @@ a.card:hover { border-color: var(--crimson); transform: translateY(-2px); color:
 .footer a:hover { color: var(--white); text-decoration: underline; }
 .footer__mark {
   align-self: flex-start;
-  height: 54px;
+  height: 92px;
   width: auto;
   max-width: 100%;
+}
+
+@media (max-width: 640px) {
+  .footer__mark { height: 74px; }
 }
 
 .footer h4 {
