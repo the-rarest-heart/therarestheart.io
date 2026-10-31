@@ -169,10 +169,22 @@ npx wrangler d1 export trh-commons --remote --output=commons-backup.sql
 
 ---
 
-## Still to do
+## The signup list
 
-- The three newsletter forms post nowhere. They need a mailing list service
-  (Buttondown or Kit) before they collect anything.
+Every signup form on the site — the Commons join box and each footer
+newsletter box — posts to `/api/subscribe` and lands in the `subscribers`
+table. Duplicate signups quietly update the existing row rather than erroring.
+
+Open `/admin.html` to see the count, read the list, or **Download CSV**.
+
+**Collecting is not sending.** D1 stores addresses; it cannot send email. For
+the first stretch, send the Friday email from Zoho with the list on BCC. When
+that stops being practical, import the CSV into Buttondown or Kit and point
+the forms at their endpoint instead.
+
+---
+
+## Still to do
 - Nobody is emailed when a thread gets a reply. That wants either a Worker
   cron job or an email service wired into the reply handler.
 - Gerdie's Monday question is written on the page but nothing posts it. A

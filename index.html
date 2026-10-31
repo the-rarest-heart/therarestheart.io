@@ -296,12 +296,17 @@
         <h4>The Friday email</h4>
         <div class="stack stack--sm">
           <p class="muted">One email a week. What went up, and the one thread worth reading.</p>
-          <form class="stack stack--sm" action="#" method="post">
+          <form class="stack stack--sm" data-subscribe-form="footer">
             <div class="field">
               <label for="nl-email">Email</label>
               <input id="nl-email" type="email" name="email" placeholder="you@example.com" required>
             </div>
+            <div class="honeypot" aria-hidden="true">
+              <label for="nl-website">Leave this empty</label>
+              <input id="nl-website" name="website" type="text" tabindex="-1" autocomplete="off">
+            </div>
             <button class="btn btn--primary btn--block" type="submit">Send it to me</button>
+            <p class="muted" data-form-note hidden></p>
           </form>
         </div>
       </div>

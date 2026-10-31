@@ -40,3 +40,20 @@ CREATE TABLE IF NOT EXISTS rate_limit (
   count        INTEGER NOT NULL DEFAULT 0,
   PRIMARY KEY (ip_hash, window_start)
 );
+
+-- People who asked to hear from you. Collected here so nothing is lost while
+-- you decide on a mailing-list provider; export with:
+--   wrangler d1 execute trh-commons --remote \
+--     --command "SELECT name, email, source, created_at FROM subscribers ORDER BY created_at;"
+CREATE TABLE IF NOT EXISTS subscribers (
+  id         INTEGER PRIMARY KEY AUTOINCREMENT,
+  email      TEXT    NOT NULL UNIQUE,
+  name       TEXT,
+  source     TEXT    NOT NULL DEFAULT 'footer',   -- which form they used
+  status     TEXT    NOT NULL DEFAULT 'active',   -- active | removed
+  created_at TEXT    NOT NULL,
+  ip_hash    TEXT
+);
+
+CREATE INDEX IF NOT EXISTS idx_subscribers_created
+  ON subscribers (status, created_at DESC);
