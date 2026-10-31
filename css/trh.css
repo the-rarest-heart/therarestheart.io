@@ -203,6 +203,8 @@ a:hover { color: var(--crimson-deep); }
   transition: border-color 0.15s ease, transform 0.15s ease;
 }
 a.card:hover { border-color: var(--crimson); transform: translateY(-2px); color: inherit; }
+/* article.card is a card that is not a link yet - no hover lift, so it does
+   not promise a click it cannot honour. */
 
 .card__cap {
   padding: 13px 24px;
