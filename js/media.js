@@ -235,6 +235,11 @@ window.TRHMedia = (function () {
     box.hidden = true;
     root.appendChild(box);
 
+    // Hiding the box alone left its label — "Anything to show" — stranded on
+    // the form with nothing underneath it. Hide the whole field.
+    var field = root.closest ? root.closest('.field') : null;
+    if (field) field.hidden = true;
+
     // Ask the server what is allowed before offering a button. If there is
     // nowhere to put a file, say nothing rather than offering a dead button.
     fetch('/api/uploads', { headers: adminHeader(opts) })
@@ -247,6 +252,7 @@ window.TRHMedia = (function () {
             mb(limits.maxBytes) + ' goes up in parts.'
           : 'Images and documents, up to ' + mb(limits.maxBytes) + ' each, ' + max + ' per post.';
         box.hidden = false;
+        if (field) field.hidden = false;
       })
       .catch(function () { /* no upload box, and the form still works */ });
 
