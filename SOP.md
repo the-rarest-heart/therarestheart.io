@@ -62,6 +62,10 @@ can read an unfinished note by guessing the URL.
 
 ## Adding photos, video and documents
 
+> **Not live yet.** File storage has to be switched on in Cloudflare first, so
+> until then there is no **Add a file** box on any form and the rest of this
+> section waits. See *Media* in `COMMONS.md` for the three steps.
+
 Under the note, tap **Add a file**. On a phone that opens your camera roll and
 your Files app. Pick as many as you want, one after another — they upload as
 soon as you choose them, so by the time you tap Publish there is nothing left
@@ -290,8 +294,9 @@ down to refresh on a phone.
 **"The Commons database is not connected yet."** The site cannot reach the
 database. Not something you can fix from the admin screen.
 
-**"File storage is not connected yet."** Same thing for photos and video: the
-R2 bucket is not reachable. The rest of the site keeps working.
+**"File storage is not connected yet."** Photos and video have nowhere to go:
+the R2 bucket is not reachable. Expected until storage is switched on. The
+rest of the site keeps working either way.
 
 **A photo uploaded but the post would not go.** The file is kept for a day and
 then swept away. Nothing you need to clean up.
