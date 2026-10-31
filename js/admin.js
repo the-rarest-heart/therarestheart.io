@@ -92,12 +92,19 @@
                   .then(function () { say('Reply deleted.'); loadReplies(); load(); })
                   .catch(function (err) { say(err.message, true); });
               });
+              var replyFiles = filesPanel('reply', r.id);
+
               repliesBox.appendChild(el('div', { class: 'mod-row' }, [
                 el('div', { class: 'mod-row__main' }, [
                   el('strong', { text: r.author }),
                   el('p', { class: 'muted', text: r.body.slice(0, 160) + (r.body.length > 160 ? '\u2026' : '') }),
+                  replyFiles.box,
                 ]),
-                el('div', { class: 'mod-row__acts' }, [hide, del]),
+                el('div', { class: 'mod-row__acts' }, [
+                  button('Files', 'btn--ghost', replyFiles.toggle),
+                  hide,
+                  del,
+                ]),
               ]));
             });
           })
@@ -106,8 +113,11 @@
           });
       }
 
+      var threadFiles = filesPanel('thread', t.id);
+
       var acts = el('div', { class: 'mod-row__acts' }, [
         el('a', { class: 'btn btn--small btn--ghost', href: 'thread.html?id=' + t.id, text: 'Open' }),
+        button('Files', 'btn--ghost', threadFiles.toggle),
         t.replyCount ? button('Replies (' + t.replyCount + ')', 'btn--ghost', function () {
           var opening = repliesBox.hidden;
           repliesBox.hidden = !opening;
@@ -146,7 +156,7 @@
         acts,
       ]);
 
-      rows.appendChild(el('div', { class: 'stack stack--sm' }, [rowEl, repliesBox]));
+      rows.appendChild(el('div', { class: 'stack stack--sm' }, [rowEl, threadFiles.box, repliesBox]));
     });
   }
 
@@ -160,6 +170,88 @@
       });
   }
 
+  /* ── the files on a post ──────────────────────────────── */
+
+  /**
+   * One collapsible panel listing the media on a post, with a caption field,
+   * Hide and Delete on each. Threads, replies and notes all use it, so a photo
+   * is moderated the same way wherever it was posted.
+   */
+  function filesPanel(kind, id, onChange) {
+    var box = el('div', { class: 'stack stack--sm' });
+    box.hidden = true;
+
+    function load() {
+      box.innerHTML = '';
+      api('/admin/attachments?kind=' + kind + '&id=' + id)
+        .then(function (data) {
+          if (!data.attachments.length) {
+            box.appendChild(el('p', { class: 'muted', text: 'No files on this one.' }));
+            return;
+          }
+
+          data.attachments.forEach(function (a) {
+            var caption = el('input', {
+              type: 'text',
+              class: 'input input--small',
+              placeholder: 'Caption (optional)',
+              value: a.caption || '',
+              maxlength: '300',
+            });
+
+            var save = button('Save caption', 'btn--ghost', function () {
+              api('/admin/attachments/' + a.id, {
+                method: 'PATCH',
+                body: JSON.stringify({ caption: caption.value }),
+              })
+                .then(function () { say('Caption saved.'); })
+                .catch(function (err) { say(err.message, true); });
+            });
+
+            var hide = button(a.status === 'hidden' ? 'Unhide' : 'Hide', 'btn--ghost', function () {
+              api('/admin/attachments/' + a.id, {
+                method: 'PATCH',
+                body: JSON.stringify({ status: a.status === 'hidden' ? 'visible' : 'hidden' }),
+              })
+                .then(function () { say(a.status === 'hidden' ? 'File is visible again.' : 'File hidden.'); load(); })
+                .catch(function (err) { say(err.message, true); });
+            });
+
+            var del = button('Delete', 'btn--danger', function () {
+              if (!window.confirm('Delete ' + a.filename + '? The file itself goes too, and that cannot be undone.')) return;
+              api('/admin/attachments/' + a.id, { method: 'DELETE' })
+                .then(function () { say('File deleted.'); load(); if (onChange) onChange(); })
+                .catch(function (err) { say(err.message, true); });
+            });
+
+            box.appendChild(el('div', { class: 'mod-row', 'data-hidden': a.status === 'hidden' ? 'true' : 'false' }, [
+              el('div', { class: 'mod-row__main' }, [
+                el('strong', { text: a.filename }),
+                el('p', { class: 'muted', text: a.media + ' · ' + window.TRHMedia.size(a.bytes) + ' · ' + a.status }),
+                caption,
+              ]),
+              el('div', { class: 'mod-row__acts' }, [
+                el('a', { class: 'btn btn--small btn--ghost', href: a.url, target: '_blank', rel: 'noopener', text: 'View' }),
+                save, hide, del,
+              ]),
+            ]));
+          });
+        })
+        .catch(function (err) {
+          box.appendChild(el('p', { class: 'muted form-error', text: err.message }));
+        });
+    }
+
+    return {
+      box: box,
+      toggle: function () {
+        var opening = box.hidden;
+        box.hidden = !opening;
+        if (opening) load();
+      },
+    };
+  }
+
   /* ── field notes ──────────────────────────────────────── */
 
   var noteForm = document.querySelector('[data-note-form]');
@@ -168,6 +260,8 @@
   var noteMode = document.querySelector('[data-note-mode]');
   var buildField = document.querySelector('[data-build-state]');
   var cancelBtn = document.querySelector('[data-note-cancel]');
+  var noteUpload = document.querySelector('[data-note-upload]');
+  var notePicker = null;
   var editingId = null;
 
   function tellNote(message, bad) {
@@ -184,6 +278,7 @@
   function resetNoteForm() {
     editingId = null;
     noteForm.reset();
+    if (notePicker) notePicker.reset();
     toggleBuildField();
     if (noteMode) noteMode.textContent = 'Write a note';
     if (cancelBtn) cancelBtn.hidden = true;
@@ -191,7 +286,7 @@
   }
 
   function noteBody(status) {
-    return {
+    var payload = {
       kind: noteForm.kind.value,
       title: noteForm.title.value,
       summary: noteForm.summary.value,
@@ -199,6 +294,10 @@
       buildState: noteForm.kind.value === 'build' ? noteForm.buildState.value : '',
       status: status,
     };
+    // Files uploaded in this editing session; the ones already on the note are
+    // managed from its row below, where they can be captioned or taken off.
+    if (notePicker) Object.assign(payload, notePicker.payload());
+    return payload;
   }
 
   function saveNote(status) {
@@ -254,6 +353,7 @@
                 .then(function () { tellNote(live ? 'Back to draft.' : 'Published.'); loadNotes(); })
                 .catch(function (err) { tellNote(err.message, true); });
             }),
+            button('Files', 'btn--ghost', function () { noteFiles.toggle(); }),
             button('Edit', 'btn--ghost', function () { editNote(n); }),
             button('Delete', 'btn--danger', function () {
               if (!window.confirm('Delete "' + n.title + '"? This cannot be undone.')) return;
@@ -263,12 +363,17 @@
             }),
           ]);
 
-          noteRows.appendChild(el('div', { class: 'mod-row', 'data-hidden': live ? 'false' : 'true' }, [
-            el('div', { class: 'mod-row__main' }, [
-              el('strong', { text: n.title }),
-              el('p', { class: 'muted', text: meta.join(' \u00b7 ') }),
+          var noteFiles = filesPanel('note', n.id);
+
+          noteRows.appendChild(el('div', { class: 'stack stack--sm' }, [
+            el('div', { class: 'mod-row', 'data-hidden': live ? 'false' : 'true' }, [
+              el('div', { class: 'mod-row__main' }, [
+                el('strong', { text: n.title }),
+                el('p', { class: 'muted', text: meta.join(' \u00b7 ') }),
+              ]),
+              acts,
             ]),
-            acts,
+            noteFiles.box,
           ]));
         });
       })
@@ -333,7 +438,18 @@
     });
   }
 
-  function unlock() { gate.hidden = true; panel.hidden = false; load(); loadNotes(); loadSubscribers(); }
+  function unlock() {
+    gate.hidden = true;
+    panel.hidden = false;
+    // Built here, not at page load: the box asks the server what it may send,
+    // and before you unlock there is no token to ask with.
+    if (noteUpload && !notePicker) {
+      notePicker = window.TRHMedia.picker(noteUpload, { admin: true, token: token });
+    }
+    load();
+    loadNotes();
+    loadSubscribers();
+  }
 
   function lock() {
     try { sessionStorage.removeItem(KEY); } catch (e) { /* ignore */ }

@@ -29,3 +29,6 @@ trh-agents/logs/
 
 # Your admin token, written locally for you to move into a password manager
 admin-token.txt
+
+# Local dev state
+.wrangler/

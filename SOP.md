@@ -60,6 +60,43 @@ can read an unfinished note by guessing the URL.
 
 ---
 
+## Adding photos, video and documents
+
+Under the note, tap **Add a file**. On a phone that opens your camera roll and
+your Files app. Pick as many as you want, one after another — they upload as
+soon as you choose them, so by the time you tap Publish there is nothing left
+to wait for.
+
+**What it takes:** photos (JPG, PNG, HEIC, WebP, GIF), video (MP4, MOV, WebM),
+audio (MP3, M4A, WAV), PDFs, and Word, Excel and PowerPoint files. A long
+video goes up in pieces on its own; you will see the percentage climb.
+
+**Caption each one** in the box beside it. The caption shows under a photo or
+video; on a document it becomes the name people see, so "Retention policy,
+draft" reads better than `policy-v3-FINAL-2.docx`.
+
+**Up and Down** put them in the order you want.
+
+### Putting a photo in the middle of the note
+
+By default files sit at the end. To place one, put a line of its own in the
+note body:
+
+```
+[media:1]
+```
+
+`[media:1]` is the first file in the list, `[media:2]` the second, and so on.
+Anything you don't place that way still sits at the end, so nothing gets lost
+if you miscount.
+
+### Files on a note you already published
+
+The box in the editor only adds new files. To caption, hide or delete the
+ones already on a note, find it under **Your notes** and tap **Files**.
+
+---
+
 ## Editing a note
 
 1. Find it under **Your notes**
@@ -87,6 +124,22 @@ permanently. There is no undo and no copy, unless you happen to have run a
 backup since you wrote it.
 
 **Unpublish first. Delete only when you are certain.**
+
+Deleting a note deletes its photos and video with it.
+
+---
+
+## Deleting one file
+
+Find the note under **Your notes**, tap **Files**, then on the file you want:
+
+- **Hide** takes it off the page and stops the link working. The file is still
+  stored, and **Unhide** puts it back.
+- **Delete** removes the file itself. There is no undo — a backup of the
+  database will not bring it back, because the database only ever held the
+  index, never the picture.
+
+**Hide first.** Delete when you are sure.
 
 ---
 
@@ -174,6 +227,23 @@ hidden is still stored.
 
 ---
 
+## Files on a thread or a reply
+
+Anyone can attach **images and documents** — up to 15 MB each, four per post.
+Video is deliberately off for visitors: it costs storage and invites what
+nobody wants to spend their evening moderating. You can post video yourself,
+because the admin token lifts the limits.
+
+To moderate what someone attached, open the thread's row and tap **Files**, or
+**Replies** and then **Files** on the reply. The same Hide and Delete, with
+the same meanings as above.
+
+Hiding a whole thread hides its photos too — the links stop working for
+everyone but you. Deleting a thread deletes every file on it and on all its
+replies.
+
+---
+
 # THE SIGNUP LIST
 
 On `/admin`, under **The list**:
@@ -201,6 +271,14 @@ npx wrangler d1 export trh-commons --remote --output=commons-backup.sql
 Run it from the project folder on your Mac. Keep the file somewhere that is
 not Cloudflare.
 
+**That backs up the writing, not the files.** Photos and video live in R2, a
+separate store, and the export above does not touch them. To pull those down
+too:
+
+```bash
+npx wrangler r2 object get trh-media --remote --recursive --output-dir=./media-backup
+```
+
 ---
 
 # WHEN SOMETHING LOOKS WRONG
@@ -211,6 +289,12 @@ down to refresh on a phone.
 
 **"The Commons database is not connected yet."** The site cannot reach the
 database. Not something you can fix from the admin screen.
+
+**"File storage is not connected yet."** Same thing for photos and video: the
+R2 bucket is not reachable. The rest of the site keeps working.
+
+**A photo uploaded but the post would not go.** The file is kept for a day and
+then swept away. Nothing you need to clean up.
 
 **"Not authorised" after it was working.** The tab's session ended. Paste the
 token again.

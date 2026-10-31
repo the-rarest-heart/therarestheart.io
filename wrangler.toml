@@ -14,3 +14,10 @@ compatibility_date = "2026-10-01"
 binding = "DB"
 database_name = "trh-commons"
 database_id = "008751ed-6e40-4354-aa04-e1bd2caf8367"
+
+# Images, video and documents attached to notes and threads. The index lives
+# in D1; the bytes live here. Create it once with:
+#   wrangler r2 bucket create trh-media
+[[r2_buckets]]
+binding = "MEDIA"
+bucket_name = "trh-media"

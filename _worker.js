@@ -13,6 +13,15 @@
  *   GET    /api/notes?kind=write
  *   GET    /api/notes/:slug
  *
+ *   Media — the bytes live in R2, the index lives in D1:
+ *   GET    /api/uploads                        what may be sent, and whether
+ *   POST   /api/uploads?name=photo.jpg          one file, one request
+ *   POST   /api/uploads/multipart?name=clip.mp4 big files, in parts (yours only)
+ *   PUT    /api/uploads/multipart?key=&uploadId=&part=
+ *   POST   /api/uploads/multipart/complete
+ *   DELETE /api/uploads/multipart?key=&uploadId=
+ *   GET    /api/files/:id/:filename             serves it, Range and all
+ *
  *   Moderation — all require the X-Admin-Token header:
  *   GET    /api/admin/threads?room=&status=      includes hidden rows
  *   GET    /api/admin/subscribers?format=csv
@@ -22,6 +31,9 @@
  *   DELETE /api/admin/threads/:id
  *   PATCH  /api/admin/replies/:id                { status, body }
  *   DELETE /api/admin/replies/:id
+ *   GET    /api/admin/attachments?kind=thread&id=7
+ *   PATCH  /api/admin/attachments/:id            { status, caption, sort }
+ *   DELETE /api/admin/attachments/:id
  */
 
 const ROOMS = [
@@ -80,15 +92,21 @@ async function hashIp(request, salt) {
   return [...new Uint8Array(digest)].slice(0, 12).map((b) => b.toString(16).padStart(2, '0')).join('');
 }
 
-/** True when this poster is over the hourly cap. */
-async function overLimit(db, ipHash) {
+/**
+ * True when this poster is over the hourly cap.
+ *
+ * Uploads are counted separately from posts: attaching four photos must not
+ * use up the allowance for the thread they are going on.
+ */
+async function overLimit(db, ipHash, cap) {
+  const ceiling = cap || LIMITS.postsPerHour;
   const windowStart = now().slice(0, 13); // YYYY-MM-DDTHH
   const row = await db
     .prepare('SELECT count FROM rate_limit WHERE ip_hash = ? AND window_start = ?')
     .bind(ipHash, windowStart)
     .first();
 
-  if (row && row.count >= LIMITS.postsPerHour) return true;
+  if (row && row.count >= ceiling) return true;
 
   await db
     .prepare(
@@ -149,7 +167,15 @@ async function getThread(db, id) {
     .bind(id)
     .all();
 
-  return json({ thread: publicThread(thread), replies: results.map(publicReply) });
+  const [own, byReply] = await Promise.all([
+    attachmentsFor(db, 'thread', id),
+    attachmentsForReplies(db, id),
+  ]);
+
+  return json({
+    thread: Object.assign(publicThread(thread), { attachments: own.map(publicAttachment) }),
+    replies: results.map((r) => Object.assign(publicReply(r), { attachments: byReply[r.id] || [] })),
+  });
 }
 
 async function createThread(db, request, env) {
@@ -183,7 +209,10 @@ async function createThread(db, request, env) {
     .bind(room, title, body, author, email || null, payload.newHere ? 1 : 0, stamp, stamp, ipHash)
     .run();
 
-  return json({ ok: true, id: res.meta.last_row_id }, 201);
+  const id = res.meta.last_row_id;
+  await claimAttachments(db, payload, 'thread', id, authorised(request, env));
+
+  return json({ ok: true, id }, 201);
 }
 
 async function createReply(db, request, env, threadId) {
@@ -214,6 +243,8 @@ async function createReply(db, request, env, threadId) {
     )
     .bind(threadId, body, author, email || null, stamp, ipHash)
     .run();
+
+  await claimAttachments(db, payload, 'reply', res.meta.last_row_id, authorised(request, env));
 
   await db
     .prepare('UPDATE threads SET reply_count = reply_count + 1, updated_at = ? WHERE id = ?')
@@ -314,7 +345,9 @@ async function listNotes(db, url) {
 async function getNote(db, slug) {
   const note = await db.prepare('SELECT * FROM notes WHERE slug = ?').bind(slug).first();
   if (!note || note.status !== 'published') return fail(404, 'No such note.');
-  return json({ note: publicNote(note) });
+
+  const files = await attachmentsFor(db, 'note', note.id);
+  return json({ note: Object.assign(publicNote(note), { attachments: files.map(publicAttachment) }) });
 }
 
 function readNoteFields(payload) {
@@ -356,7 +389,10 @@ async function adminCreateNote(db, request) {
           readMinutes(f.body), stamp, stamp, status === 'published' ? stamp : null)
     .run();
 
-  return json({ ok: true, id: res.meta.last_row_id, slug }, 201);
+  const id = res.meta.last_row_id;
+  await claimAttachments(db, payload, 'note', id, true);
+
+  return json({ ok: true, id, slug }, 201);
 }
 
 async function adminPatchNote(db, request, id) {
@@ -394,12 +430,16 @@ async function adminPatchNote(db, request, id) {
           readMinutes(f.body), stamp, status === 'published' ? stamp : null, id)
     .run();
 
+  await claimAttachments(db, payload, 'note', id, true);
+
   return json({ ok: true, slug });
 }
 
-async function adminDeleteNote(db, id) {
+async function adminDeleteNote(db, env, id) {
   const res = await db.prepare('DELETE FROM notes WHERE id = ?').bind(id).run();
   if (!res.meta.changes) return fail(404, 'No such note.');
+
+  await purgeAttachments(db, env.MEDIA, 'note', id);
   return json({ ok: true });
 }
 
@@ -454,7 +494,10 @@ async function adminPatchThread(db, request, id) {
   return json({ ok: true });
 }
 
-async function adminDeleteThread(db, id) {
+async function adminDeleteThread(db, env, id) {
+  // Collect the media before the rows it hangs off are gone.
+  await purgeThreadAttachments(db, env.MEDIA, id);
+
   await db.prepare('DELETE FROM replies WHERE thread_id = ?').bind(id).run();
   const res = await db.prepare('DELETE FROM threads WHERE id = ?').bind(id).run();
   if (!res.meta.changes) return fail(404, 'No such thread.');
@@ -501,10 +544,11 @@ async function adminPatchReply(db, request, id) {
   return json({ ok: true });
 }
 
-async function adminDeleteReply(db, id) {
+async function adminDeleteReply(db, env, id) {
   const reply = await db.prepare('SELECT thread_id, status FROM replies WHERE id = ?').bind(id).first();
   if (!reply) return fail(404, 'No such reply.');
 
+  await purgeAttachments(db, env.MEDIA, 'reply', id);
   await db.prepare('DELETE FROM replies WHERE id = ?').bind(id).run();
 
   // A hidden reply was already taken off the count when it was hidden.
@@ -544,6 +588,603 @@ async function adminListSubscribers(db, url) {
   return json({ subscribers: results, count: results.length });
 }
 
+/* ── attachments ─────────────────────────────────────────── */
+
+/**
+ * The only file types this site will store or serve. The browser's own
+ * content-type is never trusted; the extension decides, and these values are
+ * what we send back. SVG and anything executable are deliberately absent —
+ * they would run as code on our own origin.
+ */
+const MEDIA_TYPES = {
+  jpg:  ['image/jpeg', 'image'],
+  jpeg: ['image/jpeg', 'image'],
+  png:  ['image/png', 'image'],
+  gif:  ['image/gif', 'image'],
+  webp: ['image/webp', 'image'],
+  avif: ['image/avif', 'image'],
+  heic: ['image/heic', 'image'],
+  mp4:  ['video/mp4', 'video'],
+  m4v:  ['video/mp4', 'video'],
+  webm: ['video/webm', 'video'],
+  mov:  ['video/quicktime', 'video'],
+  mp3:  ['audio/mpeg', 'audio'],
+  m4a:  ['audio/mp4', 'audio'],
+  wav:  ['audio/wav', 'audio'],
+  pdf:  ['application/pdf', 'doc'],
+  doc:  ['application/msword', 'doc'],
+  docx: ['application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'doc'],
+  xls:  ['application/vnd.ms-excel', 'doc'],
+  xlsx: ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'doc'],
+  ppt:  ['application/vnd.ms-powerpoint', 'doc'],
+  pptx: ['application/vnd.openxmlformats-officedocument.presentationml.presentation', 'doc'],
+  csv:  ['text/csv', 'doc'],
+  txt:  ['text/plain', 'doc'],
+  md:   ['text/markdown', 'doc'],
+};
+
+const UPLOADS = {
+  // What a visitor to the Commons may attach. Video is left off on purpose:
+  // anonymous video costs storage and invites what nobody wants to moderate.
+  // Widen this list when the room is worth the risk.
+  publicMedia: ['image', 'doc'],
+  publicMaxBytes: 15 * 1024 * 1024,
+  publicPerPost: 4,
+  // Counted apart from posts, and set high enough that four photos on each of
+  // six posts never trips it.
+  publicPerHour: 30,
+  // Yours. 95 MB is the ceiling Cloudflare puts on a single request body;
+  // bigger files go up in parts instead, which has no practical ceiling.
+  adminMaxBytes: 95 * 1024 * 1024,
+  adminPerPost: 16,
+  partBytes: 32 * 1024 * 1024,
+  caption: 300,
+  // Unclaimed uploads are swept after this long. Someone who starts a post,
+  // attaches a photo and wanders off should not leave bytes behind forever.
+  orphanHours: 24,
+};
+
+const OWNER_KINDS = ['note', 'thread', 'reply'];
+
+function extensionOf(filename) {
+  const m = /\.([A-Za-z0-9]{1,5})$/.exec(filename || '');
+  return m ? m[1].toLowerCase() : '';
+}
+
+/** Keep the name readable, keep it safe to put in a URL or a download header. */
+function safeFilename(filename) {
+  const name = String(filename || '')
+    .replace(/[\\/]/g, '-')
+    .replace(/[\u0000-\u001f\u007f"]/g, '')
+    .trim()
+    .slice(0, 120);
+  return name || 'file';
+}
+
+function publicAttachment(a) {
+  return {
+    id: a.id,
+    media: a.media,
+    filename: a.filename,
+    contentType: a.content_type,
+    bytes: a.bytes,
+    caption: a.caption || '',
+    url: '/api/files/' + a.id + '/' + encodeURIComponent(a.filename),
+  };
+}
+
+/** Attachments for one post, in the order they were arranged. */
+async function attachmentsFor(db, kind, id, includeHidden) {
+  const where = includeHidden ? '' : " AND status = 'visible'";
+  const { results } = await db
+    .prepare(
+      `SELECT * FROM attachments WHERE owner_kind = ? AND owner_id = ?${where}
+       ORDER BY sort ASC, id ASC`
+    )
+    .bind(kind, id)
+    .all();
+  return results;
+}
+
+/** The same, for every reply in a thread, as a map of reply id to list. */
+async function attachmentsForReplies(db, threadId) {
+  const { results } = await db
+    .prepare(
+      `SELECT a.* FROM attachments a
+       JOIN replies r ON r.id = a.owner_id
+       WHERE a.owner_kind = 'reply' AND a.status = 'visible' AND r.thread_id = ?
+       ORDER BY a.sort ASC, a.id ASC`
+    )
+    .bind(threadId)
+    .all();
+
+  const byReply = {};
+  results.forEach((a) => {
+    (byReply[a.owner_id] = byReply[a.owner_id] || []).push(publicAttachment(a));
+  });
+  return byReply;
+}
+
+/**
+ * Hand the uploads this poster just made to the post they belong to. Only
+ * rows still unclaimed and carrying the same session id can be taken, so one
+ * person's upload can never be hung off another person's post.
+ */
+async function claimAttachments(db, payload, kind, ownerId, isAdmin) {
+  const ids = Array.isArray(payload.attachments) ? payload.attachments : [];
+  const session = clean(payload.uploadSession, 80);
+  if (!ids.length || !session) return 0;
+
+  const max = isAdmin ? UPLOADS.adminPerPost : UPLOADS.publicPerPost;
+  const wanted = ids.map(Number).filter((n) => Number.isInteger(n) && n > 0).slice(0, max);
+  if (!wanted.length) return 0;
+
+  const holes = wanted.map(() => '?').join(',');
+  const { results } = await db
+    .prepare(
+      `SELECT id, media FROM attachments
+       WHERE id IN (${holes}) AND session_id = ? AND owner_kind = 'orphan'`
+    )
+    .bind(...wanted, session)
+    .all();
+
+  const allowed = new Set(
+    results
+      .filter((a) => isAdmin || UPLOADS.publicMedia.includes(a.media))
+      .map((a) => a.id)
+  );
+
+  // Keep the order the poster arranged them in, not the order they uploaded.
+  const ordered = wanted.filter((id) => allowed.has(id));
+  if (!ordered.length) return 0;
+
+  // Captions ride along with the post, so they are saved in the same breath
+  // and a visitor with no admin token can still caption a photo.
+  const captions = {};
+  (Array.isArray(payload.captions) ? payload.captions : []).forEach((c) => {
+    if (c && Number.isInteger(Number(c.id))) {
+      captions[Number(c.id)] = clean(c.caption, UPLOADS.caption);
+    }
+  });
+
+  await db.batch(
+    ordered.map((id, i) =>
+      db
+        .prepare(
+          `UPDATE attachments SET owner_kind = ?, owner_id = ?, sort = ?, caption = ?
+           WHERE id = ? AND session_id = ? AND owner_kind = 'orphan'`
+        )
+        .bind(kind, ownerId, i, captions[id] || '', id, session)
+    )
+  );
+
+  return ordered.length;
+}
+
+/** Drop the rows and the bytes together. Used when a post is deleted. */
+async function purgeAttachments(db, bucket, kind, ownerId) {
+  const rows = await attachmentsFor(db, kind, ownerId, true);
+  if (!rows.length) return;
+
+  if (bucket) {
+    try {
+      await bucket.delete(rows.map((r) => r.r2_key));
+    } catch (err) {
+      // A missing object must not block the delete the moderator asked for.
+      console.error('r2 delete failed', err && err.message);
+    }
+  }
+
+  await db
+    .prepare('DELETE FROM attachments WHERE owner_kind = ? AND owner_id = ?')
+    .bind(kind, ownerId)
+    .run();
+}
+
+/** Every reply's attachments in one go, before the replies themselves go. */
+async function purgeThreadAttachments(db, bucket, threadId) {
+  const { results } = await db
+    .prepare(
+      `SELECT a.id, a.r2_key FROM attachments a
+       JOIN replies r ON r.id = a.owner_id
+       WHERE a.owner_kind = 'reply' AND r.thread_id = ?`
+    )
+    .bind(threadId)
+    .all();
+
+  if (results.length) {
+    if (bucket) {
+      try { await bucket.delete(results.map((r) => r.r2_key)); }
+      catch (err) { console.error('r2 delete failed', err && err.message); }
+    }
+    await db
+      .prepare(`DELETE FROM attachments WHERE id IN (${results.map(() => '?').join(',')})`)
+      .bind(...results.map((r) => r.id))
+      .run();
+  }
+
+  await purgeAttachments(db, bucket, 'thread', threadId);
+}
+
+/**
+ * Sweep uploads nobody ever attached to anything. Cheap enough to run on every
+ * upload, and it has to be awaited: a promise left dangling after the response
+ * is returned gets cancelled, so a fire-and-forget sweep never ran at all.
+ */
+async function sweepOrphans(db, bucket) {
+  const cutoff = new Date(Date.now() - UPLOADS.orphanHours * 3600 * 1000).toISOString();
+  const { results } = await db
+    .prepare("SELECT id, r2_key FROM attachments WHERE owner_kind = 'orphan' AND created_at < ? LIMIT 100")
+    .bind(cutoff)
+    .all();
+
+  if (!results.length) return;
+
+  if (bucket) {
+    try { await bucket.delete(results.map((r) => r.r2_key)); }
+    catch (err) { console.error('r2 sweep failed', err && err.message); }
+  }
+
+  await db
+    .prepare(`DELETE FROM attachments WHERE id IN (${results.map(() => '?').join(',')})`)
+    .bind(...results.map((r) => r.id))
+    .run();
+}
+
+/** What an upload request is asking for, or why we are turning it down. */
+function readUploadIntent(url, request, isAdmin) {
+  const bucketMissing = 'File storage is not connected yet.';
+  const filename = safeFilename(url.searchParams.get('name'));
+  const ext = extensionOf(filename);
+  const type = MEDIA_TYPES[ext];
+
+  if (!type) {
+    return { error: ext
+      ? '.' + ext + ' files are not accepted. Images, video, audio, PDFs and Office documents are.'
+      : 'That file has no extension, so there is no telling what it is.' };
+  }
+
+  const [contentType, media] = type;
+  if (!isAdmin && !UPLOADS.publicMedia.includes(media)) {
+    return { error: media === 'video'
+      ? 'Video cannot be posted to the Commons. An image or a document can.'
+      : 'That kind of file cannot be posted here.' };
+  }
+
+  const session = clean(request.headers.get('x-upload-session'), 80);
+  if (session.length < 8) return { error: 'This upload is missing its session. Reload the page and try again.' };
+
+  return { filename, ext, contentType, media, session, bucketMissing };
+}
+
+function uploadKey(session, ext) {
+  return 'up/' + session.replace(/[^A-Za-z0-9-]/g, '').slice(0, 40) + '/' +
+    crypto.randomUUID() + '.' + ext;
+}
+
+/**
+ * What the upload box needs to know before it draws itself: whether there is
+ * anywhere to put a file at all, and what this visitor is allowed to send.
+ * Without this the button would sit there live but dead until R2 is switched
+ * on in the dashboard.
+ */
+function uploadLimits(env, request) {
+  const isAdmin = authorised(request, env);
+  return json({
+    enabled: Boolean(env.MEDIA),
+    admin: isAdmin,
+    media: isAdmin ? ['image', 'video', 'audio', 'doc'] : UPLOADS.publicMedia,
+    maxBytes: isAdmin ? UPLOADS.adminMaxBytes : UPLOADS.publicMaxBytes,
+    perPost: isAdmin ? UPLOADS.adminPerPost : UPLOADS.publicPerPost,
+    parts: isAdmin,
+  });
+}
+
+/** One request, one file. Everything a phone camera photo needs. */
+async function putUpload(db, env, request, url) {
+  const bucket = env.MEDIA;
+  if (!bucket) return fail(503, 'File storage is not connected yet.');
+
+  const isAdmin = authorised(request, env);
+  const intent = readUploadIntent(url, request, isAdmin);
+  if (intent.error) return fail(400, intent.error);
+
+  const declared = Number(request.headers.get('content-length') || 0);
+  const cap = isAdmin ? UPLOADS.adminMaxBytes : UPLOADS.publicMaxBytes;
+
+  if (!declared) return fail(411, 'That upload did not say how big it is.');
+  if (declared > cap) {
+    return fail(413, isAdmin
+      ? 'Over ' + mb(cap) + ' has to go up in parts. The upload box does that for you.'
+      : 'That file is ' + mb(declared) + '. The limit here is ' + mb(cap) + '.');
+  }
+
+  const ipHash = await hashIp(request, env.IP_SALT);
+  if (!isAdmin && (await overLimit(db, 'up:' + ipHash, UPLOADS.publicPerHour))) {
+    return fail(429, 'That is a lot of uploading in one hour. Try again later.');
+  }
+
+  const key = uploadKey(intent.session, intent.ext);
+  await bucket.put(key, request.body, {
+    httpMetadata: { contentType: intent.contentType },
+  });
+
+  const row = await insertAttachment(db, {
+    key,
+    session: intent.session,
+    filename: intent.filename,
+    contentType: intent.contentType,
+    media: intent.media,
+    bytes: declared,
+    ipHash,
+  });
+
+  try { await sweepOrphans(db, bucket); }
+  catch (err) { console.error('sweep failed', err && err.message); }
+
+  return json({ ok: true, attachment: publicAttachment(row) }, 201);
+}
+
+async function insertAttachment(db, f) {
+  const res = await db
+    .prepare(
+      `INSERT INTO attachments
+         (r2_key, owner_kind, session_id, filename, content_type, media, bytes, created_at, ip_hash)
+       VALUES (?, 'orphan', ?, ?, ?, ?, ?, ?, ?)`
+    )
+    .bind(f.key, f.session, f.filename, f.contentType, f.media, f.bytes, now(), f.ipHash)
+    .run();
+
+  return {
+    id: res.meta.last_row_id,
+    media: f.media,
+    filename: f.filename,
+    content_type: f.contentType,
+    bytes: f.bytes,
+    caption: '',
+  };
+}
+
+const mb = (bytes) => Math.round(bytes / (1024 * 1024)) + ' MB';
+
+/* Big files, in parts. Yours only — a visitor has no need of it. */
+
+async function startMultipart(db, env, request, url) {
+  const bucket = env.MEDIA;
+  if (!bucket) return fail(503, 'File storage is not connected yet.');
+
+  const intent = readUploadIntent(url, request, true);
+  if (intent.error) return fail(400, intent.error);
+
+  const key = uploadKey(intent.session, intent.ext);
+  const upload = await bucket.createMultipartUpload(key, {
+    httpMetadata: { contentType: intent.contentType },
+  });
+
+  return json({ ok: true, key, uploadId: upload.uploadId, partBytes: UPLOADS.partBytes });
+}
+
+async function putPart(env, request, url) {
+  const bucket = env.MEDIA;
+  if (!bucket) return fail(503, 'File storage is not connected yet.');
+
+  const key = url.searchParams.get('key') || '';
+  const uploadId = url.searchParams.get('uploadId') || '';
+  const part = Number(url.searchParams.get('part') || 0);
+  const session = clean(request.headers.get('x-upload-session'), 80);
+
+  if (!key.startsWith('up/' + session.replace(/[^A-Za-z0-9-]/g, '').slice(0, 40) + '/')) {
+    return fail(403, 'That upload belongs to another session.');
+  }
+  if (!uploadId || !Number.isInteger(part) || part < 1 || part > 10000) {
+    return fail(400, 'That part number makes no sense.');
+  }
+
+  const upload = bucket.resumeMultipartUpload(key, uploadId);
+  const uploaded = await upload.uploadPart(part, request.body);
+  return json({ ok: true, partNumber: uploaded.partNumber, etag: uploaded.etag });
+}
+
+async function finishMultipart(db, env, request) {
+  const bucket = env.MEDIA;
+  if (!bucket) return fail(503, 'File storage is not connected yet.');
+
+  let payload;
+  try { payload = await request.json(); } catch (e) { return fail(400, 'Expected JSON.'); }
+
+  const key = String(payload.key || '');
+  const uploadId = String(payload.uploadId || '');
+  const session = clean(request.headers.get('x-upload-session'), 80);
+  const filename = safeFilename(payload.name);
+  const ext = extensionOf(filename);
+  const type = MEDIA_TYPES[ext];
+  const parts = Array.isArray(payload.parts) ? payload.parts : [];
+
+  if (!type) return fail(400, 'That file type is not accepted.');
+  if (!key.startsWith('up/' + session.replace(/[^A-Za-z0-9-]/g, '').slice(0, 40) + '/')) {
+    return fail(403, 'That upload belongs to another session.');
+  }
+  if (!uploadId || !parts.length) return fail(400, 'There is nothing to finish.');
+
+  const upload = bucket.resumeMultipartUpload(key, uploadId);
+  const object = await upload.complete(
+    parts.map((p) => ({ partNumber: Number(p.partNumber), etag: String(p.etag) }))
+  );
+
+  const row = await insertAttachment(db, {
+    key,
+    session,
+    filename,
+    contentType: type[0],
+    media: type[1],
+    bytes: object.size,
+    ipHash: await hashIp(request, env.IP_SALT),
+  });
+
+  try { await sweepOrphans(db, bucket); }
+  catch (err) { console.error('sweep failed', err && err.message); }
+
+  return json({ ok: true, attachment: publicAttachment(row) }, 201);
+}
+
+async function abortMultipart(env, request, url) {
+  const bucket = env.MEDIA;
+  if (!bucket) return fail(503, 'File storage is not connected yet.');
+
+  const key = url.searchParams.get('key') || '';
+  const uploadId = url.searchParams.get('uploadId') || '';
+  const session = clean(request.headers.get('x-upload-session'), 80);
+
+  if (!key.startsWith('up/' + session.replace(/[^A-Za-z0-9-]/g, '').slice(0, 40) + '/')) {
+    return fail(403, 'That upload belongs to another session.');
+  }
+
+  try { await bucket.resumeMultipartUpload(key, uploadId).abort(); }
+  catch (err) { /* already gone is the outcome we wanted */ }
+
+  return json({ ok: true });
+}
+
+/* Serving the bytes back out. */
+
+/** A hidden post must take its media with it, or the URLs stay live. */
+async function attachmentIsPublic(db, row) {
+  if (row.status !== 'visible') return false;
+
+  if (row.owner_kind === 'note') {
+    const n = await db.prepare('SELECT status FROM notes WHERE id = ?').bind(row.owner_id).first();
+    return !!n && n.status === 'published';
+  }
+  if (row.owner_kind === 'thread') {
+    const t = await db.prepare('SELECT status FROM threads WHERE id = ?').bind(row.owner_id).first();
+    return !!t && t.status !== 'hidden';
+  }
+  if (row.owner_kind === 'reply') {
+    const r = await db
+      .prepare(
+        `SELECT r.status AS rs, t.status AS ts FROM replies r
+         JOIN threads t ON t.id = r.thread_id WHERE r.id = ?`
+      )
+      .bind(row.owner_id)
+      .first();
+    return !!r && r.rs === 'visible' && r.ts !== 'hidden';
+  }
+
+  // An orphan is a draft. Only you can see it, and only until the sweep.
+  return false;
+}
+
+async function serveFile(db, env, request, id) {
+  const bucket = env.MEDIA;
+  if (!bucket) return fail(503, 'File storage is not connected yet.');
+
+  const row = await db.prepare('SELECT * FROM attachments WHERE id = ?').bind(id).first();
+  if (!row) return fail(404, 'No such file.');
+
+  if (!(await attachmentIsPublic(db, row)) && !authorised(request, env)) {
+    return fail(404, 'No such file.');
+  }
+
+  const headers = new Headers({
+    'content-type': row.content_type,
+    'cache-control': 'public, max-age=31536000, immutable',
+    'accept-ranges': 'bytes',
+    'x-content-type-options': 'nosniff',
+    // Images, video and audio play in the page. Everything else downloads,
+    // which is also what keeps a document from rendering on our own origin.
+    'content-disposition':
+      (row.media === 'doc' ? 'attachment' : 'inline') +
+      "; filename*=UTF-8''" + encodeURIComponent(row.filename),
+  });
+
+  if (request.method === 'HEAD') {
+    const head = await bucket.head(row.r2_key);
+    if (!head) return fail(404, 'No such file.');
+    headers.set('content-length', String(head.size));
+    headers.set('etag', head.httpEtag);
+    return new Response(null, { headers });
+  }
+
+  // R2 reads the Range header itself, which is what lets a video seek.
+  const object = await bucket.get(row.r2_key, {
+    range: request.headers,
+    onlyIf: request.headers,
+  });
+
+  if (!object) return fail(404, 'No such file.');
+  headers.set('etag', object.httpEtag);
+
+  if (!('body' in object)) return new Response(null, { status: 304, headers });
+
+  if (object.range && (object.range.offset || object.range.length !== object.size)) {
+    const start = object.range.offset || 0;
+    const length = object.range.length === undefined ? object.size - start : object.range.length;
+    headers.set('content-range', 'bytes ' + start + '-' + (start + length - 1) + '/' + object.size);
+    headers.set('content-length', String(length));
+    return new Response(object.body, { status: 206, headers });
+  }
+
+  headers.set('content-length', String(object.size));
+  return new Response(object.body, { headers });
+}
+
+/* Moderating one file at a time, same as a reply. */
+
+async function adminListAttachments(db, url) {
+  const kind = url.searchParams.get('kind') || '';
+  const ownerId = Number(url.searchParams.get('id') || 0);
+  if (!OWNER_KINDS.includes(kind) || !ownerId) return fail(400, 'Which post?');
+
+  const rows = await attachmentsFor(db, kind, ownerId, true);
+  return json({
+    attachments: rows.map((a) => Object.assign(publicAttachment(a), { status: a.status })),
+  });
+}
+
+async function adminPatchAttachment(db, request, id) {
+  let payload;
+  try { payload = await request.json(); } catch (e) { return fail(400, 'Expected JSON.'); }
+
+  const sets = [];
+  const binds = [];
+
+  if (typeof payload.status === 'string' && ['visible', 'hidden'].includes(payload.status)) {
+    sets.push('status = ?');
+    binds.push(payload.status);
+  }
+  if (typeof payload.caption === 'string') {
+    sets.push('caption = ?');
+    binds.push(clean(payload.caption, UPLOADS.caption));
+  }
+  if (Number.isInteger(payload.sort)) {
+    sets.push('sort = ?');
+    binds.push(payload.sort);
+  }
+
+  if (!sets.length) return fail(400, 'Nothing to change.');
+
+  const res = await db
+    .prepare(`UPDATE attachments SET ${sets.join(', ')} WHERE id = ?`)
+    .bind(...binds, id)
+    .run();
+
+  if (!res.meta.changes) return fail(404, 'No such file.');
+  return json({ ok: true });
+}
+
+async function adminDeleteAttachment(db, env, id) {
+  const row = await db.prepare('SELECT r2_key FROM attachments WHERE id = ?').bind(id).first();
+  if (!row) return fail(404, 'No such file.');
+
+  if (env.MEDIA) {
+    try { await env.MEDIA.delete(row.r2_key); }
+    catch (err) { console.error('r2 delete failed', err && err.message); }
+  }
+
+  await db.prepare('DELETE FROM attachments WHERE id = ?').bind(id).run();
+  return json({ ok: true });
+}
+
 /* ── router ──────────────────────────────────────────────── */
 
 async function api(request, env, url) {
@@ -558,6 +1199,28 @@ async function api(request, env, url) {
   if (path === '/api/subscribe' && method === 'POST') return subscribe(db, request, env);
 
   if (path === '/api/notes' && method === 'GET') return listNotes(db, url);
+
+  if (path === '/api/uploads') {
+    if (method === 'GET') return uploadLimits(env, request);
+    if (method === 'POST') return putUpload(db, env, request, url);
+    return fail(405, 'Method not allowed.');
+  }
+
+  if (path === '/api/uploads/multipart') {
+    if (!authorised(request, env)) return fail(401, 'Not authorised.');
+    if (method === 'POST') return startMultipart(db, env, request, url);
+    if (method === 'PUT') return putPart(env, request, url);
+    if (method === 'DELETE') return abortMultipart(env, request, url);
+    return fail(405, 'Method not allowed.');
+  }
+
+  if (path === '/api/uploads/multipart/complete' && method === 'POST') {
+    if (!authorised(request, env)) return fail(401, 'Not authorised.');
+    return finishMultipart(db, env, request);
+  }
+
+  const fm = path.match(/^\/api\/files\/(\d+)(?:\/[^/]*)?$/);
+  if (fm && (method === 'GET' || method === 'HEAD')) return serveFile(db, env, request, Number(fm[1]));
 
   const nm = path.match(/^\/api\/notes\/([a-z0-9-]+)$/);
   if (nm && method === 'GET') return getNote(db, nm[1]);
@@ -587,15 +1250,21 @@ async function api(request, env, url) {
 
     m = path.match(/^\/api\/admin\/notes\/(\d+)$/);
     if (m && method === 'PATCH') return adminPatchNote(db, request, Number(m[1]));
-    if (m && method === 'DELETE') return adminDeleteNote(db, Number(m[1]));
+    if (m && method === 'DELETE') return adminDeleteNote(db, env, Number(m[1]));
 
     m = path.match(/^\/api\/admin\/threads\/(\d+)$/);
     if (m && method === 'PATCH') return adminPatchThread(db, request, Number(m[1]));
-    if (m && method === 'DELETE') return adminDeleteThread(db, Number(m[1]));
+    if (m && method === 'DELETE') return adminDeleteThread(db, env, Number(m[1]));
 
     m = path.match(/^\/api\/admin\/replies\/(\d+)$/);
     if (m && method === 'PATCH') return adminPatchReply(db, request, Number(m[1]));
-    if (m && method === 'DELETE') return adminDeleteReply(db, Number(m[1]));
+    if (m && method === 'DELETE') return adminDeleteReply(db, env, Number(m[1]));
+
+    if (path === '/api/admin/attachments' && method === 'GET') return adminListAttachments(db, url);
+
+    m = path.match(/^\/api\/admin\/attachments\/(\d+)$/);
+    if (m && method === 'PATCH') return adminPatchAttachment(db, request, Number(m[1]));
+    if (m && method === 'DELETE') return adminDeleteAttachment(db, env, Number(m[1]));
 
     return fail(404, 'No such endpoint.');
   }

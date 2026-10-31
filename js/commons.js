@@ -142,6 +142,8 @@
     var form = document.querySelector('[data-new-thread]');
     if (form) {
       var status = form.querySelector('[data-form-note]');
+      var files = form.querySelector('[data-upload]');
+      var picker = files ? window.TRHMedia.picker(files, {}) : null;
       form.addEventListener('submit', function (event) {
         event.preventDefault();
         var button = form.querySelector('button[type="submit"]');
@@ -156,11 +158,17 @@
           email: form.email.value,
           website: form.website.value,
         };
+        if (picker) Object.assign(payload, picker.payload());
 
         api('/threads', { method: 'POST', body: JSON.stringify(payload) })
           .then(function (data) {
             if (data.id) window.location.href = 'thread.html?id=' + data.id;
-            else { form.reset(); note(status, 'Thanks — posted.'); button.disabled = false; }
+            else {
+              form.reset();
+              if (picker) picker.reset();
+              note(status, 'Thanks — posted.');
+              button.disabled = false;
+            }
           })
           .catch(function (err) { note(status, err.message, 'bad'); button.disabled = false; });
       });
@@ -190,6 +198,9 @@
       threadRoot.appendChild(el('h1', { class: 'h-sect', text: t.title }));
       threadRoot.appendChild(paragraphs(t.body));
 
+      var threadMedia = window.TRHMedia.render(t.attachments);
+      if (threadMedia) threadRoot.appendChild(threadMedia);
+
       repliesRoot.innerHTML = '';
       repliesRoot.appendChild(el('h2', {
         class: 'h-card',
@@ -200,6 +211,7 @@
         repliesRoot.appendChild(el('article', { class: 'reply' }, [
           el('p', { class: 'reply__who', text: r.author + ' · ' + when(r.createdAt) }),
           paragraphs(r.body),
+          window.TRHMedia.render(r.attachments),
         ]));
       });
     }
@@ -225,23 +237,29 @@
 
     if (replyForm) {
       var replyNote = replyForm.querySelector('[data-form-note]');
+      var replyFiles = replyForm.querySelector('[data-upload]');
+      var replyPicker = replyFiles ? window.TRHMedia.picker(replyFiles, {}) : null;
       replyForm.addEventListener('submit', function (event) {
         event.preventDefault();
         var button = replyForm.querySelector('button[type="submit"]');
         button.disabled = true;
         note(replyNote, 'Posting…');
 
+        var reply = {
+          body: replyForm.body.value,
+          author: replyForm.author.value,
+          email: replyForm.email.value,
+          website: replyForm.website.value,
+        };
+        if (replyPicker) Object.assign(reply, replyPicker.payload());
+
         api('/threads/' + encodeURIComponent(id) + '/replies', {
           method: 'POST',
-          body: JSON.stringify({
-            body: replyForm.body.value,
-            author: replyForm.author.value,
-            email: replyForm.email.value,
-            website: replyForm.website.value,
-          }),
+          body: JSON.stringify(reply),
         })
           .then(function () {
             replyForm.body.value = '';
+            if (replyPicker) replyPicker.reset();
             note(replyNote, '');
             button.disabled = false;
             load();

@@ -23,12 +23,39 @@
     return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
   }
 
-  /** Paragraphs as text nodes. Whatever is typed stays text. */
-  function paragraphs(text) {
+  /**
+   * Paragraphs as text nodes. Whatever is typed stays text.
+   *
+   * A line of its own reading [media:2] is swapped for the second attached
+   * file, which is how a photo lands between two paragraphs instead of in a
+   * heap at the end. Anything not placed that way follows the body.
+   */
+  function paragraphs(text, files) {
     var wrap = el('div', { class: 'stack' });
+    var media = files || [];
+    var placed = {};
+
     String(text || '').split(/\n{2,}/).forEach(function (chunk) {
-      if (chunk.trim()) wrap.appendChild(el('p', { text: chunk.trim() }));
+      var line = chunk.trim();
+      if (!line) return;
+
+      var marker = /^\[media:(\d{1,2})\]$/.exec(line);
+      if (marker) {
+        var at = Number(marker[1]) - 1;
+        if (media[at] && !placed[at]) {
+          placed[at] = true;
+          wrap.appendChild(window.TRHMedia.render([media[at]]));
+        }
+        return;
+      }
+
+      wrap.appendChild(el('p', { text: line }));
     });
+
+    var left = media.filter(function (a, i) { return !placed[i]; });
+    var rest = window.TRHMedia.render(left);
+    if (rest) wrap.appendChild(rest);
+
     return wrap;
   }
 
@@ -129,7 +156,7 @@
       root.appendChild(el('p', { class: 'eyebrow', text: meta.join(' · ') }));
       root.appendChild(el('h1', { class: 'h-hero', text: n.title }));
       if (n.summary) root.appendChild(el('p', { class: 'lede', text: n.summary }));
-      root.appendChild(paragraphs(n.body));
+      root.appendChild(paragraphs(n.body, n.attachments));
     }
 
     if (!slug) {

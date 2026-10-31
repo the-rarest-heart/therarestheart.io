@@ -19,13 +19,60 @@ step, no framework, no third-party community service: it stays yours.
 | --- | --- |
 | `_worker.js` | The API, plus handing everything else to the static files |
 | `schema.sql` | The database tables |
-| `wrangler.toml` | Pages config and the D1 binding |
+| `wrangler.toml` | Pages config, the D1 binding and the R2 binding |
 | `js/commons.js` | Room list, new-thread form, thread view, replies |
+| `js/media.js` | The upload box, and drawing attachments back out |
 | `js/admin.js` | Your writing and moderation screen |
 | `js/notes.js` | Field Notes list and the single note page |
 | `note.html` | One field note |
 | `admin.html` | `/admin.html` — write notes, and hide / pin / edit / delete threads |
 | `thread.html` | One thread and its replies |
+
+---
+
+## Media
+
+Attachments go in **R2**, Cloudflare's file store. D1 holds the index — who
+posted it, what it is, what order it goes in — and R2 holds the bytes. Nothing
+is served straight from R2: every file goes through `/api/files/:id`, so a
+hidden post's photos stop being reachable the moment you hide it.
+
+**One step is not done yet.** R2 has to be switched on in the Cloudflare
+dashboard before the bucket can be created:
+
+1. Cloudflare dashboard → **R2** → enable it
+2. Then, from this folder:
+
+```bash
+npx wrangler r2 bucket create trh-media
+```
+
+Until that is done, uploads answer *"File storage is not connected yet."* and
+everything else on the site carries on as normal.
+
+**Free allowance:** 10 GB stored, 1M uploads and 10M reads a month, and
+Cloudflare charges nothing for bandwidth out. Above that it is $0.015 per GB
+per month — a hundred short videos would cost pennies.
+
+**What is allowed, and to whom** — the `UPLOADS` block near the top of
+`_worker.js`:
+
+| | Visitors | You |
+| --- | --- | --- |
+| Images | yes | yes |
+| PDFs, Word, Excel, PowerPoint | yes | yes |
+| Video and audio | no | yes |
+| Size of one file | 15 MB | 95 MB in one go, no real limit in parts |
+| Files on one post | 4 | 16 |
+
+Video is off for visitors on purpose. Change `publicMedia` to
+`['image', 'doc', 'video', 'audio']` if that ever stops being the right call.
+
+The file type is decided by the extension, never by what the browser claims,
+and the list is in `MEDIA_TYPES`. SVG is deliberately absent: it can carry
+script, and it would run on our own origin.
+
+Uploads that never get attached to a post are swept after 24 hours.
 
 ---
 
@@ -212,6 +259,11 @@ the forms at their endpoint instead.
 ---
 
 ## Still to do
+- **Enable R2 in the dashboard and create the `trh-media` bucket.** Uploads do
+  not work until this is done; nothing else is affected.
+- Images are stored and served at whatever size they were taken, so a photo
+  straight off a phone can be several MB. Cloudflare Images would resize them
+  on the way out, at $5 a month.
 - Nobody is emailed when a thread gets a reply. That wants either a Worker
   cron job or an email service wired into the reply handler.
 - Gerdie's Monday question is written on the page but nothing posts it. A

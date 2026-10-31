@@ -113,6 +113,13 @@
             <textarea id="n-body" name="body" rows="14" placeholder="Write it here." required></textarea>
           </div>
 
+          <div class="field">
+            <label>Files</label>
+            <div data-note-upload></div>
+            <p class="muted small">A line of its own reading <code>[media:1]</code> drops the first
+              file in at that point in the note. Anything you don't place that way sits at the end.</p>
+          </div>
+
           <div class="pills">
             <button class="btn btn--primary" type="submit" data-note-publish>Publish</button>
             <button class="btn btn--ghost" type="button" data-note-draft>Save as draft</button>
@@ -143,6 +150,7 @@
   </div>
 </main>
 
+<script src="js/media.js"></script>
 <script src="js/admin.js"></script>
 </body>
 </html>
