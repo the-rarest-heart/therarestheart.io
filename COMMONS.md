@@ -19,13 +19,87 @@ step, no framework, no third-party community service: it stays yours.
 | --- | --- |
 | `_worker.js` | The API, plus handing everything else to the static files |
 | `schema.sql` | The database tables |
-| `wrangler.toml` | Pages config and the D1 binding |
+| `wrangler.toml` | Pages config, the D1 binding and the R2 binding |
 | `js/commons.js` | Room list, new-thread form, thread view, replies |
+| `js/media.js` | The upload box, and drawing attachments back out |
 | `js/admin.js` | Your writing and moderation screen |
 | `js/notes.js` | Field Notes list and the single note page |
 | `note.html` | One field note |
 | `admin.html` | `/admin.html` — write notes, and hide / pin / edit / delete threads |
 | `thread.html` | One thread and its replies |
+
+---
+
+## Media
+
+Attachments go in **R2**, Cloudflare's file store. D1 holds the index — who
+posted it, what it is, what order it goes in — and R2 holds the bytes. Nothing
+is served straight from R2: every file goes through `/api/files/:id`, so a
+hidden post's photos stop being reachable the moment you hide it.
+
+**Storage is not switched on yet,** so the binding in `wrangler.toml` is
+commented out. That is deliberate: Pages refuses to publish the Function at
+all when a binding names a bucket that does not exist. The assets go up, the
+Function does not, and `/api/*` — the whole Commons — goes down with it. The
+build log says it plainly:
+
+```
+Error: Failed to publish your Function. Got error: R2 bucket 'trh-media'
+not found.
+```
+
+The schema is the other half of the same problem. `attachments` is created by
+`schema.sql`, applied by hand, so it can lag a deploy — and a note that reads
+its attachments from a table that is not there is a 500 on writing that has
+nothing to do with attachments. Every read of the table now goes through
+`readAttachments()`, which treats *no such table* as "no attachments" and
+rethrows anything else. Notes, threads and replies render, and posting and
+moderating keep working, whether or not the table has landed.
+
+Three steps, in this order:
+
+1. Cloudflare dashboard → **R2** → enable it (needs a card on file; the free
+   allowance below still applies)
+2. From this folder:
+
+```bash
+npx wrangler r2 bucket create trh-media
+npx wrangler d1 execute trh-commons --remote --file=./schema.sql
+```
+
+3. Uncomment the `[[r2_buckets]]` block in `wrangler.toml`, commit, push
+
+The `d1 execute` is safe to run whenever and more than once — `schema.sql` is
+nothing but `CREATE TABLE IF NOT EXISTS`, so it adds what is missing and
+leaves everything already there alone.
+
+Until step 3, uploads answer *"File storage is not connected yet."*, the
+upload box never draws itself, and everything else on the site carries on as
+normal.
+
+**Free allowance:** 10 GB stored, 1M uploads and 10M reads a month, and
+Cloudflare charges nothing for bandwidth out. Above that it is $0.015 per GB
+per month — a hundred short videos would cost pennies.
+
+**What is allowed, and to whom** — the `UPLOADS` block near the top of
+`_worker.js`:
+
+| | Visitors | You |
+| --- | --- | --- |
+| Images | yes | yes |
+| PDFs, Word, Excel, PowerPoint | yes | yes |
+| Video and audio | no | yes |
+| Size of one file | 15 MB | 95 MB in one go, no real limit in parts |
+| Files on one post | 4 | 16 |
+
+Video is off for visitors on purpose. Change `publicMedia` to
+`['image', 'doc', 'video', 'audio']` if that ever stops being the right call.
+
+The file type is decided by the extension, never by what the browser claims,
+and the list is in `MEDIA_TYPES`. SVG is deliberately absent: it can carry
+script, and it would run on our own origin.
+
+Uploads that never get attached to a post are swept after 24 hours.
 
 ---
 
@@ -212,6 +286,13 @@ the forms at their endpoint instead.
 ---
 
 ## Still to do
+- **Enable R2, create the `trh-media` bucket, uncomment the binding.** See
+  Media above — all three, in that order. Uploads do not work until they are
+  done, and uncommenting the binding before the bucket exists takes `/api/*`
+  down. Nothing else is affected.
+- Images are stored and served at whatever size they were taken, so a photo
+  straight off a phone can be several MB. Cloudflare Images would resize them
+  on the way out, at $5 a month.
 - Nobody is emailed when a thread gets a reply. That wants either a Worker
   cron job or an email service wired into the reply handler.
 - Gerdie's Monday question is written on the page but nothing posts it. A

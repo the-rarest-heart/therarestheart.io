@@ -77,3 +77,29 @@ CREATE TABLE IF NOT EXISTS notes (
 
 CREATE INDEX IF NOT EXISTS idx_notes_live
   ON notes (status, published_at DESC);
+
+-- Attachments. The bytes live in R2; this table is the index over them.
+-- An upload arrives before the post it belongs to exists, so a fresh row is
+-- 'orphan' and carries the uploader's session id. Posting claims it.
+CREATE TABLE IF NOT EXISTS attachments (
+  id           INTEGER PRIMARY KEY AUTOINCREMENT,
+  r2_key       TEXT    NOT NULL UNIQUE,
+  owner_kind   TEXT    NOT NULL DEFAULT 'orphan',   -- orphan | note | thread | reply
+  owner_id     INTEGER,                             -- null while still an orphan
+  session_id   TEXT    NOT NULL,                    -- ties an upload to the post that claims it
+  filename     TEXT    NOT NULL,
+  content_type TEXT    NOT NULL,                    -- from our own allowlist, never the browser's
+  media        TEXT    NOT NULL,                    -- image | video | audio | doc
+  bytes        INTEGER NOT NULL,
+  caption      TEXT    NOT NULL DEFAULT '',
+  status       TEXT    NOT NULL DEFAULT 'visible',  -- visible | hidden
+  sort         INTEGER NOT NULL DEFAULT 0,
+  created_at   TEXT    NOT NULL,
+  ip_hash      TEXT
+);
+
+CREATE INDEX IF NOT EXISTS idx_attachments_owner
+  ON attachments (owner_kind, owner_id, status, sort, id);
+
+CREATE INDEX IF NOT EXISTS idx_attachments_orphans
+  ON attachments (owner_kind, created_at);

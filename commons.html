@@ -144,6 +144,11 @@
               <textarea id="t-body" name="body" rows="6" placeholder="What did you try, and what happened?" required minlength="15" maxlength="6000"></textarea>
             </div>
 
+            <div class="field">
+              <label>Anything to show</label>
+              <div data-upload></div>
+            </div>
+
             <div class="honeypot" aria-hidden="true">
               <label for="t-website">Leave this empty</label>
               <input id="t-website" name="website" type="text" tabindex="-1" autocomplete="off">
@@ -326,6 +331,7 @@
 </div>
 
 <script src="js/site.js"></script>
+<script src="js/media.js"></script>
 <script src="js/commons.js"></script>
 <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
 </body>
