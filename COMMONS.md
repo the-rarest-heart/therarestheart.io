@@ -242,42 +242,44 @@ Pages serves everything it holds — pages, scripts, stylesheet, images — with
 cache-control: public, max-age=0, must-revalidate
 ```
 
-which is the right default: every request asks whether the file changed, and
-the ETag makes the answer a 304 rather than a download. That is what the
-`*.pages.dev` preview URLs return.
+Every request asks whether the file changed and the ETag makes the answer a
+304 rather than a download. **Nothing in this repository needs to change.**
 
-**The custom domain does not.** On therarestheart.io the scripts, stylesheet
-and images come back with
+What can mislead you is that Cloudflare's edge keeps the `cache-control` it
+stored when it first filled an entry, and a 304 revalidation refreshes the
+entry without refreshing that header. So the edge can hand out a header the
+origin stopped sending a while ago. Directly observed, after the Worker
+briefly set `max-age=60` and that change was reverted:
 
 ```
-cache-control: public, max-age=14400, must-revalidate
+/js/media.js           max-age=60  cf-cache-status: REVALIDATED
+/css/trh.css           max-age=60  cf-cache-status: REVALIDATED
+/images/GERD-logo.png  max-age=0   cf-cache-status: REVALIDATED
+/js/media.js?b=random  max-age=0   cf-cache-status: MISS        ← the origin
 ```
 
-Four hours. That is the zone's **Browser Cache TTL**, a Cloudflare default
-that rewrites the origin's header on anything it caches. The pages themselves
-escape it because Cloudflare does not cache HTML, which is why a deploy can
-look like it worked — the new page arrives, the old scripts do not.
+The images never carried 60, so their stored header is still 0. Add a query
+string and you bypass the entry and see what Pages actually sends.
 
-So a returning visitor can run new HTML against up to four-hour-old
-JavaScript, and the two have to agree. It bit us for real: the fix for the
-stranded upload label was deployed and correct, the file Cloudflare was
-serving contained it, and an already-open page still ran the old script. On a
-phone that had never visited, it looked perfect.
+That is where the four-hour header came from. It was a stored edge header, not
+a setting and not anything in this repository — and a browser that received it
+then honoured it for four hours, which is how the fix to the stranded upload
+label came to be live and correct while an open page still ran the old script.
 
-**The fix is one setting, and it is not in this repository:**
+**If a deploy looks like it did nothing:** hard-reload first — it is usually
+just your own browser. If it persists for other people, purge the edge copy:
 
 > Cloudflare dashboard → therarestheart.io → **Caching** → **Configuration**
-> → **Browser Cache TTL** → **Respect Existing Headers**
+> → **Purge Cache**
 
-Then the origin's `max-age=0` is honoured and every change is live for
-everyone on their next page load.
+Entries also correct themselves once the file's content next changes.
 
-Worth knowing what *doesn't* fix it. A `_headers` file is ignored, because
+Worth knowing what would *not* help. A `_headers` file is ignored, because
 `_worker.js` puts Pages in advanced mode. Setting the header in the Worker
-does nothing either — the zone overrides it downstream, which is exactly how
-this was mistaken for an origin problem in the first place. Versioned
-filenames (`media.js?v=3`) would work, but only while someone remembers to
-bump them on every edit, and forgetting is silent.
+does nothing for an already-cached entry either — that was tried, reverted,
+and is the reason the table above could be measured at all. Versioned
+filenames (`media.js?v=3`) would sidestep the whole thing, but only while
+someone remembers to bump them on every edit, and forgetting is silent.
 
 ---
 
