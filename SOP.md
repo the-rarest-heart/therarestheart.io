@@ -287,9 +287,15 @@ npx wrangler r2 object get trh-media --remote --recursive --output-dir=./media-b
 
 # WHEN SOMETHING LOOKS WRONG
 
-**You changed something and the site looks the same.** Almost always the
-browser showing you an old copy. Hard-reload: `Cmd+Shift+R` on a Mac, or pull
-down to refresh on a phone.
+**You changed something and the site looks the same.** The browser showing you
+an old copy. Hard-reload: `Cmd+Shift+R` on a Mac, or pull down to refresh on
+a phone.
+
+Worth knowing this is not only you. Cloudflare currently hands visitors the
+scripts and stylesheet with a four-hour cache, so someone who visited this
+morning can get a new page running old code — and it looks perfect on any
+phone that has not been to the site before. One dashboard setting fixes it
+for everyone; see *Caching* in `COMMONS.md`.
 
 **"The Commons database is not connected yet."** The site cannot reach the
 database. Not something you can fix from the admin screen.
