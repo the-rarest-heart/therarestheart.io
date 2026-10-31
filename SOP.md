@@ -268,19 +268,25 @@ CSV into Buttondown or Kit.
 Your writing lives in the database. Threads can be rebuilt by the people who
 wrote them; your field notes cannot.
 
+Paste this whole line — it moves to the project folder itself, so it works
+wherever you are:
+
 ```bash
-npx wrangler d1 export trh-commons --remote --output=commons-backup.sql
+mkdir -p "$HOME/trh-backups" && cd /Users/rareheart/therarestheart.io && npx wrangler d1 export trh-commons --remote --output="$HOME/trh-backups/commons-$(date +%F).sql"
 ```
 
-Run it from the project folder on your Mac. Keep the file somewhere that is
-not Cloudflare.
+It lands in `~/trh-backups` with the date in the name, deliberately **outside**
+the project folder. The export contains your subscribers' names and email
+addresses, and the project folder is a git repository — a file dropped in
+there can end up pushed to GitHub. Keep a copy somewhere that is not
+Cloudflare.
 
 **That backs up the writing, not the files.** Photos and video live in R2, a
 separate store, and the export above does not touch them. To pull those down
 too:
 
 ```bash
-npx wrangler r2 object get trh-media --remote --recursive --output-dir=./media-backup
+mkdir -p "$HOME/trh-backups" && cd /Users/rareheart/therarestheart.io && npx wrangler r2 object get trh-media --remote --recursive --output-dir="$HOME/trh-backups/media"
 ```
 
 ---
