@@ -68,8 +68,51 @@
       if (t.newHere) meta.push('pinned as new here');
       if (t.email) meta.push(t.email);
 
+      var repliesBox = el('div', { class: 'stack stack--sm' });
+      repliesBox.hidden = true;
+
+      function loadReplies() {
+        repliesBox.innerHTML = '';
+        fetch('/api/threads/' + t.id)
+          .then(function (res) { return res.json(); })
+          .then(function (data) {
+            if (!data.replies || !data.replies.length) {
+              repliesBox.appendChild(el('p', { class: 'muted', text: 'No replies on this one.' }));
+              return;
+            }
+            data.replies.forEach(function (r) {
+              var hide = button('Hide', 'btn--ghost', function () {
+                api('/admin/replies/' + r.id, { method: 'PATCH', body: JSON.stringify({ status: 'hidden' }) })
+                  .then(function () { say('Reply hidden.'); loadReplies(); })
+                  .catch(function (err) { say(err.message, true); });
+              });
+              var del = button('Delete', 'btn--danger', function () {
+                if (!window.confirm('Delete the reply from ' + r.author + '? This cannot be undone.')) return;
+                api('/admin/replies/' + r.id, { method: 'DELETE' })
+                  .then(function () { say('Reply deleted.'); loadReplies(); load(); })
+                  .catch(function (err) { say(err.message, true); });
+              });
+              repliesBox.appendChild(el('div', { class: 'mod-row' }, [
+                el('div', { class: 'mod-row__main' }, [
+                  el('strong', { text: r.author }),
+                  el('p', { class: 'muted', text: r.body.slice(0, 160) + (r.body.length > 160 ? '\u2026' : '') }),
+                ]),
+                el('div', { class: 'mod-row__acts' }, [hide, del]),
+              ]));
+            });
+          })
+          .catch(function () {
+            repliesBox.appendChild(el('p', { class: 'muted form-error', text: 'Could not load the replies.' }));
+          });
+      }
+
       var acts = el('div', { class: 'mod-row__acts' }, [
         el('a', { class: 'btn btn--small btn--ghost', href: 'thread.html?id=' + t.id, text: 'Open' }),
+        t.replyCount ? button('Replies (' + t.replyCount + ')', 'btn--ghost', function () {
+          var opening = repliesBox.hidden;
+          repliesBox.hidden = !opening;
+          if (opening) loadReplies();
+        }) : null,
         button(hidden ? 'Unhide' : 'Hide', 'btn--ghost', function () {
           patch(t.id, { status: hidden ? 'open' : 'hidden' }, hidden ? 'Thread is visible again.' : 'Thread hidden.');
         }),
@@ -94,14 +137,16 @@
         }),
       ]);
 
-      rows.appendChild(el('div', { class: 'mod-row', 'data-hidden': hidden ? 'true' : 'false' }, [
+      var rowEl = el('div', { class: 'mod-row', 'data-hidden': hidden ? 'true' : 'false' }, [
         el('div', { class: 'mod-row__main' }, [
           el('strong', { text: t.title }),
           el('p', { class: 'muted', text: meta.join(' · ') }),
           el('p', { class: 'muted', text: t.body.slice(0, 180) + (t.body.length > 180 ? '…' : '') }),
         ]),
         acts,
-      ]));
+      ]);
+
+      rows.appendChild(el('div', { class: 'stack stack--sm' }, [rowEl, repliesBox]));
     });
   }
 

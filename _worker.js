@@ -465,11 +465,19 @@ async function adminPatchReply(db, request, id) {
   let payload;
   try { payload = await request.json(); } catch (e) { return fail(400, 'Expected JSON.'); }
 
+  const existing = await db.prepare('SELECT thread_id, status FROM replies WHERE id = ?').bind(id).first();
+  if (!existing) return fail(404, 'No such reply.');
+
   const sets = [];
   const binds = [];
+  let countDelta = 0;
 
   if (typeof payload.status === 'string' && ['visible', 'hidden'].includes(payload.status)) {
     sets.push('status = ?'); binds.push(payload.status);
+    // The count on the card should match what a reader can actually see.
+    if (payload.status !== existing.status) {
+      countDelta = payload.status === 'hidden' ? -1 : 1;
+    }
   }
   if (typeof payload.body === 'string') {
     const b = clean(payload.body, LIMITS.body);
@@ -482,18 +490,30 @@ async function adminPatchReply(db, request, id) {
 
   const res = await db.prepare(`UPDATE replies SET ${sets.join(', ')} WHERE id = ?`).bind(...binds).run();
   if (!res.meta.changes) return fail(404, 'No such reply.');
+
+  if (countDelta !== 0) {
+    await db
+      .prepare('UPDATE threads SET reply_count = MAX(reply_count + ?, 0) WHERE id = ?')
+      .bind(countDelta, existing.thread_id)
+      .run();
+  }
+
   return json({ ok: true });
 }
 
 async function adminDeleteReply(db, id) {
-  const reply = await db.prepare('SELECT thread_id FROM replies WHERE id = ?').bind(id).first();
+  const reply = await db.prepare('SELECT thread_id, status FROM replies WHERE id = ?').bind(id).first();
   if (!reply) return fail(404, 'No such reply.');
 
   await db.prepare('DELETE FROM replies WHERE id = ?').bind(id).run();
-  await db
-    .prepare('UPDATE threads SET reply_count = MAX(reply_count - 1, 0) WHERE id = ?')
-    .bind(reply.thread_id)
-    .run();
+
+  // A hidden reply was already taken off the count when it was hidden.
+  if (reply.status !== 'hidden') {
+    await db
+      .prepare('UPDATE threads SET reply_count = MAX(reply_count - 1, 0) WHERE id = ?')
+      .bind(reply.thread_id)
+      .run();
+  }
 
   return json({ ok: true });
 }
