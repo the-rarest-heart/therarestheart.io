@@ -10,10 +10,14 @@
  *   GET    /api/threads/:id
  *   POST   /api/threads/:id/replies
  *   POST   /api/subscribe
+ *   GET    /api/notes?kind=write
+ *   GET    /api/notes/:slug
  *
  *   Moderation — all require the X-Admin-Token header:
  *   GET    /api/admin/threads?room=&status=      includes hidden rows
  *   GET    /api/admin/subscribers?format=csv
+ *   GET    /api/admin/notes            POST   /api/admin/notes
+ *   PATCH  /api/admin/notes/:id         DELETE /api/admin/notes/:id
  *   PATCH  /api/admin/threads/:id                { status, new_here, title, body }
  *   DELETE /api/admin/threads/:id
  *   PATCH  /api/admin/replies/:id                { status, body }
@@ -30,7 +34,12 @@ const ROOMS = [
 
 const ROOM_IDS = ROOMS.map((r) => r.id);
 
+const NOTE_KINDS = ['write', 'build', 'find'];
+
 const LIMITS = {
+  noteTitle: 160,
+  noteSummary: 400,
+  noteBody: 60000,
   title: 140,
   body: 6000,
   author: 60,
@@ -245,6 +254,155 @@ async function subscribe(db, request, env) {
   return json({ ok: true }, 201);
 }
 
+/* ── field notes ─────────────────────────────────────────── */
+
+function slugify(title) {
+  return title
+    .toLowerCase()
+    .replace(/['\u2019]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 70) || 'note';
+}
+
+/** Rough but honest: average reading runs about 220 words a minute. */
+function readMinutes(body) {
+  const words = body.trim().split(/\s+/).filter(Boolean).length;
+  return Math.max(1, Math.round(words / 220));
+}
+
+async function uniqueSlug(db, base, ignoreId) {
+  let slug = base;
+  for (let n = 2; n < 60; n += 1) {
+    const row = await db.prepare('SELECT id FROM notes WHERE slug = ?').bind(slug).first();
+    if (!row || (ignoreId && row.id === ignoreId)) return slug;
+    slug = base + '-' + n;
+  }
+  return base + '-' + Date.now();
+}
+
+const publicNote = (n) => ({
+  id: n.id,
+  slug: n.slug,
+  kind: n.kind,
+  title: n.title,
+  summary: n.summary,
+  body: n.body,
+  buildState: n.build_state || '',
+  readMinutes: n.read_minutes,
+  publishedAt: n.published_at,
+  updatedAt: n.updated_at,
+});
+
+const noteCard = (n) => {
+  const card = publicNote(n);
+  delete card.body;
+  return card;
+};
+
+async function listNotes(db, url) {
+  const kind = url.searchParams.get('kind') || 'all';
+  if (kind !== 'all' && !NOTE_KINDS.includes(kind)) return fail(400, 'Unknown kind.');
+
+  const where = kind === 'all' ? "status = 'published'" : "status = 'published' AND kind = ?";
+  const stmt = db.prepare(`SELECT * FROM notes WHERE ${where} ORDER BY published_at DESC LIMIT 100`);
+
+  const { results } = await (kind === 'all' ? stmt : stmt.bind(kind)).all();
+  return json({ kind, notes: results.map(noteCard) });
+}
+
+async function getNote(db, slug) {
+  const note = await db.prepare('SELECT * FROM notes WHERE slug = ?').bind(slug).first();
+  if (!note || note.status !== 'published') return fail(404, 'No such note.');
+  return json({ note: publicNote(note) });
+}
+
+function readNoteFields(payload) {
+  const kind = String(payload.kind || '');
+  const title = clean(payload.title, LIMITS.noteTitle);
+  const summary = clean(payload.summary, LIMITS.noteSummary);
+  const body = clean(payload.body, LIMITS.noteBody);
+  const buildState = clean(payload.buildState, 40);
+
+  if (!NOTE_KINDS.includes(kind)) return { error: 'Pick writing, build log or research.' };
+  if (title.length < 6) return { error: 'Give it a title of at least 6 characters.' };
+  if (body.length < 40) return { error: 'The body is too short to publish.' };
+
+  return { kind, title, summary, body, buildState };
+}
+
+async function adminListNotes(db) {
+  const { results } = await db.prepare('SELECT * FROM notes ORDER BY updated_at DESC LIMIT 200').all();
+  return json({ notes: results.map((n) => Object.assign(publicNote(n), { status: n.status })) });
+}
+
+async function adminCreateNote(db, request) {
+  let payload;
+  try { payload = await request.json(); } catch (e) { return fail(400, 'Expected JSON.'); }
+
+  const f = readNoteFields(payload);
+  if (f.error) return fail(400, f.error);
+
+  const stamp = now();
+  const status = payload.status === 'published' ? 'published' : 'draft';
+  const slug = await uniqueSlug(db, slugify(f.title));
+
+  const res = await db
+    .prepare(
+      `INSERT INTO notes (slug, kind, title, summary, body, status, build_state, read_minutes, created_at, updated_at, published_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+    )
+    .bind(slug, f.kind, f.title, f.summary, f.body, status, f.buildState || null,
+          readMinutes(f.body), stamp, stamp, status === 'published' ? stamp : null)
+    .run();
+
+  return json({ ok: true, id: res.meta.last_row_id, slug }, 201);
+}
+
+async function adminPatchNote(db, request, id) {
+  let payload;
+  try { payload = await request.json(); } catch (e) { return fail(400, 'Expected JSON.'); }
+
+  const existing = await db.prepare('SELECT * FROM notes WHERE id = ?').bind(id).first();
+  if (!existing) return fail(404, 'No such note.');
+
+  // A status-only toggle should not have to resend the whole note.
+  if (Object.keys(payload).length === 1 && typeof payload.status === 'string') {
+    const status = payload.status === 'published' ? 'published' : 'draft';
+    const stamp = now();
+    await db
+      .prepare('UPDATE notes SET status = ?, updated_at = ?, published_at = COALESCE(published_at, ?) WHERE id = ?')
+      .bind(status, stamp, status === 'published' ? stamp : null, id)
+      .run();
+    return json({ ok: true, slug: existing.slug });
+  }
+
+  const f = readNoteFields(payload);
+  if (f.error) return fail(400, f.error);
+
+  const status = payload.status === 'published' ? 'published' : 'draft';
+  const stamp = now();
+  const slug = f.title === existing.title ? existing.slug : await uniqueSlug(db, slugify(f.title), id);
+
+  await db
+    .prepare(
+      `UPDATE notes SET slug = ?, kind = ?, title = ?, summary = ?, body = ?, status = ?,
+              build_state = ?, read_minutes = ?, updated_at = ?, published_at = COALESCE(published_at, ?)
+       WHERE id = ?`
+    )
+    .bind(slug, f.kind, f.title, f.summary, f.body, status, f.buildState || null,
+          readMinutes(f.body), stamp, status === 'published' ? stamp : null, id)
+    .run();
+
+  return json({ ok: true, slug });
+}
+
+async function adminDeleteNote(db, id) {
+  const res = await db.prepare('DELETE FROM notes WHERE id = ?').bind(id).run();
+  if (!res.meta.changes) return fail(404, 'No such note.');
+  return json({ ok: true });
+}
+
 /* ── moderation ──────────────────────────────────────────── */
 
 function authorised(request, env) {
@@ -379,6 +537,11 @@ async function api(request, env, url) {
 
   if (path === '/api/subscribe' && method === 'POST') return subscribe(db, request, env);
 
+  if (path === '/api/notes' && method === 'GET') return listNotes(db, url);
+
+  const nm = path.match(/^\/api\/notes\/([a-z0-9-]+)$/);
+  if (nm && method === 'GET') return getNote(db, nm[1]);
+
   if (path === '/api/threads') {
     if (method === 'GET') return listThreads(db, url);
     if (method === 'POST') return createThread(db, request, env);
@@ -396,6 +559,15 @@ async function api(request, env, url) {
 
     if (path === '/api/admin/threads' && method === 'GET') return adminListThreads(db, url);
     if (path === '/api/admin/subscribers' && method === 'GET') return adminListSubscribers(db, url);
+
+    if (path === '/api/admin/notes') {
+      if (method === 'GET') return adminListNotes(db);
+      if (method === 'POST') return adminCreateNote(db, request);
+    }
+
+    m = path.match(/^\/api\/admin\/notes\/(\d+)$/);
+    if (m && method === 'PATCH') return adminPatchNote(db, request, Number(m[1]));
+    if (m && method === 'DELETE') return adminDeleteNote(db, Number(m[1]));
 
     m = path.match(/^\/api\/admin\/threads\/(\d+)$/);
     if (m && method === 'PATCH') return adminPatchThread(db, request, Number(m[1]));

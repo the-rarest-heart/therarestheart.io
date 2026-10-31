@@ -21,8 +21,10 @@ step, no framework, no third-party community service: it stays yours.
 | `schema.sql` | The database tables |
 | `wrangler.toml` | Pages config and the D1 binding |
 | `js/commons.js` | Room list, new-thread form, thread view, replies |
-| `js/admin.js` | Your moderation screen |
-| `admin.html` | `/admin.html` — hide, pin, edit, delete |
+| `js/admin.js` | Your writing and moderation screen |
+| `js/notes.js` | Field Notes list and the single note page |
+| `note.html` | One field note |
+| `admin.html` | `/admin.html` — write notes, and hide / pin / edit / delete threads |
 | `thread.html` | One thread and its replies |
 
 ---
@@ -166,6 +168,31 @@ safe:
 ```bash
 npx wrangler d1 export trh-commons --remote --output=commons-backup.sql
 ```
+
+This matters more now that your writing lives here too. Threads can be
+rebuilt by the people who wrote them; your field notes cannot. Put a reminder
+somewhere.
+
+---
+
+## Writing a field note
+
+Open `/admin.html`, paste your token, and the first panel is the editor. It
+works on a phone, which is the whole point — editing HTML by hand never did.
+
+- **Kind** picks where it lands: Writing, Build log, or Research. Choosing
+  Build log reveals an *In progress / Shipped* badge.
+- **One line for the card** is the sentence that makes someone open it. The
+  body is plain text; leave a blank line between paragraphs.
+- **Save as draft** keeps it off the site entirely — a draft returns 404 at
+  its own URL, not just hidden from the list.
+- **Publish** puts it on `/notes` immediately. No deploy, no commit.
+
+The URL comes from the title. Retitling a published note changes its address,
+so any link somebody already shared will break — rewrite the title before you
+publish, not after.
+
+Reading time is counted from the body at roughly 220 words a minute.
 
 ---
 
