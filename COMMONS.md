@@ -48,6 +48,14 @@ Error: Failed to publish your Function. Got error: R2 bucket 'trh-media'
 not found.
 ```
 
+The schema is the other half of the same problem. `attachments` is created by
+`schema.sql`, applied by hand, so it can lag a deploy — and a note that reads
+its attachments from a table that is not there is a 500 on writing that has
+nothing to do with attachments. Every read of the table now goes through
+`readAttachments()`, which treats *no such table* as "no attachments" and
+rethrows anything else. Notes, threads and replies render, and posting and
+moderating keep working, whether or not the table has landed.
+
 Three steps, in this order:
 
 1. Cloudflare dashboard → **R2** → enable it (needs a card on file; the free
@@ -56,9 +64,14 @@ Three steps, in this order:
 
 ```bash
 npx wrangler r2 bucket create trh-media
+npx wrangler d1 execute trh-commons --remote --file=./schema.sql
 ```
 
 3. Uncomment the `[[r2_buckets]]` block in `wrangler.toml`, commit, push
+
+The `d1 execute` is safe to run whenever and more than once — `schema.sql` is
+nothing but `CREATE TABLE IF NOT EXISTS`, so it adds what is missing and
+leaves everything already there alone.
 
 Until step 3, uploads answer *"File storage is not connected yet."*, the
 upload box never draws itself, and everything else on the site carries on as

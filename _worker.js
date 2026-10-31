@@ -673,30 +673,48 @@ function publicAttachment(a) {
   };
 }
 
+/**
+ * The attachments table is created by schema.sql, which is applied by hand and
+ * so can lag a deploy. Every read of it goes through here: a note or a thread
+ * has to keep rendering whether or not the table has landed yet, because the
+ * alternative is a 500 on writing that has nothing to do with attachments.
+ * Anything other than a missing table is a real fault and is rethrown.
+ */
+async function readAttachments(db, sql, binds) {
+  try {
+    const { results } = await db.prepare(sql).bind(...binds).all();
+    return results;
+  } catch (err) {
+    const message = (err && err.message) || '';
+    if (/no such table/i.test(message)) {
+      console.error('attachments table is not there yet — run schema.sql');
+      return [];
+    }
+    throw err;
+  }
+}
+
 /** Attachments for one post, in the order they were arranged. */
 async function attachmentsFor(db, kind, id, includeHidden) {
   const where = includeHidden ? '' : " AND status = 'visible'";
-  const { results } = await db
-    .prepare(
-      `SELECT * FROM attachments WHERE owner_kind = ? AND owner_id = ?${where}
-       ORDER BY sort ASC, id ASC`
-    )
-    .bind(kind, id)
-    .all();
-  return results;
+  return readAttachments(
+    db,
+    `SELECT * FROM attachments WHERE owner_kind = ? AND owner_id = ?${where}
+     ORDER BY sort ASC, id ASC`,
+    [kind, id]
+  );
 }
 
 /** The same, for every reply in a thread, as a map of reply id to list. */
 async function attachmentsForReplies(db, threadId) {
-  const { results } = await db
-    .prepare(
-      `SELECT a.* FROM attachments a
-       JOIN replies r ON r.id = a.owner_id
-       WHERE a.owner_kind = 'reply' AND a.status = 'visible' AND r.thread_id = ?
-       ORDER BY a.sort ASC, a.id ASC`
-    )
-    .bind(threadId)
-    .all();
+  const results = await readAttachments(
+    db,
+    `SELECT a.* FROM attachments a
+     JOIN replies r ON r.id = a.owner_id
+     WHERE a.owner_kind = 'reply' AND a.status = 'visible' AND r.thread_id = ?
+     ORDER BY a.sort ASC, a.id ASC`,
+    [threadId]
+  );
 
   const byReply = {};
   results.forEach((a) => {
@@ -783,14 +801,13 @@ async function purgeAttachments(db, bucket, kind, ownerId) {
 
 /** Every reply's attachments in one go, before the replies themselves go. */
 async function purgeThreadAttachments(db, bucket, threadId) {
-  const { results } = await db
-    .prepare(
-      `SELECT a.id, a.r2_key FROM attachments a
-       JOIN replies r ON r.id = a.owner_id
-       WHERE a.owner_kind = 'reply' AND r.thread_id = ?`
-    )
-    .bind(threadId)
-    .all();
+  const results = await readAttachments(
+    db,
+    `SELECT a.id, a.r2_key FROM attachments a
+     JOIN replies r ON r.id = a.owner_id
+     WHERE a.owner_kind = 'reply' AND r.thread_id = ?`,
+    [threadId]
+  );
 
   if (results.length) {
     if (bucket) {
