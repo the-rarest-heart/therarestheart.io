@@ -9,9 +9,11 @@
  *   POST   /api/threads
  *   GET    /api/threads/:id
  *   POST   /api/threads/:id/replies
+ *   POST   /api/subscribe
  *
  *   Moderation — all require the X-Admin-Token header:
  *   GET    /api/admin/threads?room=&status=      includes hidden rows
+ *   GET    /api/admin/subscribers?format=csv
  *   PATCH  /api/admin/threads/:id                { status, new_here, title, body }
  *   DELETE /api/admin/threads/:id
  *   PATCH  /api/admin/replies/:id                { status, body }
@@ -212,6 +214,37 @@ async function createReply(db, request, env, threadId) {
   return json({ ok: true, id: res.meta.last_row_id }, 201);
 }
 
+async function subscribe(db, request, env) {
+  let payload;
+  try { payload = await request.json(); } catch (e) { return fail(400, 'Expected JSON.'); }
+
+  if (clean(payload.website, 100)) return json({ ok: true });
+
+  const email = clean(payload.email, LIMITS.email).toLowerCase();
+  const name = clean(payload.name, LIMITS.author);
+  const source = clean(payload.source, 40) || 'footer';
+
+  if (!email) return fail(400, 'An email address, and that is all.');
+  if (!isEmail(email)) return fail(400, 'That email address does not look right.');
+
+  const ipHash = await hashIp(request, env.IP_SALT);
+  if (await overLimit(db, ipHash)) return fail(429, 'Try again in a little while.');
+
+  // Signing up twice is not an error worth showing anyone.
+  await db
+    .prepare(
+      `INSERT INTO subscribers (email, name, source, status, created_at, ip_hash)
+       VALUES (?, ?, ?, 'active', ?, ?)
+       ON CONFLICT (email) DO UPDATE SET
+         name = COALESCE(NULLIF(excluded.name, ''), subscribers.name),
+         status = 'active'`
+    )
+    .bind(email, name || null, source, now(), ipHash)
+    .run();
+
+  return json({ ok: true }, 201);
+}
+
 /* ── moderation ──────────────────────────────────────────── */
 
 function authorised(request, env) {
@@ -307,6 +340,32 @@ async function adminDeleteReply(db, id) {
   return json({ ok: true });
 }
 
+async function adminListSubscribers(db, url) {
+  if (url.searchParams.get('format') === 'csv') {
+    const { results } = await db
+      .prepare("SELECT name, email, source, created_at FROM subscribers WHERE status = 'active' ORDER BY created_at")
+      .all();
+
+    const esc = (v) => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
+    const rows = [['name', 'email', 'source', 'joined'].join(',')]
+      .concat(results.map((r) => [r.name, r.email, r.source, r.created_at].map(esc).join(',')));
+
+    return new Response(rows.join('\n'), {
+      headers: {
+        'content-type': 'text/csv; charset=utf-8',
+        'content-disposition': 'attachment; filename="commons-subscribers.csv"',
+        'cache-control': 'no-store',
+      },
+    });
+  }
+
+  const { results } = await db
+    .prepare("SELECT id, name, email, source, created_at FROM subscribers WHERE status = 'active' ORDER BY created_at DESC LIMIT 500")
+    .all();
+
+  return json({ subscribers: results, count: results.length });
+}
+
 /* ── router ──────────────────────────────────────────────── */
 
 async function api(request, env, url) {
@@ -317,6 +376,8 @@ async function api(request, env, url) {
   if (!db) return fail(503, 'The Commons database is not connected yet.');
 
   if (path === '/api/rooms' && method === 'GET') return json({ rooms: ROOMS });
+
+  if (path === '/api/subscribe' && method === 'POST') return subscribe(db, request, env);
 
   if (path === '/api/threads') {
     if (method === 'GET') return listThreads(db, url);
@@ -334,6 +395,7 @@ async function api(request, env, url) {
     if (!authorised(request, env)) return fail(401, 'Not authorised.');
 
     if (path === '/api/admin/threads' && method === 'GET') return adminListThreads(db, url);
+    if (path === '/api/admin/subscribers' && method === 'GET') return adminListSubscribers(db, url);
 
     m = path.match(/^\/api\/admin\/threads\/(\d+)$/);
     if (m && method === 'PATCH') return adminPatchThread(db, request, Number(m[1]));

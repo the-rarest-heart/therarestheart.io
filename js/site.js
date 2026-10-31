@@ -110,6 +110,61 @@
     });
   });
 
+  /* ── signup forms ─────────────────────────────────────────
+     The Commons join form and every footer newsletter box post
+     here. Addresses land in D1; nothing is sent yet.
+     ─────────────────────────────────────────────────────── */
+  var signupForms = document.querySelectorAll('[data-subscribe-form]');
+
+  Array.prototype.forEach.call(signupForms, function (form) {
+    var out = form.querySelector('[data-form-note]');
+    var button = form.querySelector('button[type="submit"]');
+
+    function tell(message, bad) {
+      if (!out) return;
+      out.textContent = message;
+      out.className = 'muted' + (bad ? ' form-error' : '');
+      out.hidden = !message;
+    }
+
+    form.addEventListener('submit', function (event) {
+      event.preventDefault();
+      button.disabled = true;
+      tell('One moment\u2026');
+
+      var field = function (name) {
+        var el = form.querySelector('[name="' + name + '"]');
+        return el ? el.value : '';
+      };
+
+      fetch('/api/subscribe', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          email: field('email'),
+          name: field('name'),
+          source: form.getAttribute('data-subscribe-form') || 'footer',
+          website: field('website'),
+        }),
+      })
+        .then(function (res) {
+          return res.json().catch(function () { return {}; }).then(function (data) {
+            if (!res.ok) throw new Error(data.error || 'That did not go through.');
+            return data;
+          });
+        })
+        .then(function () {
+          form.reset();
+          button.disabled = false;
+          tell("You're on the list. Nothing else to do.");
+        })
+        .catch(function (err) {
+          button.disabled = false;
+          tell(err.message, true);
+        });
+    });
+  });
+
   /* ── gerdie dock ──────────────────────────────────────────
      He never opens himself. One click to open, Escape or the
      close button to shut him up.
