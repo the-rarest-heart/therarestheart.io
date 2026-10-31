@@ -234,6 +234,53 @@ real answer offline.
 
 ---
 
+## Caching, and why a deploy can look like it did nothing
+
+Pages serves everything it holds — pages, scripts, stylesheet, images — with
+
+```
+cache-control: public, max-age=0, must-revalidate
+```
+
+which is the right default: every request asks whether the file changed, and
+the ETag makes the answer a 304 rather than a download. That is what the
+`*.pages.dev` preview URLs return.
+
+**The custom domain does not.** On therarestheart.io the scripts, stylesheet
+and images come back with
+
+```
+cache-control: public, max-age=14400, must-revalidate
+```
+
+Four hours. That is the zone's **Browser Cache TTL**, a Cloudflare default
+that rewrites the origin's header on anything it caches. The pages themselves
+escape it because Cloudflare does not cache HTML, which is why a deploy can
+look like it worked — the new page arrives, the old scripts do not.
+
+So a returning visitor can run new HTML against up to four-hour-old
+JavaScript, and the two have to agree. It bit us for real: the fix for the
+stranded upload label was deployed and correct, the file Cloudflare was
+serving contained it, and an already-open page still ran the old script. On a
+phone that had never visited, it looked perfect.
+
+**The fix is one setting, and it is not in this repository:**
+
+> Cloudflare dashboard → therarestheart.io → **Caching** → **Configuration**
+> → **Browser Cache TTL** → **Respect Existing Headers**
+
+Then the origin's `max-age=0` is honoured and every change is live for
+everyone on their next page load.
+
+Worth knowing what *doesn't* fix it. A `_headers` file is ignored, because
+`_worker.js` puts Pages in advanced mode. Setting the header in the Worker
+does nothing either — the zone overrides it downstream, which is exactly how
+this was mistaken for an origin problem in the first place. Versioned
+filenames (`media.js?v=3`) would work, but only while someone remembers to
+bump them on every edit, and forgetting is silent.
+
+---
+
 ## Backing it up
 
 D1 has no automatic export. Run this now and then and keep the file somewhere
