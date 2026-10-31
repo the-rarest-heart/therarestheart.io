@@ -1289,6 +1289,33 @@ async function api(request, env, url) {
   return fail(404, 'No such endpoint.');
 }
 
+/**
+ * The pages revalidate on every request, but Pages hands out the scripts and
+ * the stylesheet with a four-hour cache and the filenames never change. A
+ * returning visitor therefore ran new HTML against old JavaScript for up to
+ * four hours after a deploy — the two have to agree, and it looked fine on
+ * any phone that had not visited before, which is the worst way to find out.
+ *
+ * A minute instead. Repeat page loads in one sitting still come from cache,
+ * and the ETag from ASSETS means the check after that is a 304, not a
+ * download. Versioned filenames would cache better, but only while someone
+ * remembers to bump them on every edit, and forgetting is silent.
+ *
+ * Images keep the default: a stale picture is a stale picture, not a broken
+ * page, and they are the files worth caching hard.
+ */
+const CO_DEPENDENT = /^\/(?:js|css)\//;
+
+function withFreshness(response) {
+  const headers = new Headers(response.headers);
+  headers.set('cache-control', 'public, max-age=60, must-revalidate');
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers,
+  });
+}
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -1302,6 +1329,7 @@ export default {
       }
     }
 
-    return env.ASSETS.fetch(request);
+    const asset = await env.ASSETS.fetch(request);
+    return CO_DEPENDENT.test(url.pathname) ? withFreshness(asset) : asset;
   },
 };
