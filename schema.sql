@@ -57,3 +57,23 @@ CREATE TABLE IF NOT EXISTS subscribers (
 
 CREATE INDEX IF NOT EXISTS idx_subscribers_created
   ON subscribers (status, created_at DESC);
+
+-- Field Notes. Written from /admin.html so a note can be published from a
+-- phone, which editing HTML by hand never allowed.
+CREATE TABLE IF NOT EXISTS notes (
+  id            INTEGER PRIMARY KEY AUTOINCREMENT,
+  slug          TEXT    NOT NULL UNIQUE,
+  kind          TEXT    NOT NULL,                  -- write | build | find
+  title         TEXT    NOT NULL,
+  summary       TEXT    NOT NULL DEFAULT '',       -- the line on the card
+  body          TEXT    NOT NULL,
+  status        TEXT    NOT NULL DEFAULT 'draft',  -- draft | published
+  build_state   TEXT,                              -- build logs only: In progress | Shipped
+  read_minutes  INTEGER NOT NULL DEFAULT 0,        -- 0 means work it out from the body
+  created_at    TEXT    NOT NULL,
+  updated_at    TEXT    NOT NULL,
+  published_at  TEXT
+);
+
+CREATE INDEX IF NOT EXISTS idx_notes_live
+  ON notes (status, published_at DESC);

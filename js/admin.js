@@ -115,6 +115,129 @@
       });
   }
 
+  /* ── field notes ──────────────────────────────────────── */
+
+  var noteForm = document.querySelector('[data-note-form]');
+  var noteRows = document.querySelector('[data-note-rows]');
+  var noteNote = noteForm && noteForm.querySelector('[data-note-note]');
+  var noteMode = document.querySelector('[data-note-mode]');
+  var buildField = document.querySelector('[data-build-state]');
+  var cancelBtn = document.querySelector('[data-note-cancel]');
+  var editingId = null;
+
+  function tellNote(message, bad) {
+    if (!noteNote) return;
+    noteNote.textContent = message || '';
+    noteNote.className = 'muted' + (bad ? ' form-error' : '');
+    noteNote.hidden = !message;
+  }
+
+  function toggleBuildField() {
+    if (buildField) buildField.hidden = noteForm.kind.value !== 'build';
+  }
+
+  function resetNoteForm() {
+    editingId = null;
+    noteForm.reset();
+    toggleBuildField();
+    if (noteMode) noteMode.textContent = 'Write a note';
+    if (cancelBtn) cancelBtn.hidden = true;
+    tellNote('');
+  }
+
+  function noteBody(status) {
+    return {
+      kind: noteForm.kind.value,
+      title: noteForm.title.value,
+      summary: noteForm.summary.value,
+      body: noteForm.body.value,
+      buildState: noteForm.kind.value === 'build' ? noteForm.buildState.value : '',
+      status: status,
+    };
+  }
+
+  function saveNote(status) {
+    tellNote(status === 'published' ? 'Publishing\u2026' : 'Saving\u2026');
+
+    var path = editingId ? '/admin/notes/' + editingId : '/admin/notes';
+    var method = editingId ? 'PATCH' : 'POST';
+
+    api(path, { method: method, body: JSON.stringify(noteBody(status)) })
+      .then(function () {
+        resetNoteForm();
+        tellNote(status === 'published' ? 'Published. It is on the site now.' : 'Saved as a draft.');
+        loadNotes();
+      })
+      .catch(function (err) { tellNote(err.message, true); });
+  }
+
+  function editNote(n) {
+    editingId = n.id;
+    noteForm.kind.value = n.kind;
+    noteForm.title.value = n.title;
+    noteForm.summary.value = n.summary || '';
+    noteForm.body.value = n.body;
+    if (n.buildState) noteForm.buildState.value = n.buildState;
+    toggleBuildField();
+    if (noteMode) noteMode.textContent = 'Editing: ' + n.title;
+    if (cancelBtn) cancelBtn.hidden = false;
+    tellNote('');
+    noteForm.scrollIntoView({ block: 'start' });
+  }
+
+  function loadNotes() {
+    api('/admin/notes')
+      .then(function (data) {
+        noteRows.innerHTML = '';
+
+        if (!data.notes.length) {
+          noteRows.appendChild(el('p', { class: 'muted', text: 'Nothing written yet.' }));
+          return;
+        }
+
+        var KIND = { write: 'Writing', build: 'Build log', find: 'Research' };
+
+        data.notes.forEach(function (n) {
+          var live = n.status === 'published';
+          var meta = [KIND[n.kind] || n.kind, n.status, n.readMinutes + ' min'];
+          if (n.buildState) meta.push(n.buildState);
+
+          var acts = el('div', { class: 'mod-row__acts' }, [
+            live ? el('a', { class: 'btn btn--small btn--ghost', href: 'note.html?n=' + n.slug, text: 'View' }) : null,
+            button(live ? 'Unpublish' : 'Publish', 'btn--ghost', function () {
+              api('/admin/notes/' + n.id, { method: 'PATCH', body: JSON.stringify({ status: live ? 'draft' : 'published' }) })
+                .then(function () { tellNote(live ? 'Back to draft.' : 'Published.'); loadNotes(); })
+                .catch(function (err) { tellNote(err.message, true); });
+            }),
+            button('Edit', 'btn--ghost', function () { editNote(n); }),
+            button('Delete', 'btn--danger', function () {
+              if (!window.confirm('Delete "' + n.title + '"? This cannot be undone.')) return;
+              api('/admin/notes/' + n.id, { method: 'DELETE' })
+                .then(function () { tellNote('Deleted.'); loadNotes(); })
+                .catch(function (err) { tellNote(err.message, true); });
+            }),
+          ]);
+
+          noteRows.appendChild(el('div', { class: 'mod-row', 'data-hidden': live ? 'false' : 'true' }, [
+            el('div', { class: 'mod-row__main' }, [
+              el('strong', { text: n.title }),
+              el('p', { class: 'muted', text: meta.join(' \u00b7 ') }),
+            ]),
+            acts,
+          ]));
+        });
+      })
+      .catch(function (err) { tellNote(err.message, true); });
+  }
+
+  if (noteForm) {
+    noteForm.kind.addEventListener('change', toggleBuildField);
+    noteForm.addEventListener('submit', function (event) { event.preventDefault(); saveNote('published'); });
+    document.querySelector('[data-note-draft]').addEventListener('click', function () { saveNote('draft'); });
+    if (cancelBtn) cancelBtn.addEventListener('click', resetNoteForm);
+    toggleBuildField();
+  }
+
   /* ── subscribers ──────────────────────────────────────── */
 
   var subsCount = document.querySelector('[data-subs-count]');
@@ -165,7 +288,7 @@
     });
   }
 
-  function unlock() { gate.hidden = true; panel.hidden = false; load(); loadSubscribers(); }
+  function unlock() { gate.hidden = true; panel.hidden = false; load(); loadNotes(); loadSubscribers(); }
 
   function lock() {
     try { sessionStorage.removeItem(KEY); } catch (e) { /* ignore */ }

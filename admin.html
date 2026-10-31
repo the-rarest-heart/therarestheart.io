@@ -72,6 +72,61 @@
         </div>
       </div>
 
+      <!-- ░░ WRITE A NOTE ░░ -->
+      <div class="panel" data-note-editor>
+        <form class="stack" data-note-form>
+          <div class="stack stack--sm">
+            <p class="eyebrow" data-note-mode>Write a note</p>
+            <p class="muted">Blank line between paragraphs. Save it as a draft and finish it later, or publish it now.</p>
+          </div>
+
+          <div class="form-row">
+            <div class="field">
+              <label for="n-kind">Kind</label>
+              <select id="n-kind" name="kind" required>
+                <option value="write">Writing</option>
+                <option value="build">Build log</option>
+                <option value="find">Research</option>
+              </select>
+            </div>
+            <div class="field" data-build-state hidden>
+              <label for="n-state">Build state</label>
+              <select id="n-state" name="buildState">
+                <option value="In progress">In progress</option>
+                <option value="Shipped">Shipped</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="n-title">Title</label>
+            <input id="n-title" name="title" type="text" placeholder="Say it the way you would say it out loud" required maxlength="160">
+          </div>
+
+          <div class="field">
+            <label for="n-summary">One line for the card</label>
+            <input id="n-summary" name="summary" type="text" placeholder="The sentence that makes someone open it" maxlength="400">
+          </div>
+
+          <div class="field">
+            <label for="n-body">The note</label>
+            <textarea id="n-body" name="body" rows="14" placeholder="Write it here." required></textarea>
+          </div>
+
+          <div class="pills">
+            <button class="btn btn--primary" type="submit" data-note-publish>Publish</button>
+            <button class="btn btn--ghost" type="button" data-note-draft>Save as draft</button>
+            <button class="btn btn--ghost" type="button" data-note-cancel hidden>Cancel edit</button>
+          </div>
+          <p class="muted" data-note-note hidden></p>
+        </form>
+      </div>
+
+      <div class="stack stack--sm">
+        <p class="eyebrow">Your notes</p>
+        <div class="stack stack--sm" data-note-rows></div>
+      </div>
+
       <div class="panel panel--paper stack stack--sm" data-subs-panel>
         <p class="eyebrow">The list</p>
         <p class="muted" data-subs-count>Counting&hellip;</p>
