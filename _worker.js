@@ -1104,6 +1104,55 @@ async function attachmentIsPublic(db, row) {
   return false;
 }
 
+/**
+ * A draft's files are not public, and serveFile lets you past that on the
+ * X-Admin-Token header — but a "View" link is a plain navigation and cannot
+ * send a header, so clicking it on your own unpublished note returned 404.
+ *
+ * The admin file list therefore hands out a short-lived signed link instead.
+ * The signature is an HMAC over the attachment id and the expiry, keyed on
+ * the admin token, so it cannot be forged, cannot be moved to another file,
+ * stops working after two hours, and never puts the token itself in a URL.
+ * It stays an ordinary URL, which matters for video: the browser can still
+ * make Range requests against it, so seeking works.
+ */
+const PREVIEW_TTL_MS = 2 * 60 * 60 * 1000;
+
+async function previewSignature(secret, id, exp) {
+  const key = await crypto.subtle.importKey(
+    'raw', new TextEncoder().encode(secret),
+    { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']
+  );
+  const mac = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(id + '.' + exp));
+  return [...new Uint8Array(mac)].map((b) => b.toString(16).padStart(2, '0')).join('').slice(0, 32);
+}
+
+async function previewKey(env, id) {
+  if (!env.ADMIN_TOKEN) return '';
+  const exp = Date.now() + PREVIEW_TTL_MS;
+  return exp + '.' + (await previewSignature(env.ADMIN_TOKEN, id, exp));
+}
+
+/** Same length every time, so comparing them leaks nothing about the secret. */
+function sameString(a, b) {
+  if (a.length !== b.length) return false;
+  let diff = 0;
+  for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  return diff === 0;
+}
+
+async function validPreviewKey(env, request, id) {
+  if (!env.ADMIN_TOKEN) return false;
+  const given = new URL(request.url).searchParams.get('k') || '';
+  const cut = given.indexOf('.');
+  if (cut < 1) return false;
+
+  const exp = Number(given.slice(0, cut));
+  if (!Number.isFinite(exp) || exp < Date.now()) return false;
+
+  return sameString(given.slice(cut + 1), await previewSignature(env.ADMIN_TOKEN, id, exp));
+}
+
 async function serveFile(db, env, request, id) {
   const bucket = env.MEDIA;
   if (!bucket) return fail(503, 'File storage is not connected yet.');
@@ -1111,9 +1160,10 @@ async function serveFile(db, env, request, id) {
   const row = await db.prepare('SELECT * FROM attachments WHERE id = ?').bind(id).first();
   if (!row) return fail(404, 'No such file.');
 
-  if (!(await attachmentIsPublic(db, row)) && !authorised(request, env)) {
-    return fail(404, 'No such file.');
-  }
+  const maySee = (await attachmentIsPublic(db, row))
+    || authorised(request, env)
+    || (await validPreviewKey(env, request, id));
+  if (!maySee) return fail(404, 'No such file.');
 
   const headers = new Headers({
     'content-type': row.content_type,
@@ -1160,15 +1210,22 @@ async function serveFile(db, env, request, id) {
 
 /* Moderating one file at a time, same as a reply. */
 
-async function adminListAttachments(db, url) {
+async function adminListAttachments(db, env, url) {
   const kind = url.searchParams.get('kind') || '';
   const ownerId = Number(url.searchParams.get('id') || 0);
   if (!OWNER_KINDS.includes(kind) || !ownerId) return fail(400, 'Which post?');
 
   const rows = await attachmentsFor(db, kind, ownerId, true);
-  return json({
-    attachments: rows.map((a) => Object.assign(publicAttachment(a), { status: a.status })),
-  });
+  const attachments = await Promise.all(rows.map(async (a) => {
+    const key = await previewKey(env, a.id);
+    return Object.assign(publicAttachment(a), {
+      status: a.status,
+      // Opens a draft's or a hidden file in the browser, where the header
+      // a fetch would send cannot follow.
+      previewUrl: key ? '/api/files/' + a.id + '/' + encodeURIComponent(a.filename) + '?k=' + key : null,
+    });
+  }));
+  return json({ attachments });
 }
 
 async function adminPatchAttachment(db, request, id) {
@@ -1290,7 +1347,7 @@ async function api(request, env, url) {
     if (m && method === 'PATCH') return adminPatchReply(db, request, Number(m[1]));
     if (m && method === 'DELETE') return adminDeleteReply(db, env, Number(m[1]));
 
-    if (path === '/api/admin/attachments' && method === 'GET') return adminListAttachments(db, url);
+    if (path === '/api/admin/attachments' && method === 'GET') return adminListAttachments(db, env, url);
 
     m = path.match(/^\/api\/admin\/attachments\/(\d+)$/);
     if (m && method === 'PATCH') return adminPatchAttachment(db, request, Number(m[1]));

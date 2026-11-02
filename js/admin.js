@@ -231,7 +231,7 @@
                 caption,
               ]),
               el('div', { class: 'mod-row__acts' }, [
-                el('a', { class: 'btn btn--small btn--ghost', href: a.url, target: '_blank', rel: 'noopener', text: 'View' }),
+                el('a', { class: 'btn btn--small btn--ghost', href: a.previewUrl || a.url, target: '_blank', rel: 'noopener', text: 'View' }),
                 save, hide, del,
               ]),
             ]));
