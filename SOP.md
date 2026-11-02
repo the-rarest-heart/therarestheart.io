@@ -95,6 +95,10 @@ if you miscount.
 The box in the editor only adds new files. To caption, hide or delete the
 ones already on a note, find it under **Your notes** and tap **Files**.
 
+**View** opens the file itself, and it works on a draft — the link it uses is
+signed and lasts two hours, so you can watch a video back before deciding to
+publish it. Anyone else following that link gets nothing.
+
 ---
 
 ## Editing a note
