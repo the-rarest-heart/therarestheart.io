@@ -37,16 +37,22 @@ posted it, what it is, what order it goes in — and R2 holds the bytes. Nothing
 is served straight from R2: every file goes through `/api/files/:id`, so a
 hidden post's photos stop being reachable the moment you hide it.
 
-**Storage is not switched on yet,** so the binding in `wrangler.toml` is
-commented out. That is deliberate: Pages refuses to publish the Function at
-all when a binding names a bucket that does not exist. The assets go up, the
-Function does not, and `/api/*` — the whole Commons — goes down with it. The
-build log says it plainly:
+**Storage is on.** R2 was enabled and the `trh-media` bucket created on
+2 November 2026, the `attachments` table applied to the remote database the
+same day, and the `[[r2_buckets]]` binding in `wrangler.toml` uncommented
+once both existed.
+
+That order is not optional. Pages refuses to publish the Function at all when
+a binding names a bucket that does not exist — the assets go up, the Function
+does not, and `/api/*`, the whole Commons, goes down with it:
 
 ```
 Error: Failed to publish your Function. Got error: R2 bucket 'trh-media'
 not found.
 ```
+
+So if the bucket is ever deleted or renamed, comment the binding out again
+*before* the next deploy.
 
 The schema is the other half of the same problem. `attachments` is created by
 `schema.sql`, applied by hand, so it can lag a deploy — and a note that reads
@@ -56,11 +62,8 @@ nothing to do with attachments. Every read of the table now goes through
 rethrows anything else. Notes, threads and replies render, and posting and
 moderating keep working, whether or not the table has landed.
 
-Three steps, in this order:
-
-1. Cloudflare dashboard → **R2** → enable it (needs a card on file; the free
-   allowance below still applies)
-2. From this folder:
+**Rebuilding it from nothing** would be, in this order: enable R2 in the
+dashboard, then
 
 ```bash
 cd /Users/rareheart/therarestheart.io && npx wrangler r2 bucket create trh-media
@@ -70,15 +73,14 @@ cd /Users/rareheart/therarestheart.io && npx wrangler r2 bucket create trh-media
 cd /Users/rareheart/therarestheart.io && npx wrangler d1 execute trh-commons --remote --file=./schema.sql
 ```
 
-3. Uncomment the `[[r2_buckets]]` block in `wrangler.toml`, commit, push
+and only then uncomment the binding. The `d1 execute` is safe to run whenever
+and more than once — `schema.sql` is nothing but `CREATE TABLE IF NOT
+EXISTS`, so it adds what is missing and leaves everything already there
+alone.
 
-The `d1 execute` is safe to run whenever and more than once — `schema.sql` is
-nothing but `CREATE TABLE IF NOT EXISTS`, so it adds what is missing and
-leaves everything already there alone.
-
-Until step 3, uploads answer *"File storage is not connected yet."*, the
-upload box never draws itself, and everything else on the site carries on as
-normal.
+While a binding is absent the site degrades rather than breaking: uploads
+answer *"File storage is not connected yet."*, the upload box never draws
+itself, and everything else carries on as normal.
 
 **Free allowance:** 10 GB stored, 1M uploads and 10M reads a month, and
 Cloudflare charges nothing for bandwidth out. Above that it is $0.015 per GB
@@ -342,10 +344,8 @@ the forms at their endpoint instead.
 ---
 
 ## Still to do
-- **Enable R2, create the `trh-media` bucket, uncomment the binding.** See
-  Media above — all three, in that order. Uploads do not work until they are
-  done, and uncommenting the binding before the bucket exists takes `/api/*`
-  down. Nothing else is affected.
+- Nothing is emailed to you when a thread gets a reply, and nothing posts
+  Gerdie's Monday question. Both want a Worker cron trigger.
 - Images are stored and served at whatever size they were taken, so a photo
   straight off a phone can be several MB. Cloudflare Images would resize them
   on the way out, at $5 a month.

@@ -62,10 +62,6 @@ can read an unfinished note by guessing the URL.
 
 ## Adding photos, video and documents
 
-> **Not live yet.** File storage has to be switched on in Cloudflare first, so
-> until then there is no **Add a file** box on any form and the rest of this
-> section waits. See *Media* in `COMMONS.md` for the three steps.
-
 Under the note, tap **Add a file**. On a phone that opens your camera roll and
 your Files app. Pick as many as you want, one after another — they upload as
 soon as you choose them, so by the time you tap Publish there is nothing left
