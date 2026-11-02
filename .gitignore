@@ -33,5 +33,15 @@ trh-agents/logs/
 # Your admin token, written locally for you to move into a password manager
 admin-token.txt
 
+# Database and media exports. These carry subscriber names and addresses, and
+# this folder is a git repository, so one left in here could be pushed. The
+# SOP writes them to ~/trh-backups instead; this is the backstop for when the
+# command gets run in here anyway. Nothing here matches schema.sql.
+*-backup.sql
+commons-backup*.sql
+commons-????-??-??.sql
+/media-backup/
+/trh-backups/
+
 # Local dev state
 .wrangler/

@@ -63,8 +63,11 @@ Three steps, in this order:
 2. From this folder:
 
 ```bash
-npx wrangler r2 bucket create trh-media
-npx wrangler d1 execute trh-commons --remote --file=./schema.sql
+cd /Users/rareheart/therarestheart.io && npx wrangler r2 bucket create trh-media
+```
+
+```bash
+cd /Users/rareheart/therarestheart.io && npx wrangler d1 execute trh-commons --remote --file=./schema.sql
 ```
 
 3. Uncomment the `[[r2_buckets]]` block in `wrangler.toml`, commit, push
@@ -110,13 +113,13 @@ Recorded here so it can be redone. Nothing below needs running again.
 **1. Sign in.**
 
 ```bash
-npx wrangler login
+cd /Users/rareheart/therarestheart.io && npx wrangler login
 ```
 
 **2. Create the database.**
 
 ```bash
-npx wrangler d1 create trh-commons
+cd /Users/rareheart/therarestheart.io && npx wrangler d1 create trh-commons
 ```
 
 It prints a `database_id`. Paste it into `wrangler.toml`, replacing
@@ -125,7 +128,7 @@ It prints a `database_id`. Paste it into `wrangler.toml`, replacing
 **3. Create the tables.**
 
 ```bash
-npx wrangler d1 execute trh-commons --remote --file=./schema.sql
+cd /Users/rareheart/therarestheart.io && npx wrangler d1 execute trh-commons --remote --file=./schema.sql
 ```
 
 **4. Set the two secrets** — on the Pages project, not on a Worker.
@@ -134,11 +137,11 @@ npx wrangler d1 execute trh-commons --remote --file=./schema.sql
 rate-limiting hashes unguessable; you never type it anywhere.
 
 ```bash
-npx wrangler pages secret put ADMIN_TOKEN --project-name therarestheart-io
+cd /Users/rareheart/therarestheart.io && npx wrangler pages secret put ADMIN_TOKEN --project-name therarestheart-io
 ```
 
 ```bash
-npx wrangler pages secret put IP_SALT --project-name therarestheart-io
+cd /Users/rareheart/therarestheart.io && npx wrangler pages secret put IP_SALT --project-name therarestheart-io
 ```
 
 **5. Deploying.**
@@ -158,14 +161,14 @@ Preview) if you ever want to moderate from a preview.
 ## Working on it locally
 
 ```bash
-npx wrangler pages dev
+cd /Users/rareheart/therarestheart.io && npx wrangler pages dev
 ```
 
 Local runs read secrets from `.dev.vars`, which is gitignored and must never
 be committed. Give the local database its tables once:
 
 ```bash
-npx wrangler d1 execute trh-commons --local --file=./schema.sql
+cd /Users/rareheart/therarestheart.io && npx wrangler d1 execute trh-commons --local --file=./schema.sql
 ```
 
 ---
@@ -285,12 +288,16 @@ someone remembers to bump them on every edit, and forgetting is silent.
 
 ## Backing it up
 
-D1 has no automatic export. Run this now and then and keep the file somewhere
-safe:
+D1 has no automatic export. Run this now and then:
 
 ```bash
-npx wrangler d1 export trh-commons --remote --output=commons-backup.sql
+mkdir -p "$HOME/trh-backups" && cd /Users/rareheart/therarestheart.io && npx wrangler d1 export trh-commons --remote --output="$HOME/trh-backups/commons-$(date +%F).sql"
 ```
+
+It writes to `~/trh-backups`, outside this repository on purpose: the export
+carries subscriber names and email addresses, and a file left in the project
+folder can be committed and pushed. `.gitignore` catches the old in-repo
+names as a backstop.
 
 This matters more now that your writing lives here too. Threads can be
 rebuilt by the people who wrote them; your field notes cannot. Put a reminder
