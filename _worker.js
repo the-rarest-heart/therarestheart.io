@@ -350,7 +350,13 @@ async function getNote(db, slug) {
   return json({ note: Object.assign(publicNote(note), { attachments: files.map(publicAttachment) }) });
 }
 
-function readNoteFields(payload) {
+/**
+ * A draft is unfinished by definition — that is what the button is for. Only
+ * the rules a draft genuinely needs apply to one: a kind, and a title, since
+ * the web address is built from it. The body minimum is a publishing rule and
+ * is checked only when something is actually going public.
+ */
+function readNoteFields(payload, status) {
   const kind = String(payload.kind || '');
   const title = clean(payload.title, LIMITS.noteTitle);
   const summary = clean(payload.summary, LIMITS.noteSummary);
@@ -359,9 +365,16 @@ function readNoteFields(payload) {
 
   if (!NOTE_KINDS.includes(kind)) return { error: 'Pick writing, build log or research.' };
   if (title.length < 6) return { error: 'Give it a title of at least 6 characters.' };
-  if (body.length < 40) return { error: 'The body is too short to publish.' };
+  if (status === 'published' && body.length < 40) {
+    return { error: 'The body is too short to publish. Save it as a draft instead.' };
+  }
 
   return { kind, title, summary, body, buildState };
+}
+
+/** 'published' only when asked for explicitly; everything else is a draft. */
+function intendedStatus(payload) {
+  return payload.status === 'published' ? 'published' : 'draft';
 }
 
 async function adminListNotes(db) {
@@ -373,11 +386,11 @@ async function adminCreateNote(db, request) {
   let payload;
   try { payload = await request.json(); } catch (e) { return fail(400, 'Expected JSON.'); }
 
-  const f = readNoteFields(payload);
+  const status = intendedStatus(payload);
+  const f = readNoteFields(payload, status);
   if (f.error) return fail(400, f.error);
 
   const stamp = now();
-  const status = payload.status === 'published' ? 'published' : 'draft';
   const slug = await uniqueSlug(db, slugify(f.title));
 
   const res = await db
@@ -413,10 +426,10 @@ async function adminPatchNote(db, request, id) {
     return json({ ok: true, slug: existing.slug });
   }
 
-  const f = readNoteFields(payload);
+  const status = intendedStatus(payload);
+  const f = readNoteFields(payload, status);
   if (f.error) return fail(400, f.error);
 
-  const status = payload.status === 'published' ? 'published' : 'draft';
   const stamp = now();
   const slug = f.title === existing.title ? existing.slug : await uniqueSlug(db, slugify(f.title), id);
 
