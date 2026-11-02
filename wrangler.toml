@@ -18,17 +18,11 @@ database_id = "008751ed-6e40-4354-aa04-e1bd2caf8367"
 # Images, video and documents attached to notes and threads. The index lives
 # in D1; the bytes live here.
 #
-# COMMENTED OUT UNTIL THE BUCKET EXISTS. Pages refuses to publish the Function
-# at all if a binding names a bucket that is not there — assets go up, /api/*
-# does not, and the Commons goes down with it. The Worker already copes with a
-# missing MEDIA binding: uploads answer "File storage is not connected yet."
-# and the upload box never draws itself.
-#
-# To turn storage on:
-#   1. Enable R2 in the Cloudflare dashboard (one button, needs a card on file)
-#   2. npx wrangler r2 bucket create trh-media
-#   3. Delete the three # below, commit, push
-#
-# [[r2_buckets]]
-# binding = "MEDIA"
-# bucket_name = "trh-media"
+# The bucket must exist before this binding does. Pages refuses to publish the
+# Function at all when a binding names a bucket that is not there — the assets
+# go up, /api/* does not, and the Commons goes down with it. Bucket created
+# 2026-11-02; if it is ever deleted, comment this block out again before the
+# next deploy.
+[[r2_buckets]]
+binding = "MEDIA"
+bucket_name = "trh-media"
