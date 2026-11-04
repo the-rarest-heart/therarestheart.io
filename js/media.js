@@ -156,14 +156,34 @@ window.TRHMedia = (function () {
     return ext + ' · ' + size(a.bytes);
   }
 
+  /**
+   * Pictures arrive whenever the network hands them over, and one appearing
+   * mid-paragraph is a jolt. The fade is applied here rather than in the
+   * stylesheet so that a page whose JS never ran still shows its pictures:
+   * the hidden state only ever exists while something is around to undo it.
+   * An image already in cache is marked loaded at once, so it does not blink.
+   */
+  function fadeIn(img) {
+    if (window.TRHMotion && window.TRHMotion.still) return;
+    img.className = 'is-fading';
+    if (img.complete) { img.classList.add('is-loaded'); return; }
+    img.addEventListener('load', function () { img.classList.add('is-loaded'); });
+    img.addEventListener('error', function () { img.classList.add('is-loaded'); });
+  }
+
   function one(a) {
     var cap = a.caption ? el('figcaption', { text: a.caption }) : null;
 
     if (a.media === 'image') {
+      var img = el('img', {
+        src: a.url,
+        alt: a.caption || a.filename,
+        loading: 'lazy',
+        decoding: 'async',
+      });
+      fadeIn(img);
       return el('figure', { class: 'media media--image' }, [
-        el('a', { href: a.url, target: '_blank', rel: 'noopener' }, [
-          el('img', { src: a.url, alt: a.caption || a.filename, loading: 'lazy', decoding: 'async' }),
-        ]),
+        el('a', { href: a.url, target: '_blank', rel: 'noopener' }, [img]),
         cap,
       ]);
     }

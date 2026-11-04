@@ -601,6 +601,13 @@ a.thread:hover { border-color: var(--crimson); color: inherit; }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   * { transition: none !important; }
+  /* Transitions alone are not enough once there are keyframes. Anything that
+     animates must also stop, and anything that starts offset must start where
+     it ends, or a reader who asked for stillness gets a blank page. */
+  *, *::before, *::after { animation: none !important; }
+  .reveal { opacity: 1 !important; transform: none !important; }
+  .media img.is-fading { opacity: 1 !important; }
+  .skeleton { background-image: none; }
 }
 
 /* ──────────────────────────────────────────────────────────────
@@ -765,4 +772,135 @@ a.thread:hover { border-color: var(--crimson); color: inherit; }
   font-family: var(--body);
   font-size: 15px;
   width: 100%;
+}
+
+
+/* ──────────────────────────────────────────────────────────────
+   Motion
+
+   Restrained on purpose. The argument this site makes is that the
+   work is plain and the numbers are real, and motion that performs
+   undercuts that. Everything below either tells you something —
+   this is loading, this is new, this is how far you have read — or
+   settles a card into place. Nothing here moves to be noticed.
+   All of it stops under prefers-reduced-motion, above.
+   ────────────────────────────────────────────────────────────── */
+
+/* ── waiting ──────────────────────────────────────────────
+   A skeleton in the shape of the thing that is coming. It
+   replaces a bare "Loading…", which reads as a broken page and
+   then shoves the layout when the real content lands. */
+
+.skeleton {
+  background: var(--line);
+  background-image: linear-gradient(
+    90deg,
+    var(--line) 0%,
+    var(--line-strong) 40%,
+    var(--line) 80%
+  );
+  background-size: 300% 100%;
+  border-radius: 6px;
+  animation: trh-sheen 1.4s ease-in-out infinite;
+}
+
+@keyframes trh-sheen {
+  from { background-position: 150% 0; }
+  to   { background-position: -150% 0; }
+}
+
+.skeleton-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px 22px;
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--white);
+}
+
+.skeleton-line { height: 12px; }
+.skeleton-line--title { height: 19px; width: 70%; }
+.skeleton-line--meta  { height: 11px; width: 35%; }
+.skeleton-line--short { width: 45%; }
+
+/* ── arriving ─────────────────────────────────────────────
+   Ten pixels and a fade, once, as a card comes into view. Enough
+   to feel settled rather than stamped on the page; not enough to
+   read as an effect. The stagger is capped so a long list never
+   turns into a queue you wait on. */
+
+.reveal {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+.reveal.is-in { opacity: 1; transform: none; }
+
+/* ── a reply you just posted ──────────────────────────────
+   The thread reloads after you post, so without this your reply
+   simply appears somewhere and you are left scanning for it. */
+
+.reply.is-new { animation: trh-land 0.6s ease both; }
+
+@keyframes trh-land {
+  from { opacity: 0; transform: translateY(-6px); border-left-color: var(--crimson); }
+  to   { opacity: 1; transform: none; }
+}
+
+.reply.is-new::after {
+  content: "";
+  position: absolute;
+  inset: -6px -10px;
+  border-radius: 12px;
+  background: var(--crimson);
+  opacity: 0.09;
+  pointer-events: none;
+  animation: trh-fade-out 2.4s ease forwards;
+}
+.reply { position: relative; }
+
+@keyframes trh-fade-out {
+  from { opacity: 0.09; }
+  to   { opacity: 0; }
+}
+
+/* ── pictures ─────────────────────────────────────────────
+   An image with no reserved space drops in and shoves the
+   paragraph you are reading down the screen. In a grid every tile
+   gets the same box, which both holds the space and lines the
+   tiles up; contain rather than cover, because these are often
+   screenshots and cropping one loses the thing it was showing.
+   A lone image keeps its natural shape and only fades. */
+
+/* Fail open. The hidden state is applied by JS and only by JS, so a broken
+   script leaves pictures visible rather than leaving a page of blanks. */
+.media img.is-fading { opacity: 0; transition: opacity 0.4s ease; }
+.media img.is-fading.is-loaded { opacity: 1; }
+
+.media-set--grid .media--image a {
+  aspect-ratio: 4 / 3;
+  display: block;
+  background: var(--paper);
+}
+.media-set--grid .media--image img {
+  height: 100%;
+  object-fit: contain;
+}
+
+/* ── how far you have read ────────────────────────────────
+   A field note can run long. This is the one indicator that
+   measurably helps someone finish rather than drift. */
+
+.read-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  width: 100%;
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  background: var(--crimson);
+  z-index: 100;
+  pointer-events: none;
 }
