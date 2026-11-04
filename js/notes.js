@@ -148,7 +148,7 @@
 
     function show(n) {
       root.innerHTML = '';
-      document.title = n.title + ' — Field Notes';
+      document.title = n.title + ' | Field Notes';
 
       var meta = [KIND[n.kind], n.readMinutes + ' min', when(n.publishedAt)];
       if (n.buildState) meta.push(n.buildState);
