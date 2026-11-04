@@ -769,6 +769,16 @@ async function claimAttachments(db, payload, kind, ownerId, isAdmin) {
   const ordered = wanted.filter((id) => allowed.has(id));
   if (!ordered.length) return 0;
 
+  // Carry on from the files already on this post rather than starting at zero
+  // again. Editing a note to add a second batch used to number them 0,1,2…
+  // on top of the first batch's 0,1,2…, and two files sharing a sort are put
+  // in whatever order their ids happen to fall in.
+  const last = await db
+    .prepare('SELECT MAX(sort) AS top FROM attachments WHERE owner_kind = ? AND owner_id = ?')
+    .bind(kind, ownerId)
+    .first();
+  const base = last && Number.isInteger(last.top) ? last.top + 1 : 0;
+
   // Captions ride along with the post, so they are saved in the same breath
   // and a visitor with no admin token can still caption a photo.
   const captions = {};
@@ -785,7 +795,7 @@ async function claimAttachments(db, payload, kind, ownerId, isAdmin) {
           `UPDATE attachments SET owner_kind = ?, owner_id = ?, sort = ?, caption = ?
            WHERE id = ? AND session_id = ? AND owner_kind = 'orphan'`
         )
-        .bind(kind, ownerId, i, captions[id] || '', id, session)
+        .bind(kind, ownerId, base + i, captions[id] || '', id, session)
     )
   );
 
