@@ -93,12 +93,12 @@
     }
 
     function load() {
-      list.innerHTML = '';
-      list.appendChild(el('p', { class: 'muted', text: 'Loading…' }));
+      window.TRHMotion.skeletons(list, 'note', 3);
 
       api('/notes?kind=' + encodeURIComponent(kind))
         .then(function (data) {
           list.innerHTML = '';
+          list.removeAttribute('aria-busy');
 
           if (!data.notes.length) {
             list.appendChild(el('div', { class: 'panel panel--paper stack stack--sm' }, [
@@ -106,7 +106,12 @@
               el('p', { class: 'muted', text: 'The first notes are being written. The Commons is open in the meantime.' }),
             ]));
           } else {
-            data.notes.forEach(function (n) { list.appendChild(card(n)); });
+            var cards = data.notes.map(function (n) {
+              var node = card(n);
+              list.appendChild(node);
+              return node;
+            });
+            window.TRHMotion.reveal(cards);
           }
 
           if (count) {
@@ -122,6 +127,7 @@
         })
         .catch(function (err) {
           list.innerHTML = '';
+          list.removeAttribute('aria-busy');
           list.appendChild(el('p', { class: 'muted form-error', text: err.message }));
         });
     }
@@ -157,6 +163,9 @@
       root.appendChild(el('h1', { class: 'h-hero', text: n.title }));
       if (n.summary) root.appendChild(el('p', { class: 'lede', text: n.summary }));
       root.appendChild(paragraphs(n.body, n.attachments));
+
+      // Only worth drawing once there is a note to measure against.
+      window.TRHMotion.readingProgress(root);
     }
 
     if (!slug) {

@@ -87,9 +87,7 @@
     function roomLabel(id) { return ROOM_LABELS[id] || id; }
 
     function load() {
-      list.setAttribute('aria-busy', 'true');
-      list.innerHTML = '';
-      list.appendChild(el('p', { class: 'muted', text: 'Loading…' }));
+      window.TRHMotion.skeletons(list, 'thread', 4);
 
       api('/threads?room=' + encodeURIComponent(room))
         .then(function (data) {
@@ -102,7 +100,12 @@
               el('p', { class: 'muted', text: 'Be the first. A question with no answer is still useful to the next person who searches for it.' }),
             ]));
           } else {
-            data.threads.forEach(function (t) { list.appendChild(threadCard(t)); });
+            var cards = data.threads.map(function (t) {
+              var node = threadCard(t);
+              list.appendChild(node);
+              return node;
+            });
+            window.TRHMotion.reveal(cards);
           }
 
           if (count) {
@@ -184,6 +187,8 @@
     var repliesRoot = document.querySelector('[data-replies]');
     var replyForm = document.querySelector('[data-reply-form]');
 
+    var justPosted = false;
+
     function renderThread(data) {
       threadRoot.innerHTML = '';
       var t = data.thread;
@@ -207,13 +212,28 @@
         text: data.replies.length ? data.replies.length + (data.replies.length === 1 ? ' reply' : ' replies') : 'No replies yet',
       }));
 
-      data.replies.forEach(function (r) {
-        repliesRoot.appendChild(el('article', { class: 'reply' }, [
+      var replyNodes = data.replies.map(function (r) {
+        var node = el('article', { class: 'reply' }, [
           el('p', { class: 'reply__who', text: r.author + ' · ' + when(r.createdAt) }),
           paragraphs(r.body),
           window.TRHMedia.render(r.attachments),
-        ]));
+        ]);
+        repliesRoot.appendChild(node);
+        return node;
       });
+      window.TRHMotion.reveal(replyNodes);
+
+      // The thread reloads after you post, so without this your reply just
+      // appears somewhere in the list and you are left hunting for it.
+      if (justPosted && replyNodes.length) {
+        var mine = replyNodes[replyNodes.length - 1];
+        window.TRHMotion.landed(mine);
+        mine.scrollIntoView({
+          block: 'center',
+          behavior: window.TRHMotion.still ? 'auto' : 'smooth',
+        });
+      }
+      justPosted = false;
     }
 
     function load() {
@@ -262,6 +282,7 @@
             if (replyPicker) replyPicker.reset();
             note(replyNote, '');
             button.disabled = false;
+            justPosted = true;
             load();
           })
           .catch(function (err) { note(replyNote, err.message, 'bad'); button.disabled = false; });
