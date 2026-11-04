@@ -183,6 +183,25 @@
     draw();
   }
 
+  /**
+   * Pages built from plain HTML opt in by putting data-reveal on a container;
+   * its children then settle in exactly as the cards the API builds do. An
+   * attribute rather than a class so it is obvious in the markup that this is
+   * a behaviour and not a style, and so nothing is hidden unless this script
+   * is actually here to show it again.
+   */
+  function wire() {
+    Array.prototype.forEach.call(document.querySelectorAll('[data-reveal]'), function (group) {
+      reveal(group.children);
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', wire);
+  } else {
+    wire();
+  }
+
   window.TRHMotion = {
     skeletons: skeletons,
     reveal: reveal,
