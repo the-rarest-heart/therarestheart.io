@@ -700,7 +700,7 @@ async function readAttachments(db, sql, binds) {
   } catch (err) {
     const message = (err && err.message) || '';
     if (/no such table/i.test(message)) {
-      console.error('attachments table is not there yet — run schema.sql');
+      console.error('attachments table is not there yet; run schema.sql');
       return [];
     }
     throw err;

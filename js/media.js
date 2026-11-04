@@ -327,7 +327,7 @@ window.TRHMedia = (function () {
         say('Uploading ' + label + '…');
 
         return upload(file, { admin: admin, token: opts.token }, function (fraction) {
-          say('Uploading ' + label + ' — ' + Math.round(fraction * 100) + '%');
+          say('Uploading ' + label + ' · ' + Math.round(fraction * 100) + '%');
         })
           .then(function (data) {
             chosen.push(Object.assign({ caption: '' }, data.attachment));

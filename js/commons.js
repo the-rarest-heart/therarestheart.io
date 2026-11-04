@@ -166,7 +166,7 @@
             else {
               form.reset();
               if (picker) picker.reset();
-              note(status, 'Thanks — posted.');
+              note(status, 'Thanks, posted.');
               button.disabled = false;
             }
           })
@@ -187,7 +187,7 @@
     function renderThread(data) {
       threadRoot.innerHTML = '';
       var t = data.thread;
-      document.title = t.title + ' — The Commons';
+      document.title = t.title + ' | The Commons';
 
       var meta = el('div', { class: 'thread__meta' });
       if (t.newHere) meta.appendChild(el('span', { class: 'badge badge--new', text: 'New here' }));
