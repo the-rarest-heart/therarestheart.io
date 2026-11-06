@@ -1,0 +1,1319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Remote Tech Help for Parents &amp; Seniors | The Rarest Heart</title>
+  <meta name="description" content="Patient remote tech help and scam protection for older adults, from a CompTIA Security+ certified technician. Screen-share sessions from $75. You don't have to be in the room." />
+  <link rel="icon" type="image/png" href="images/favicon.png">
+  <link rel="apple-touch-icon" href="images/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700;1,300&display=swap" rel="stylesheet" />
+
+  <!--
+    ════════════════════════════════════════════════════════════════
+    BEFORE THIS PAGE GOES LIVE — replace every item below.
+    Search the file for  PLACEHOLDER  to find them all.
+
+    [ ] Phone number       — 4 places. Get the Google Voice number first.
+    [ ] E&O insurance      — "Insured" appears 3x. Don't publish until bound.
+    [ ] State of LLC       — says South Carolina. Fix if registered elsewhere.
+    [ ] DISH policy        — read outside-employment policy before publishing.
+    [ ] Formspree endpoint — currently shares TheGERD's form (mwvdreqz).
+                             Make a second endpoint so family leads don't
+                             land in the same inbox as demo requests.
+    [ ] Testimonials       — do 3 free sessions, then replace the last
+                             FAQ row with 2 real ones (first names + consent).
+
+    This page is NOT linked from index.html. Add the link only after the
+    checklist above is clear.
+    ════════════════════════════════════════════════════════════════
+  -->
+
+  <style>
+    /* ──────────────────────────────────────────────────────────────
+       TRH design system, retuned for this page's audience.
+
+       Two deliberate deviations from index.html:
+
+       1. ACCENT IS GOLD, not green. Green is TheGERD's product colour
+          on this site. Gold reads warmer, and it keeps the two
+          offerings visually distinct on one domain.
+
+       2. TYPE IS BIGGER AND HEAVIER. Base 19px / weight 400 instead of
+          default / 300, body copy at full --white instead of
+          --off-white. Readers in their seventies cannot comfortably
+          read 300-weight DM Sans at 16px on #080809.
+       ────────────────────────────────────────────────────────────── */
+
+    :root {
+      --navy: #080809;
+      --navy-mid: #0e0e0f;
+      --navy-light: #151516;
+      --white: #f4f4f0;
+      --off-white: #c8c8c4;
+      --accent: #c4a55a;
+      --accent-glow: rgba(196, 165, 90, 0.22);
+      --accent-hover: #d4b86f;
+      --accent-soft: rgba(196, 165, 90, 0.08);
+      --accent-line: rgba(196, 165, 90, 0.35);
+      --gold: #c4a55a;
+      --pulse: #c4a55a;
+      --pulse-glow: rgba(196, 165, 90, 0.22);
+      --warn: #e55050;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    /* Opacity only — deliberately NOT translateY like index.html's copy.
+       With animation-fill-mode: both, the final transform sticks on <body>,
+       and any transform other than none makes <body> the containing block
+       for position:fixed children — which silently breaks the fixed nav and
+       the mobile call bar (they scroll away with the page). index.html has
+       this same bug; worth fixing there too. */
+    @keyframes pageFadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    body {
+      background-color: var(--navy);
+      color: var(--white);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 1.1875rem;   /* 19px — see note above */
+      font-weight: 400;
+      line-height: 1.7;
+      overflow-x: hidden;
+      animation: pageFadeIn 0.45s ease both;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.4;
+    }
+
+    h1, h2, h3, h4 { font-family: 'Syne', sans-serif; line-height: 1.1; }
+    .mono { font-family: 'IBM Plex Mono', monospace; }
+
+    a { color: var(--accent); }
+
+    /* Anything still unfilled is impossible to miss. */
+    .placeholder {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.8em;
+      letter-spacing: 0.08em;
+      color: var(--warn);
+      border: 1px dashed var(--warn);
+      border-radius: 3px;
+      padding: 0.1em 0.5em;
+      white-space: nowrap;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 1rem 4rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(8, 8, 9, 0.9);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .nav-logo { display: flex; align-items: center; gap: 0.75rem; text-decoration: none; }
+    .nav-logo-heart { width: 60px; height: 60px; }
+
+    .nav-logo-text {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.2rem;
+      color: var(--white);
+      letter-spacing: -0.02em;
+    }
+
+    .nav-logo-text span { color: var(--pulse); }
+
+    .nav-links { display: flex; gap: 2rem; list-style: none; align-items: center; }
+
+    .nav-links a {
+      color: var(--off-white);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 400;
+      letter-spacing: 0.02em;
+      transition: color 0.2s;
+      position: relative;
+    }
+
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -4px; left: 0;
+      width: 0; height: 1px;
+      background: var(--accent);
+      transition: width 0.3s;
+    }
+
+    .nav-links a:hover { color: var(--white); }
+    .nav-links a:hover::after { width: 100%; }
+
+    .nav-phone {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.9rem !important;
+      color: var(--white) !important;
+      white-space: nowrap;
+    }
+
+    .nav-cta {
+      background: var(--accent);
+      color: #080809 !important;
+      padding: 0.6rem 1.25rem;
+      border-radius: 4px;
+      font-weight: 500;
+      transition: background 0.2s, transform 0.2s;
+    }
+
+    .nav-cta::after { display: none !important; }
+    .nav-cta:hover { background: var(--accent-hover) !important; transform: translateY(-1px); }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      position: relative;
+      padding: 9rem 4rem 4rem;
+      overflow: hidden;
+    }
+
+    .hero-grid-bg {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(196,165,90,0.045) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(196,165,90,0.045) 1px, transparent 1px);
+      background-size: 60px 60px;
+      mask-image: radial-gradient(ellipse 80% 60% at 50% 50%, black, transparent);
+    }
+
+    .hero-glow {
+      position: absolute;
+      width: 700px; height: 700px;
+      border-radius: 50%;
+      background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+      top: -220px; right: -180px;
+      pointer-events: none;
+    }
+
+    .hero-inner {
+      position: relative;
+      z-index: 1;
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1.35fr 0.65fr;
+      gap: 4rem;
+      align-items: center;
+    }
+
+    .hero-eyebrow {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.75rem;
+      letter-spacing: 0.15em;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      opacity: 0;
+      animation: fadeUp 0.8s ease forwards 0.2s;
+    }
+
+    .hero-eyebrow::before {
+      content: '';
+      display: inline-block;
+      width: 32px; height: 1px;
+      background: var(--accent);
+    }
+
+    .hero-headline {
+      /* Capped so the primary CTA still clears the fold on a 900px screen. */
+      font-size: clamp(2rem, 3.9vw, 3.5rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.04;
+      margin-bottom: 1.75rem;
+      max-width: 20ch;
+      opacity: 0;
+      animation: fadeUp 0.8s ease forwards 0.4s;
+    }
+
+    .hero-sub {
+      font-size: 1.25rem;
+      color: var(--white);
+      max-width: 54ch;
+      margin-bottom: 2.5rem;
+      font-weight: 400;
+      opacity: 0;
+      animation: fadeUp 0.8s ease forwards 0.6s;
+    }
+
+    .hero-sub p + p { margin-top: 1rem; }
+    .hero-sub strong { font-weight: 700; }
+
+    .hero-actions {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      align-items: center;
+      opacity: 0;
+      animation: fadeUp 0.8s ease forwards 0.8s;
+    }
+
+    .hero-badges {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      margin-top: 2.5rem;
+      opacity: 0;
+      animation: fadeUp 0.8s ease forwards 1s;
+    }
+
+    .hero-badge {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.4rem 0.9rem;
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,0.12);
+      color: var(--off-white);
+    }
+
+    /* ── BUTTONS ── */
+    .btn-primary, .btn-secondary {
+      padding: 1.1rem 2rem;
+      border-radius: 4px;
+      text-decoration: none;
+      font-size: 1.05rem;
+      letter-spacing: 0.01em;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      min-height: 48px;
+      font-family: 'DM Sans', sans-serif;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #080809;
+      font-weight: 700;
+      border: none;
+      transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px var(--accent-glow);
+    }
+
+    .btn-secondary {
+      border: 1px solid rgba(255,255,255,0.2);
+      color: var(--white);
+      background: transparent;
+      font-weight: 400;
+      transition: border-color 0.2s, background 0.2s, transform 0.2s;
+    }
+
+    .btn-secondary:hover {
+      border-color: rgba(255,255,255,0.5);
+      background: rgba(255,255,255,0.05);
+      transform: translateY(-2px);
+    }
+
+    /* ── FOUNDER CARD (hero, right) ── */
+    .founder-card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 12px;
+      overflow: hidden;
+      opacity: 0;
+      animation: fadeUp 0.8s ease forwards 0.9s;
+    }
+
+    .founder-photo { width: 100%; aspect-ratio: 4 / 5; overflow: hidden; }
+
+    .founder-photo img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      object-position: center top;
+      display: block;
+    }
+
+    .founder-info {
+      padding: 1.25rem;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .founder-name {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.2rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.2rem;
+    }
+
+    .founder-title {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 0.9rem;
+      line-height: 1.5;
+    }
+
+    .founder-creds { display: flex; flex-direction: column; gap: 0.4rem; }
+
+    .founder-cred {
+      font-size: 0.9rem;
+      color: var(--off-white);
+      display: flex;
+      align-items: flex-start;
+      gap: 0.5rem;
+      line-height: 1.4;
+    }
+
+    .founder-cred::before {
+      content: '▸';
+      color: var(--accent);
+      font-size: 0.7rem;
+      line-height: 1.9;
+    }
+
+    /* ── SECTION SHARED ── */
+    section { position: relative; z-index: 1; }
+
+    .section-inner { max-width: 1200px; margin: 0 auto; padding: 0 4rem; }
+    .section-inner.narrow { max-width: 820px; }
+
+    .band {
+      padding: 7rem 0;
+      background: var(--navy-mid);
+      border-top: 1px solid rgba(255,255,255,0.05);
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .plain { padding: 7rem 0; }
+
+    .section-label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 0.9rem;
+    }
+
+    .section-title {
+      font-size: clamp(1.9rem, 3.4vw, 2.75rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 1.25rem;
+      max-width: 24ch;
+    }
+
+    .section-title.wide { max-width: 34ch; }
+
+    .section-desc {
+      font-size: 1.15rem;
+      color: var(--white);
+      max-width: 58ch;
+    }
+
+    .section-head { margin-bottom: 3.5rem; }
+
+    /* ── PRICING ── */
+    .price-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+      align-items: start;
+    }
+
+    .price-card {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      padding: 2rem;
+      transition: border-color 0.3s, background 0.3s, transform 0.3s;
+      position: relative;
+      height: 100%;
+    }
+
+    .price-card:hover {
+      border-color: var(--accent-line);
+      background: var(--accent-soft);
+      transform: translateY(-3px);
+    }
+
+    .price-card.featured {
+      border-color: var(--accent-line);
+      background: var(--accent-soft);
+    }
+
+    .price-flag {
+      position: absolute;
+      top: -0.75rem; left: 2rem;
+      background: var(--accent);
+      color: #080809;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.65rem;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 0.3rem 0.75rem;
+      border-radius: 3px;
+    }
+
+    .price-card h3 {
+      font-size: 1.35rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      margin-bottom: 0.5rem;
+    }
+
+    .price-amount {
+      font-family: 'Syne', sans-serif;
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: var(--accent);
+      letter-spacing: -0.03em;
+      line-height: 1;
+      margin-bottom: 0.4rem;
+    }
+
+    .price-amount small {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--off-white);
+      letter-spacing: 0;
+    }
+
+    .price-meta {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--off-white);
+      margin-bottom: 1.5rem;
+      line-height: 1.6;
+    }
+
+    .price-card p { font-size: 1.05rem; color: var(--white); }
+    .price-card p + ul { margin-top: 1rem; }
+
+    .price-card ul { list-style: none; display: flex; flex-direction: column; gap: 0.75rem; }
+
+    .price-card li {
+      font-size: 1rem;
+      color: var(--white);
+      display: flex;
+      align-items: flex-start;
+      gap: 0.65rem;
+      line-height: 1.55;
+    }
+
+    .price-card li::before {
+      content: '✓';
+      color: var(--accent);
+      font-size: 0.9rem;
+      line-height: 1.6;
+      flex-shrink: 0;
+    }
+
+    /* ── TRUST / "IS THIS A SCAM?" ── */
+    .trust-lead {
+      font-size: 1.3rem;
+      color: var(--white);
+      max-width: 62ch;
+      margin-bottom: 1rem;
+    }
+
+    .trust-lead strong { font-weight: 700; color: var(--accent); }
+
+    .promise-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin: 2.5rem 0;
+    }
+
+    .promise {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-left: 3px solid var(--accent);
+      border-radius: 0 8px 8px 0;
+      padding: 1.1rem 1.5rem;
+      font-size: 1.08rem;
+      color: var(--white);
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+    }
+
+    .promise-mark {
+      color: var(--accent);
+      font-size: 1.1rem;
+      line-height: 1.5;
+      flex-shrink: 0;
+    }
+
+    .promise strong { font-weight: 700; }
+
+    .verify-box {
+      background: var(--accent-soft);
+      border: 1px solid var(--accent-line);
+      border-radius: 10px;
+      padding: 1.75rem 2rem;
+      font-size: 1.08rem;
+    }
+
+    .verify-box h3 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+    }
+
+    .verify-box ul { list-style: none; margin-top: 0.9rem; display: flex; flex-direction: column; gap: 0.5rem; }
+    .verify-box li { display: flex; gap: 0.6rem; align-items: flex-start; line-height: 1.5; }
+    .verify-box li::before { content: '▸'; color: var(--accent); font-size: 0.75rem; line-height: 1.9; }
+
+    /* ── FOR THE PARENT ── */
+    .parent-note {
+      border-left: 3px solid var(--accent);
+      padding: 0.5rem 0 0.5rem 2.5rem;
+      max-width: 60ch;
+    }
+
+    .parent-note h2 {
+      font-size: clamp(1.8rem, 3.2vw, 2.5rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 1.5rem;
+    }
+
+    .parent-note p {
+      font-size: 1.4rem;
+      line-height: 1.65;
+      color: var(--white);
+      margin-bottom: 1.25rem;
+    }
+
+    .parent-note p:last-of-type { margin-bottom: 2rem; }
+
+    /* ── HOW IT WORKS ── */
+    .steps { display: flex; flex-direction: column; gap: 1.25rem; counter-reset: step; }
+
+    .step {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 1.5rem;
+      align-items: start;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 10px;
+      padding: 1.5rem 1.75rem;
+    }
+
+    .step-num {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--accent);
+      line-height: 1;
+      width: 2.5rem;
+      flex-shrink: 0;
+    }
+
+    .step h3 { font-size: 1.2rem; font-weight: 700; margin-bottom: 0.4rem; letter-spacing: -0.01em; }
+    .step p { font-size: 1.05rem; color: var(--white); }
+
+    /* ── ABOUT ── */
+    .about-layout { display: grid; grid-template-columns: 0.8fr 1.2fr; gap: 4rem; align-items: start; }
+    .about-copy p { font-size: 1.15rem; margin-bottom: 1.25rem; color: var(--white); }
+    .about-copy p:last-child { margin-bottom: 0; }
+    .about-copy strong { font-weight: 700; color: var(--accent); }
+
+    .about-photo {
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.07);
+      aspect-ratio: 4 / 5;
+    }
+
+    .about-photo img { width: 100%; height: 100%; object-fit: cover; object-position: center top; display: block; }
+
+    /* ── FAQ ── */
+    .faq-list { display: flex; flex-direction: column; gap: 0; }
+
+    .faq-item { border-bottom: 1px solid rgba(255,255,255,0.08); padding: 1.75rem 0; }
+    .faq-item:first-child { border-top: 1px solid rgba(255,255,255,0.08); }
+
+    .faq-q {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.2rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      margin-bottom: 0.6rem;
+      color: var(--white);
+    }
+
+    .faq-a { font-size: 1.08rem; color: var(--white); max-width: 68ch; }
+
+    /* ── BOOKING ── */
+    .book-section { padding: 8rem 0; position: relative; overflow: hidden; }
+
+    .book-glow {
+      position: absolute;
+      width: 600px; height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+      top: -200px; left: -150px;
+      pointer-events: none;
+    }
+
+    .book-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5rem;
+      align-items: start;
+      position: relative;
+      z-index: 1;
+    }
+
+    .book-copy h2 { margin-bottom: 1.25rem; }
+    .book-copy p { font-size: 1.2rem; color: var(--white); margin-bottom: 2rem; }
+
+    .book-reassure {
+      font-size: 1rem;
+      color: var(--off-white);
+      border-top: 1px solid rgba(255,255,255,0.08);
+      padding-top: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    .book-form {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      padding: 2.25rem;
+    }
+
+    .book-form h3 { font-size: 1.3rem; font-weight: 700; margin-bottom: 0.4rem; }
+
+    .book-form-sub { font-size: 1rem; color: var(--off-white); margin-bottom: 1.75rem; }
+
+    .form-group { margin-bottom: 1.25rem; }
+
+    .form-group label {
+      display: block;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--off-white);
+      margin-bottom: 0.5rem;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      width: 100%;
+      background: var(--navy-light);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 4px;
+      padding: 0.9rem 1rem;
+      color: var(--white);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 1.05rem;
+      min-height: 48px;
+      transition: border-color 0.2s;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .form-group textarea { resize: vertical; min-height: 110px; }
+    .form-group select option { background: var(--navy-light); }
+
+    .form-submit {
+      width: 100%;
+      justify-content: center;
+      font-size: 1.1rem;
+    }
+
+    #form-success { display: none; text-align: center; padding: 2rem 0; }
+    #form-success .success-icon { font-size: 2.5rem; margin-bottom: 1rem; }
+    #form-success h4 { font-size: 1.25rem; font-weight: 700; margin-bottom: 0.6rem; }
+    #form-success p { font-size: 1.05rem; color: var(--off-white); }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid rgba(255,255,255,0.06);
+      padding: 3rem 4rem;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 2rem;
+    }
+
+    .footer-block { display: flex; flex-direction: column; gap: 0.4rem; }
+
+    .footer-copy { font-size: 0.9rem; color: var(--off-white); }
+    .footer-copy.dim { opacity: 0.5; }
+
+    .footer-links { display: flex; gap: 2rem; list-style: none; flex-wrap: wrap; }
+
+    .footer-links a {
+      font-size: 0.9rem;
+      color: var(--off-white);
+      opacity: 0.6;
+      text-decoration: none;
+      transition: opacity 0.2s;
+    }
+
+    .footer-links a:hover { opacity: 1; }
+
+    /* ── ANIMATION ── */
+    .reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.7s ease, transform 0.7s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.001s !important; animation-delay: 0s !important; transition-duration: 0.001s !important; }
+      .reveal { opacity: 1; transform: none; }
+      html { scroll-behavior: auto; }
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 1000px) {
+      .price-grid { grid-template-columns: 1fr; }
+      .hero-inner, .about-layout, .book-layout { grid-template-columns: 1fr; gap: 3rem; }
+      .founder-card { max-width: 320px; }
+      .about-photo { max-width: 360px; }
+    }
+
+    @media (max-width: 900px) {
+      nav { padding: 0.75rem 1.5rem; }
+      .nav-links { display: none; }
+      .nav-logo-heart { width: 48px; height: 48px; }
+      .hero { padding: 7rem 1.5rem 4rem; min-height: auto; }
+      .section-inner { padding: 0 1.5rem; }
+      .band, .plain { padding: 5rem 0; }
+      .book-section { padding: 5rem 0; }
+      .parent-note { padding-left: 1.5rem; }
+      .parent-note p { font-size: 1.25rem; }
+      .book-form { padding: 1.5rem; }
+      footer { padding: 2rem 1.5rem; flex-direction: column; align-items: flex-start; }
+    }
+
+    /* Nav collapses on mobile, so keep the phone number reachable. */
+    .mobile-call {
+      display: none;
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      z-index: 99;
+      background: var(--accent);
+      color: #080809;
+      text-align: center;
+      padding: 1rem;
+      font-weight: 700;
+      font-size: 1.05rem;
+      text-decoration: none;
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    @media (max-width: 900px) {
+      .mobile-call { display: block; }
+      body { padding-bottom: 3.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a href="safe.html" class="nav-logo">
+      <img src="images/trhlogo.svg" alt="The Rarest Heart" class="nav-logo-heart" width="60" height="60">
+      <span class="nav-logo-text">The Rarest <span>Heart</span></span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#how">How It Works</a></li>
+      <li><a href="#pricing">What It Costs</a></li>
+      <li><a href="#trust">Is This a Scam?</a></li>
+      <!-- PLACEHOLDER: phone -->
+      <li><a href="#book" class="nav-phone">Call <span class="placeholder">ADD PHONE</span></a></li>
+      <li><a href="#book" class="nav-cta">Book a Session</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-grid-bg"></div>
+    <div class="hero-glow"></div>
+
+    <div class="hero-inner">
+      <div class="hero-content">
+        <div class="hero-eyebrow">Remote tech help · CompTIA Security+ certified</div>
+
+        <h1 class="hero-headline">Your mother won't tell you when something goes wrong on her computer.</h1>
+
+        <div class="hero-sub">
+          <p>She doesn't want to be a burden, and she doesn't want to admit she's confused. So she clicks the thing, or she calls the number on the screen, and you find out weeks later.</p>
+          <p>I'm Kelvin Martin. I fix the tech problem and I teach her how to spot the scam — patiently, in plain language, over a screen share. <strong>You don't have to be in the room. Neither do I.</strong></p>
+        </div>
+
+        <div class="hero-actions">
+          <a href="#book" class="btn-primary">Book a Scam-Proofing Session — $99</a>
+          <!-- PLACEHOLDER: phone -->
+          <a href="#book" class="btn-secondary">Not sure yet? Call me first</a>
+        </div>
+
+        <div class="hero-badges">
+          <span class="hero-badge">CompTIA Security+</span>
+          <span class="hero-badge">Google Cybersecurity Certificate</span>
+          <span class="hero-badge">The Rarest Heart LLC</span>
+          <span class="hero-badge">Insured</span>
+        </div>
+      </div>
+
+      <div class="founder-card">
+        <div class="founder-photo">
+          <img src="images/founder.jpg" alt="Kelvin Martin, founder of The Rarest Heart" />
+        </div>
+        <div class="founder-info">
+          <div class="founder-name">Kelvin Martin</div>
+          <div class="founder-title">Founder · The Rarest Heart LLC</div>
+          <div class="founder-creds">
+            <div class="founder-cred">CompTIA Security+ certified</div>
+            <div class="founder-cred">Google Cybersecurity Certificate</div>
+            <div class="founder-cred">Field technician, in homes daily</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section class="band" id="pricing">
+    <div class="section-inner">
+      <div class="section-head reveal">
+        <div class="section-label">What I do</div>
+        <h2 class="section-title wide">Three things people book, and what each one costs.</h2>
+        <p class="section-desc">No quotes, no sales call, no subscription you have to cancel. You can see the price before you decide.</p>
+      </div>
+
+      <div class="price-grid">
+        <div class="price-card featured reveal">
+          <span class="price-flag">Most families start here</span>
+          <h3>Scam-Proofing Session</h3>
+          <div class="price-amount">$99</div>
+          <div class="price-meta">90 minutes · remote</div>
+          <p>I go through your parent's phone, computer, and email the way an attacker would, and then I close the doors.</p>
+          <ul>
+            <li>A password manager, set up and explained — not a list in a drawer</li>
+            <li>Two-step login turned on for email and banking, the two accounts that matter most</li>
+            <li>A walkthrough of what the real scams look like right now: the fake Microsoft call, the fake bank text, the grandchild-in-trouble call, the gift-card ask</li>
+            <li>A written summary emailed to you both, so you know exactly what changed</li>
+          </ul>
+        </div>
+
+        <div class="price-card reveal">
+          <h3>Setup &amp; Fix Session</h3>
+          <div class="price-amount">$75</div>
+          <div class="price-meta">Up to an hour · remote</div>
+          <p>Whatever's broken or baffling.</p>
+          <ul>
+            <li>Phone and tablet setup</li>
+            <li>Email that stopped working</li>
+            <li>Photos they can't find</li>
+            <li>Video calls with the grandkids</li>
+            <li>A printer that's been "possessed since March"</li>
+            <li>Wi-Fi, streaming, a new device out of the box</li>
+          </ul>
+        </div>
+
+        <div class="price-card reveal">
+          <h3>Monthly Check-In</h3>
+          <div class="price-amount">$49<small> /month</small></div>
+          <div class="price-meta">One session a month · cancel any time</div>
+          <p>For families who want someone already in place.</p>
+          <ul>
+            <li>One short session each month</li>
+            <li>Email questions any time in between</li>
+            <li>Software updates and new scams covered as they show up</li>
+            <li>Your parent has someone to ask besides whoever's on the phone claiming to be from Microsoft</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TRUST -->
+  <section class="plain" id="trust">
+    <div class="section-inner narrow">
+      <div class="reveal">
+        <div class="section-label">Read this part carefully</div>
+        <h2 class="section-title wide">You're right to be suspicious of someone asking for remote access.</h2>
+
+        <p class="trust-lead">That's exactly the scam I'm protecting your parent from. A stranger calls, says there's a virus, talks them into handing over their screen, and empties an account. <strong>If you weren't a little suspicious of me right now, I'd be worried about you.</strong></p>
+
+        <p class="section-desc">So here's what I will never do. In writing, on the page, before you give me a dollar.</p>
+      </div>
+
+      <ul class="promise-list">
+        <li class="promise reveal"><span class="promise-mark">✓</span><span><strong>I will never call your parent out of the blue.</strong> Real help starts with you contacting me. If someone calls them claiming to be me, it isn't me.</span></li>
+        <li class="promise reveal"><span class="promise-mark">✓</span><span><strong>I will never ask for or type a password.</strong> If one's needed, they type it while I look away. I don't write passwords down and I don't save them anywhere.</span></li>
+        <li class="promise reveal"><span class="promise-mark">✓</span><span><strong>I will never ask to be paid by gift card, wire transfer, crypto, or a cash app.</strong> I send an invoice. Any other payment request is not from me.</span></li>
+        <li class="promise reveal"><span class="promise-mark">✓</span><span><strong>I will never install anything that lets me reconnect later.</strong> Your parent reads me a one-time code to start the session. When it ends, my access ends.</span></li>
+        <li class="promise reveal"><span class="promise-mark">✓</span><span><strong>I will never work on a screen your parent isn't watching.</strong> They see everything I do, as I do it, and they can stop me at any second without explaining why.</span></li>
+        <li class="promise reveal"><span class="promise-mark">✓</span><span><strong>I will never move money, open an account, or buy anything</strong> on their behalf.</span></li>
+        <li class="promise reveal"><span class="promise-mark">✓</span><span><strong>I will never touch files, photos, or email</strong> beyond what we agreed to.</span></li>
+      </ul>
+
+      <div class="verify-box reveal">
+        <h3>Every client signs a consent form with all of this on it, before the first session.</h3>
+        <p>You get a copy. So does your parent. And you can check me out before any of that:</p>
+        <ul>
+          <li>CompTIA Security+ certified — verifiable, ask and I'll send the credential ID</li>
+          <li>Google Cybersecurity Certificate</li>
+          <li>The Rarest Heart LLC, a registered South Carolina company</li>
+          <li>Professional liability insurance — ask and I'll send the certificate</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOR THE PARENT -->
+  <section class="band">
+    <div class="section-inner">
+      <div class="parent-note reveal">
+        <div class="section-label">If your son or daughter sent you this page</div>
+        <h2>Nothing on your computer is broken because of you.</h2>
+        <p>Technology changed fast, and nobody sat down and explained the new rules. That's not a you problem. It's a nobody-taught-you problem.</p>
+        <p>I won't rush you. I won't take over and do it silently while you watch. I won't make you feel foolish for asking the same question twice — ask it four times, that's fine, that's what you're paying me for.</p>
+        <p>We'll talk on the phone or on a video call. You'll see your own screen the whole time. You can stop whenever you want.</p>
+        <p>And when we're done, you'll know how to tell a real message from a fake one. That's the part that actually matters.</p>
+        <!-- PLACEHOLDER: phone -->
+        <a href="#book" class="btn-primary">Call me and ask anything</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="plain" id="how">
+    <div class="section-inner narrow">
+      <div class="section-head reveal">
+        <div class="section-label">How it works</div>
+        <h2 class="section-title wide">What actually happens in a session.</h2>
+      </div>
+
+      <div class="steps">
+        <div class="step reveal">
+          <div class="step-num">1</div>
+          <div>
+            <h3>You book and tell me what's going on.</h3>
+            <p>You, or your parent, or both of you on the call — whatever's easier. $99 for scam-proofing, $75 for a fix session.</p>
+          </div>
+        </div>
+
+        <div class="step reveal">
+          <div class="step-num">2</div>
+          <div>
+            <h3>We pick a time that's good for them, not for me.</h3>
+            <p>Mornings are usually best. Weekends are fine.</p>
+          </div>
+        </div>
+
+        <div class="step reveal">
+          <div class="step-num">3</div>
+          <div>
+            <h3>I call them. They let me in with a one-time code.</h3>
+            <p>Nothing to install ahead of time. I walk them through it on the phone, slowly. If they'd rather have you on the line too, stay on.</p>
+          </div>
+        </div>
+
+        <div class="step reveal">
+          <div class="step-num">4</div>
+          <div>
+            <h3>We fix it, and then I explain it.</h3>
+            <p>Twice if needed. The explaining is the service — anybody can click the buttons.</p>
+          </div>
+        </div>
+
+        <div class="step reveal">
+          <div class="step-num">5</div>
+          <div>
+            <h3>You both get a written summary.</h3>
+            <p>What was wrong, what I changed, what to watch for. Plain English, no jargon.</p>
+          </div>
+        </div>
+
+        <div class="step reveal">
+          <div class="step-num">6</div>
+          <div>
+            <h3>My access ends when the call ends.</h3>
+            <p>Nothing left running. Nothing left installed.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHO I AM -->
+  <section class="band">
+    <div class="section-inner">
+      <div class="section-head reveal">
+        <div class="section-label">Who's actually doing this</div>
+        <h2 class="section-title wide">Someone who knows the security side, and who has sat at a lot of kitchen tables.</h2>
+      </div>
+
+      <div class="about-layout">
+        <div class="about-photo reveal">
+          <img src="images/founder.jpg" alt="Kelvin Martin" />
+        </div>
+        <div class="about-copy reveal">
+          <p>I'm Kelvin Martin. I run The Rarest Heart, a technology company in South Carolina, and I spend my days as a field technician in people's homes — which means I've spent years explaining technology to people who never asked to learn it, standing in their living rooms.</p>
+          <p>I'm CompTIA Security+ certified and hold the Google Cybersecurity Certificate. I build software for IT teams in regulated industries, where getting security wrong has consequences.</p>
+          <p>That's the combination I'm selling you: someone who knows the security side properly, and who has sat at a lot of kitchen tables explaining things without making anyone feel stupid.</p>
+          <p>My company's whole premise is <strong>People + Process + Tool — in that order.</strong> Your parent is the person. The tool is just how we get it done.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="plain">
+    <div class="section-inner narrow">
+      <div class="section-head reveal">
+        <div class="section-label">Questions</div>
+        <h2 class="section-title">The things families ask me first.</h2>
+      </div>
+
+      <div class="faq-list">
+        <div class="faq-item reveal">
+          <div class="faq-q">What if my parent isn't comfortable with a screen share?</div>
+          <div class="faq-a">Then we start on the phone. Plenty of what I do — spotting scam texts, checking whether an email is real, walking through a setting — works fine by voice. The screen share is a convenience, not a requirement.</div>
+        </div>
+
+        <div class="faq-item reveal">
+          <div class="faq-q">What if they live somewhere else?</div>
+          <div class="faq-a">Doesn't matter. That's the point of doing this remotely. If you're in Denver and they're in Charleston, nobody drives.</div>
+        </div>
+
+        <div class="faq-item reveal">
+          <div class="faq-q">Can I be on the call too?</div>
+          <div class="faq-a">Please do. A lot of families prefer it, especially the first time.</div>
+        </div>
+
+        <div class="faq-item reveal">
+          <div class="faq-q">What if it turns out to need someone physically there?</div>
+          <div class="faq-a">I'll tell you straight. Some things — a dead hard drive, bad cabling, a router that needs replacing — can't be done over a screen. I'll say so, tell you what it needs, and I won't bill you for the session that found out.</div>
+        </div>
+
+        <div class="faq-item reveal">
+          <div class="faq-q">What if my parent has memory problems?</div>
+          <div class="faq-a">Then I need you to sign the consent form too, and I'd want you on the first call. I'm not comfortable relying on verbal permission from someone who may not remember giving it, and you shouldn't be either.</div>
+        </div>
+
+        <div class="faq-item reveal">
+          <div class="faq-q">Do you keep any access afterward?</div>
+          <div class="faq-a">No. Nothing installed, nothing running, no standing access. Every session starts with a fresh code they give me.</div>
+        </div>
+
+        <div class="faq-item reveal">
+          <div class="faq-q">How do I pay?</div>
+          <div class="faq-a">Card, after the session, by invoice. Never a gift card, never a wire, never a cash app — see above.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BOOKING -->
+  <section class="book-section" id="book">
+    <div class="book-glow"></div>
+    <div class="section-inner">
+      <div class="book-layout">
+        <div class="book-copy reveal">
+          <div class="section-label">Get started</div>
+          <h2 class="section-title wide">The scam call is coming whether you prepare for it or not.</h2>
+          <p>Ninety minutes now is cheaper than the conversation you'll have afterward.</p>
+          <p class="book-reassure">No subscription. No contract. One session, one price. If the first ten minutes tell me I can't help, I'll say so and you won't be charged.</p>
+        </div>
+
+        <div class="book-form reveal">
+          <h3>Tell me what's going on</h3>
+          <p class="book-form-sub">I answer every message myself, usually the same day.</p>
+
+          <div id="form-fields">
+            <div class="form-group">
+              <label for="f-name">Your name</label>
+              <input type="text" id="f-name" placeholder="Your name" autocomplete="name" />
+            </div>
+            <div class="form-group">
+              <label for="f-email">Your email</label>
+              <input type="email" id="f-email" placeholder="you@example.com" autocomplete="email" />
+            </div>
+            <div class="form-group">
+              <label for="f-phone">Your phone (optional)</label>
+              <input type="tel" id="f-phone" placeholder="Best number to reach you" autocomplete="tel" />
+            </div>
+            <div class="form-group">
+              <label for="f-who">Who is this for?</label>
+              <select id="f-who">
+                <option value="A parent or relative">A parent or relative</option>
+                <option value="Myself">Myself</option>
+                <option value="Someone else I help">Someone else I help</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="f-service">What are you interested in?</label>
+              <select id="f-service">
+                <option value="Scam-Proofing Session ($99)">Scam-Proofing Session — $99</option>
+                <option value="Setup &amp; Fix Session ($75)">Setup &amp; Fix Session — $75</option>
+                <option value="Monthly Check-In ($49/mo)">Monthly Check-In — $49/month</option>
+                <option value="Not sure yet">Not sure yet — I have questions</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="f-msg">What's going on?</label>
+              <textarea id="f-msg" placeholder="As much or as little as you like. If something already happened that worried you, tell me that first."></textarea>
+            </div>
+            <button class="btn-primary form-submit" onclick="submitHelpRequest()">Send →</button>
+          </div>
+
+          <div id="form-success">
+            <div class="success-icon">✓</div>
+            <h4>Got it — thank you.</h4>
+            <p>I'll reply by email, usually the same day. If it's urgent, call me and I'll pick up or call you straight back.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-block">
+      <span class="footer-copy">Remote tech help for families · The Rarest Heart LLC</span>
+      <!-- PLACEHOLDER: phone -->
+      <span class="footer-copy"><span class="placeholder">ADD PHONE</span> · therarestheart@gmail.com</span>
+      <span class="footer-copy dim">CompTIA Security+ · Google Cybersecurity Certificate · Insured</span>
+      <span class="footer-copy dim">© 2026 The Rarest Heart LLC · therarestheart.io</span>
+    </div>
+    <ul class="footer-links">
+      <li><a href="#trust">My promises to you</a></li>
+      <li><a href="#pricing">Prices</a></li>
+      <li><a href="index.html">TheGERD — for IT teams →</a></li>
+    </ul>
+  </footer>
+
+  <!-- PLACEHOLDER: phone — mobile bar, nav is hidden at this width -->
+  <a href="#book" class="mobile-call">Call me — ADD PHONE NUMBER</a>
+
+  <script>
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry, i) => {
+        if (entry.isIntersecting) {
+          setTimeout(() => entry.target.classList.add('visible'), i * 100);
+        }
+      });
+    }, { threshold: 0.1 });
+    reveals.forEach(el => observer.observe(el));
+
+    const nav = document.querySelector('nav');
+    window.addEventListener('scroll', () => {
+      nav.style.borderBottomColor = window.scrollY > 40
+        ? 'rgba(255,255,255,0.08)'
+        : 'rgba(255,255,255,0.04)';
+    });
+
+    // PLACEHOLDER: shares TheGERD's Formspree endpoint. Create a second
+    // endpoint so family enquiries don't mix with demo requests.
+    async function submitHelpRequest() {
+      const name    = document.getElementById('f-name').value.trim();
+      const email   = document.getElementById('f-email').value.trim();
+      const phone   = document.getElementById('f-phone').value.trim();
+      const who     = document.getElementById('f-who').value;
+      const service = document.getElementById('f-service').value;
+      const msg     = document.getElementById('f-msg').value.trim();
+
+      if (!name || !email) {
+        alert('Please enter your name and email so I can reply.');
+        return;
+      }
+
+      const btn = document.querySelector('.form-submit');
+      btn.textContent = 'Sending…';
+      btn.disabled = true;
+
+      try {
+        const res = await fetch('https://formspree.io/f/mwvdreqz', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify({
+            name,
+            email,
+            phone: phone || '(not provided)',
+            who_for: who,
+            service,
+            message: msg || '(no message)',
+            _subject: 'Tech Help Request — ' + name + ' — ' + service
+          })
+        });
+
+        const data = await res.json();
+
+        if (data.ok) {
+          document.getElementById('form-fields').style.display = 'none';
+          document.getElementById('form-success').style.display = 'block';
+        } else {
+          alert('Something went wrong. Please email therarestheart@gmail.com directly.');
+          btn.textContent = 'Send →';
+          btn.disabled = false;
+        }
+      } catch (e) {
+        alert('Something went wrong. Please email therarestheart@gmail.com directly.');
+        btn.textContent = 'Send →';
+        btn.disabled = false;
+      }
+    }
+  </script>
+</body>
+</html>
