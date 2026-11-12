@@ -166,7 +166,9 @@
       .then(function (data) { say(''); render(data.threads); })
       .catch(function (err) {
         say(err.message, true);
-        if (/not authorised/i.test(err.message)) { lock(); }
+        if (/not authorised/i.test(err.message)) {
+          lock('That token was not accepted. The live site and the preview on localhost each have their own token, so use the one for the address you are on.');
+        }
       });
   }
 
@@ -509,22 +511,32 @@
     loadSubscribers();
   }
 
-  function lock() {
+  var gateNote = document.querySelector('[data-gate-note]');
+
+  /** Back to the token box. A reason says why, so you are never just thrown out. */
+  function lock(reason) {
     try { sessionStorage.removeItem(KEY); } catch (e) { /* ignore */ }
     gate.hidden = false;
     panel.hidden = true;
+    if (gateNote) {
+      gateNote.hidden = !reason;
+      gateNote.textContent = reason || '';
+    }
+    var box = gate.querySelector('input');
+    if (box) { box.value = ''; if (reason) box.focus(); }
   }
 
   document.querySelector('[data-gate-form]').addEventListener('submit', function (event) {
     event.preventDefault();
     var value = event.target.querySelector('input').value.trim();
     if (!value) return;
+    if (gateNote) { gateNote.hidden = true; gateNote.textContent = ''; }
     try { sessionStorage.setItem(KEY, value); } catch (e) { /* ignore */ }
     unlock();
   });
 
   var signOut = document.querySelector('[data-sign-out]');
-  if (signOut) signOut.addEventListener('click', lock);
+  if (signOut) signOut.addEventListener('click', function () { lock(); });
 
   if (roomSelect) roomSelect.addEventListener('change', load);
 
