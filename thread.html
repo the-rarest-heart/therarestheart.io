@@ -9,7 +9,7 @@
 <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Inter:wght@400;500;600&family=Caveat:wght@500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/trh.css">
 </head>
 <body>
@@ -41,16 +41,16 @@
       <div class="row__main stack stack--lg">
         <p><a href="commons.html">&larr; All rooms</a></p>
 
-        <article class="panel stack" data-thread>
+        <article class="panel sheet stack" data-thread>
           <p class="muted">Loading&hellip;</p>
         </article>
 
         <div class="stack" data-replies></div>
 
-        <div class="panel panel--paper" id="reply">
+        <div class="panel sticky-pad" id="reply">
           <form class="stack" data-reply-form>
             <div class="stack stack--sm">
-              <p class="eyebrow">Reply</p>
+              <p class="eyebrow">Add a sticky note</p>
               <p class="muted">No account needed. Be the person you'd have wanted when you were new.</p>
             </div>
 
@@ -70,6 +70,18 @@
               <textarea id="r-body" name="body" rows="5" placeholder="What would actually help here?" required></textarea>
             </div>
 
+            <fieldset class="papers">
+              <legend>Pick your paper</legend>
+              <div class="papers__row">
+                <label class="paper-pick paper-pick--1"><input type="radio" name="color" value="1" checked><span></span><span class="sr-only">Yellow</span></label>
+                <label class="paper-pick paper-pick--2"><input type="radio" name="color" value="2"><span></span><span class="sr-only">Pink</span></label>
+                <label class="paper-pick paper-pick--3"><input type="radio" name="color" value="3"><span></span><span class="sr-only">Blue</span></label>
+                <label class="paper-pick paper-pick--4"><input type="radio" name="color" value="4"><span></span><span class="sr-only">Green</span></label>
+                <label class="paper-pick paper-pick--5"><input type="radio" name="color" value="5"><span></span><span class="sr-only">Orange</span></label>
+                <label class="paper-pick paper-pick--6"><input type="radio" name="color" value="6"><span></span><span class="sr-only">Purple</span></label>
+              </div>
+            </fieldset>
+
             <div class="field">
               <label>Anything to show</label>
               <div data-upload></div>
@@ -80,7 +92,7 @@
               <input id="r-website" name="website" type="text" tabindex="-1" autocomplete="off">
             </div>
 
-            <button class="btn btn--primary" type="submit">Post reply</button>
+            <button class="btn btn--primary" type="submit">Stick it on</button>
             <p class="muted" data-form-note hidden></p>
           </form>
         </div>
@@ -168,6 +180,7 @@
 <script src="js/motion.js"></script>
 <script src="js/media.js"></script>
 <script src="js/commons.js"></script>
+<script src="js/gerdie.js"></script>
 <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
 </body>
 </html>

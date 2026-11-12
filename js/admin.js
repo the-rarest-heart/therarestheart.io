@@ -388,6 +388,63 @@
     toggleBuildField();
   }
 
+  /* ── gerdie's glossary ────────────────────────────────── */
+
+  var termForm = document.querySelector('[data-term-form]');
+  var termRows = document.querySelector('[data-term-rows]');
+  var termNote = termForm && termForm.querySelector('[data-term-note]');
+
+  function tellTerm(message, bad) {
+    if (!termNote) return;
+    termNote.hidden = !message;
+    termNote.textContent = message || '';
+    termNote.className = 'muted' + (bad ? ' form-error' : '');
+  }
+
+  function loadTerms() {
+    if (!termRows) return;
+    api('/glossary')
+      .then(function (data) {
+        termRows.innerHTML = '';
+        if (!data.terms.length) {
+          termRows.appendChild(el('p', { class: 'muted', text: 'No words yet. Add the first one a beginner would trip on.' }));
+          return;
+        }
+        data.terms.forEach(function (t) {
+          termRows.appendChild(el('div', { class: 'thread stack stack--sm' }, [
+            el('p', {}, [el('strong', { text: t.term })]),
+            el('p', { class: 'muted', text: t.meaning }),
+            el('div', { class: 'pills' }, [
+              button('Edit', 'btn--ghost', function () {
+                termForm.term.value = t.term;
+                termForm.meaning.value = t.meaning;
+                termForm.meaning.focus();
+              }),
+              button('Delete', 'btn--ghost', function () {
+                if (!window.confirm('Delete "' + t.term + '" from the glossary?')) return;
+                api('/admin/glossary/' + t.id, { method: 'DELETE' })
+                  .then(function () { tellTerm('Deleted.'); loadTerms(); })
+                  .catch(function (err) { tellTerm(err.message, true); });
+              }),
+            ]),
+          ]));
+        });
+      })
+      .catch(function (err) { tellTerm(err.message, true); });
+  }
+
+  if (termForm) {
+    termForm.addEventListener('submit', function (event) {
+      event.preventDefault();
+      api('/admin/glossary', {
+        method: 'POST',
+        body: JSON.stringify({ term: termForm.term.value, meaning: termForm.meaning.value }),
+      })
+        .then(function () { termForm.reset(); tellTerm('Saved.'); loadTerms(); })
+        .catch(function (err) { tellTerm(err.message, true); });
+    });
+  }
+
   /* ── subscribers ──────────────────────────────────────── */
 
   var subsCount = document.querySelector('[data-subs-count]');
@@ -448,6 +505,7 @@
     }
     load();
     loadNotes();
+    loadTerms();
     loadSubscribers();
   }
 

@@ -209,16 +209,35 @@
       repliesRoot.innerHTML = '';
       repliesRoot.appendChild(el('h2', {
         class: 'h-card',
-        text: data.replies.length ? data.replies.length + (data.replies.length === 1 ? ' reply' : ' replies') : 'No replies yet',
+        text: data.replies.length
+          ? data.replies.length + (data.replies.length === 1 ? ' sticky note on this' : ' sticky notes on this')
+          : 'No sticky notes yet. Yours can be the first.',
       }));
 
-      var replyNodes = data.replies.map(function (r) {
-        var node = el('article', { class: 'reply' }, [
+      // Each reply is a sticky note on the board. The tilt is dealt in order
+      // so the same thread always looks the same; the paper is whatever the
+      // writer picked, or dealt in order too for notes written before they could.
+      var board = el('div', { class: 'board' });
+      repliesRoot.appendChild(board);
+
+      var replyNodes = data.replies.map(function (r, i) {
+        var answer = el('button', { class: 'sticky__reply', type: 'button', text: 'Reply to ' + r.author });
+        answer.addEventListener('click', function () {
+          if (!replyForm) return;
+          var at = '@' + r.author + ' ';
+          if (replyForm.body.value.indexOf(at) !== 0) replyForm.body.value = at + replyForm.body.value;
+          replyForm.scrollIntoView({ block: 'center', behavior: window.TRHMotion.still ? 'auto' : 'smooth' });
+          replyForm.body.focus({ preventScroll: true });
+        });
+
+        var paper = r.color ? ' paper--' + r.color : '';
+        var node = el('article', { class: 'reply sticky sticky--' + (i % 4 + 1) + paper }, [
           el('p', { class: 'reply__who', text: r.author + ' · ' + when(r.createdAt) }),
           paragraphs(r.body),
           window.TRHMedia.render(r.attachments),
+          replyForm ? answer : null,
         ]);
-        repliesRoot.appendChild(node);
+        board.appendChild(node);
         return node;
       });
       window.TRHMotion.reveal(replyNodes);
@@ -259,6 +278,26 @@
       var replyNote = replyForm.querySelector('[data-form-note]');
       var replyFiles = replyForm.querySelector('[data-upload]');
       var replyPicker = replyFiles ? window.TRHMedia.picker(replyFiles, {}) : null;
+
+      // The pad turns the colour you pick, and remembers it for next time.
+      var pad = document.getElementById('reply');
+      var papers = replyForm.querySelectorAll('input[name="color"]');
+      function chosenPaper() {
+        var on = replyForm.querySelector('input[name="color"]:checked');
+        return on ? on.value : '';
+      }
+      function showPaper() { if (pad) pad.setAttribute('data-paper', chosenPaper() || '1'); }
+      try {
+        var kept = localStorage.getItem('trh-paper');
+        Array.prototype.forEach.call(papers, function (p) { if (p.value === kept) p.checked = true; });
+      } catch (e) { /* no storage: the first colour stays picked */ }
+      showPaper();
+      Array.prototype.forEach.call(papers, function (p) {
+        p.addEventListener('change', function () {
+          showPaper();
+          try { localStorage.setItem('trh-paper', chosenPaper()); } catch (e) { /* fine */ }
+        });
+      });
       replyForm.addEventListener('submit', function (event) {
         event.preventDefault();
         var button = replyForm.querySelector('button[type="submit"]');
@@ -270,6 +309,7 @@
           author: replyForm.author.value,
           email: replyForm.email.value,
           website: replyForm.website.value,
+          color: chosenPaper(),
         };
         if (replyPicker) Object.assign(reply, replyPicker.payload());
 
@@ -283,6 +323,7 @@
             note(replyNote, '');
             button.disabled = false;
             justPosted = true;
+            document.dispatchEvent(new CustomEvent('trh:posted'));
             load();
           })
           .catch(function (err) { note(replyNote, err.message, 'bad'); button.disabled = false; });

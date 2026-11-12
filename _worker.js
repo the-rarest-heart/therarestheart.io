@@ -25,6 +25,10 @@
  *   Moderation — all require the X-Admin-Token header:
  *   GET    /api/admin/threads?room=&status=      includes hidden rows
  *   GET    /api/admin/subscribers?format=csv
+ *   GET    /api/glossary                        the words Gerdie can translate
+ *   GET    /api/search?q=                       notes and threads matching a question
+ *   POST   /api/admin/glossary                  { term, meaning }  (same term again replaces it)
+ *   DELETE /api/admin/glossary/:id
  *   GET    /api/admin/notes            POST   /api/admin/notes
  *   PATCH  /api/admin/notes/:id         DELETE /api/admin/notes/:id
  *   PATCH  /api/admin/threads/:id                { status, new_here, title, body }
@@ -137,6 +141,7 @@ const publicReply = (r) => ({
   id: r.id,
   body: r.body,
   author: r.author,
+  color: r.color || null,
   createdAt: r.created_at,
 });
 
@@ -235,14 +240,31 @@ async function createReply(db, request, env, threadId) {
   const ipHash = await hashIp(request, env.IP_SALT);
   if (await overLimit(db, ipHash)) return fail(429, 'That is a lot of posting in one hour. Try again later.');
 
+  // The paper colour the writer picked, 1 to 6. Anything else means none.
+  const picked = parseInt(payload.color, 10);
+  const color = picked >= 1 && picked <= 6 ? picked : null;
+
   const stamp = now();
-  const res = await db
-    .prepare(
-      `INSERT INTO replies (thread_id, body, author, email, status, created_at, ip_hash)
-       VALUES (?, ?, ?, ?, 'visible', ?, ?)`
-    )
-    .bind(threadId, body, author, email || null, stamp, ipHash)
-    .run();
+  let res;
+  try {
+    res = await db
+      .prepare(
+        `INSERT INTO replies (thread_id, body, author, email, status, created_at, ip_hash, color)
+         VALUES (?, ?, ?, ?, 'visible', ?, ?, ?)`
+      )
+      .bind(threadId, body, author, email || null, stamp, ipHash, color)
+      .run();
+  } catch (e) {
+    // A database that has not had the color column added yet (see schema.sql)
+    // must still take the reply. It just lands on a dealt colour.
+    res = await db
+      .prepare(
+        `INSERT INTO replies (thread_id, body, author, email, status, created_at, ip_hash)
+         VALUES (?, ?, ?, ?, 'visible', ?, ?)`
+      )
+      .bind(threadId, body, author, email || null, stamp, ipHash)
+      .run();
+  }
 
   await claimAttachments(db, payload, 'reply', res.meta.last_row_id, authorised(request, env));
 
@@ -283,6 +305,111 @@ async function subscribe(db, request, env) {
     .run();
 
   return json({ ok: true }, 201);
+}
+
+/* ── gerdie: the glossary and the search behind his ask box ── */
+
+/**
+ * The words Gerdie can translate. A database that has not had the glossary
+ * table created yet answers with an empty list, so the notes still load.
+ */
+async function listGlossary(db) {
+  try {
+    const { results } = await db
+      .prepare('SELECT id, term, meaning FROM glossary ORDER BY term COLLATE NOCASE')
+      .all();
+    return json({ terms: results });
+  } catch (e) {
+    return json({ terms: [] });
+  }
+}
+
+/** Saving a term that already exists replaces its meaning. */
+async function adminSaveTerm(db, request) {
+  let payload;
+  try { payload = await request.json(); } catch (e) { return fail(400, 'Expected JSON.'); }
+
+  const term = clean(payload.term, 60);
+  const meaning = clean(payload.meaning, 400);
+  if (term.length < 2) return fail(400, 'Give the word or phrase.');
+  if (meaning.length < 10) return fail(400, 'Write the meaning in a sentence.');
+
+  // The table is made the first time a word is saved, so there is no database
+  // step to remember. The same statement lives in schema.sql.
+  await db
+    .prepare(
+      `CREATE TABLE IF NOT EXISTS glossary (
+         id INTEGER PRIMARY KEY AUTOINCREMENT,
+         term TEXT NOT NULL UNIQUE COLLATE NOCASE,
+         meaning TEXT NOT NULL,
+         created_at TEXT NOT NULL,
+         updated_at TEXT NOT NULL
+       )`
+    )
+    .run();
+
+  const stamp = now();
+  await db
+    .prepare(
+      `INSERT INTO glossary (term, meaning, created_at, updated_at) VALUES (?, ?, ?, ?)
+       ON CONFLICT (term) DO UPDATE SET meaning = excluded.meaning, updated_at = excluded.updated_at`
+    )
+    .bind(term, meaning, stamp, stamp)
+    .run();
+
+  return json({ ok: true }, 201);
+}
+
+async function adminDeleteTerm(db, id) {
+  await db.prepare('DELETE FROM glossary WHERE id = ?').bind(id).run();
+  return json({ ok: true });
+}
+
+const SEARCH_SKIP = new Set([
+  'the', 'and', 'for', 'how', 'what', 'why', 'does', 'with', 'this', 'that', 'can', 'you',
+  'are', 'was', 'not', 'but', 'from', 'have', 'has', 'need', 'want', 'about', 'into', 'our',
+  'your', 'who', 'when', 'where', 'which', 'did', 'get', 'got', 'should', 'would', 'could',
+]);
+
+/**
+ * Plain word matching, no AI: every word of the question is looked for in
+ * the published notes and the visible threads. A hit in a title counts for
+ * more than one in the body. Returns at most three of each, best first.
+ */
+async function search(db, url) {
+  const q = clean(url.searchParams.get('q') || '', 120).toLowerCase();
+  const words = Array.from(new Set(q.split(/[^a-z0-9]+/).filter((w) => w.length >= 3 && !SEARCH_SKIP.has(w)))).slice(0, 6);
+  if (!words.length) return json({ notes: [], threads: [] });
+
+  const like = words.map((w) => '%' + w + '%');
+  const count = (text, w) => (String(text || '').toLowerCase().includes(w) ? 1 : 0);
+
+  const noteWhere = words.map(() => '(title LIKE ? OR summary LIKE ? OR body LIKE ?)').join(' OR ');
+  const noteRows = await db
+    .prepare(`SELECT * FROM notes WHERE status = 'published' AND (${noteWhere}) ORDER BY published_at DESC LIMIT 60`)
+    .bind(...like.flatMap((l) => [l, l, l]))
+    .all();
+
+  const threadWhere = words.map(() => '(title LIKE ? OR body LIKE ?)').join(' OR ');
+  const threadRows = await db
+    .prepare(`SELECT * FROM threads WHERE status != 'hidden' AND (${threadWhere}) ORDER BY updated_at DESC LIMIT 60`)
+    .bind(...like.flatMap((l) => [l, l]))
+    .all();
+
+  const rank = (rows, score) =>
+    rows
+      .map((row) => ({ row, score: words.reduce((sum, w) => sum + score(row, w), 0) }))
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 3)
+      .map((x) => x.row);
+
+  const notes = rank(noteRows.results, (n, w) => 3 * count(n.title, w) + 2 * count(n.summary, w) + count(n.body, w));
+  const threads = rank(threadRows.results, (t, w) => 3 * count(t.title, w) + count(t.body, w));
+
+  return json({
+    notes: notes.map(noteCard),
+    threads: threads.map((t) => ({ id: t.id, title: t.title, room: t.room, replyCount: t.reply_count })),
+  });
 }
 
 /* ── field notes ─────────────────────────────────────────── */
@@ -1319,6 +1446,9 @@ async function api(request, env, url) {
   const fm = path.match(/^\/api\/files\/(\d+)(?:\/[^/]*)?$/);
   if (fm && (method === 'GET' || method === 'HEAD')) return serveFile(db, env, request, Number(fm[1]));
 
+  if (path === '/api/glossary' && method === 'GET') return listGlossary(db);
+  if (path === '/api/search' && method === 'GET') return search(db, url);
+
   const nm = path.match(/^\/api\/notes\/([a-z0-9-]+)$/);
   if (nm && method === 'GET') return getNote(db, nm[1]);
 
@@ -1348,6 +1478,10 @@ async function api(request, env, url) {
     m = path.match(/^\/api\/admin\/notes\/(\d+)$/);
     if (m && method === 'PATCH') return adminPatchNote(db, request, Number(m[1]));
     if (m && method === 'DELETE') return adminDeleteNote(db, env, Number(m[1]));
+
+    if (path === '/api/admin/glossary' && method === 'POST') return adminSaveTerm(db, request);
+    m = path.match(/^\/api\/admin\/glossary\/(\d+)$/);
+    if (m && method === 'DELETE') return adminDeleteTerm(db, Number(m[1]));
 
     m = path.match(/^\/api\/admin\/threads\/(\d+)$/);
     if (m && method === 'PATCH') return adminPatchThread(db, request, Number(m[1]));

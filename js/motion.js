@@ -194,6 +194,35 @@
     Array.prototype.forEach.call(document.querySelectorAll('[data-reveal]'), function (group) {
       reveal(group.children);
     });
+    Array.prototype.forEach.call(document.querySelectorAll('[data-words]'), words);
+  }
+
+  /**
+   * A headline that arrives one word at a time. The words are only hidden by
+   * this script, after it has decided to animate, so a reader with no script
+   * or with reduced motion gets the plain headline and nothing is ever stuck
+   * invisible. The text itself is untouched, so a screen reader reads it
+   * exactly as written.
+   */
+  function words(node) {
+    if (still || node.getAttribute('data-words-done')) return;
+    var text = node.textContent;
+    var parts = text.split(/(\s+)/);
+    node.setAttribute('data-words-done', 'true');
+    node.textContent = '';
+
+    var n = 0;
+    parts.forEach(function (part) {
+      if (!part) return;
+      if (/^\s+$/.test(part)) { node.appendChild(document.createTextNode(part)); return; }
+      var outer = el('span', { class: 'word' });
+      var inner = el('span', { class: 'word__in', text: part });
+      inner.style.animationDelay = Math.min(n, 10) * 70 + 'ms';
+      outer.appendChild(inner);
+      node.appendChild(outer);
+      n++;
+    });
+    node.classList.add('is-words');
   }
 
   if (document.readyState === 'loading') {
@@ -202,7 +231,53 @@
     wire();
   }
 
+  /**
+   * Text that arrives as if it were being written: each block is wiped in
+   * from the left. It rides on reveal(), so it inherits every safety that
+   * has: nothing is hidden without an observer, under reduced motion, or
+   * once it is already on screen. Only the blocks visible on arrival are
+   * staggered; anything further down is written the moment you reach it.
+   */
+  function ink(nodes) {
+    var items = Array.prototype.slice.call(nodes || []);
+    if (!items.length || still) return;
+
+    var onScreen = 0;
+    var spans = items.map(function (node) {
+      var span = el('span', { class: 'ink' });
+      while (node.firstChild) span.appendChild(node.firstChild);
+      node.appendChild(span);
+      if (node.getBoundingClientRect().top < window.innerHeight) {
+        span.style.setProperty('--ink-delay', Math.min(onScreen, 5) * 450 + 'ms');
+        onScreen++;
+      }
+      return span;
+    });
+    reveal(spans);
+  }
+
+  /**
+   * When this reader was last here, as an ISO date, or '' on a first visit.
+   * Read once per browser session and then held, so moving from the homepage
+   * to the notes page does not wipe out what counts as new.
+   */
+  function since() {
+    try {
+      var prev = sessionStorage.getItem('trh-prev');
+      if (prev === null) {
+        prev = localStorage.getItem('trh-seen') || '';
+        sessionStorage.setItem('trh-prev', prev);
+        localStorage.setItem('trh-seen', new Date().toISOString());
+      }
+      return prev;
+    } catch (e) {
+      return '';
+    }
+  }
+
   window.TRHMotion = {
+    ink: ink,
+    since: since,
     skeletons: skeletons,
     reveal: reveal,
     landed: landed,

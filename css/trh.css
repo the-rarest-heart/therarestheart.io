@@ -143,8 +143,13 @@ a:hover { color: var(--crimson-deep); }
   letter-spacing: 0.01em;
   text-decoration: none;
   cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease,
+              transform 0.18s cubic-bezier(0.2, 0.7, 0.2, 1), box-shadow 0.18s ease;
 }
+/* a lift on hover, a press on click: offset and blur, never a hard block */
+.btn:hover { transform: translateY(-2px); box-shadow: 0 10px 18px -10px rgba(17, 17, 20, 0.45); }
+.btn:active { transform: translateY(0) scale(0.98); box-shadow: 0 2px 6px -3px rgba(17, 17, 20, 0.4); }
+.btn--primary:hover { box-shadow: 0 10px 20px -10px rgba(200, 16, 46, 0.65); }
 .btn--primary { background: var(--crimson); color: var(--white); border-color: var(--crimson); }
 .btn--primary:hover { background: var(--crimson-deep); border-color: var(--crimson-deep); color: var(--white); }
 .btn--ghost { background: transparent; color: var(--ink); border-color: var(--ink); }
@@ -401,6 +406,8 @@ a.card:hover { border-color: var(--crimson); transform: translateY(-2px); color:
 /* size 1 — full, once per page */
 .gerdie-full { display: flex; align-items: center; gap: 26px; flex-wrap: wrap; }
 .gerdie-full img { width: 168px; height: auto; flex: 0 0 auto; }
+/* stacked and centred: Gerdie on top, bubble underneath (homepage hero card) */
+.gerdie-full--stack { flex-direction: column; align-items: center; justify-content: center; text-align: left; }
 .gerdie-bubble {
   background: var(--white);
   color: var(--ink);
@@ -474,6 +481,116 @@ a.card:hover { border-color: var(--crimson); transform: translateY(-2px); color:
 }
 .gerdie-panel__close:hover { background: var(--paper); color: var(--ink); }
 
+/* ── what Gerdie says and offers once he is open ─────────── */
+
+.gerdie-panel { max-height: calc(100vh - 124px); max-height: calc(100dvh - 124px); overflow-y: auto; overscroll-behavior: contain; }
+.gerdie-body { display: flex; flex-direction: column; gap: 12px; }
+.gerdie-body h4 { margin: 0; padding-right: 34px; line-height: 1.2; }
+.gerdie-body h4:focus { outline: none; }
+.gerdie-say { font-size: 15px; line-height: 1.5; color: var(--ink-soft); }
+
+.gerdie-ask { display: flex; gap: 8px; align-items: stretch; }
+.gerdie-ask .field { flex: 1 1 auto; min-width: 0; }
+.gerdie-ask .btn { flex: 0 0 auto; }
+
+/* the one thing to read: a small sheet from the journal */
+.gerdie-pick {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 14px 16px;
+  background: var(--sheet);
+  border: 1px solid var(--line-strong);
+  border-radius: 6px;
+  box-shadow: var(--paper-shadow);
+  color: var(--ink);
+  text-decoration: none;
+  transition: transform 0.2s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.gerdie-pick:hover { color: var(--ink); transform: translateY(-2px) rotate(-0.4deg); }
+.gerdie-pick strong { font-family: var(--display); font-size: 17px; line-height: 1.2; }
+.gerdie-pick__sum { font-size: 14px; line-height: 1.45; color: var(--ink-soft); }
+.gerdie-pick__foot { font-size: 13px; font-weight: 600; color: var(--crimson-deep); }
+
+.gerdie-others, .gerdie-steps { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 6px; font-size: 15px; line-height: 1.45; }
+.gerdie-others a { color: var(--crimson-deep); }
+.gerdie-steps { color: var(--ink-soft); gap: 8px; }
+
+/* new since you were last here: a small sticky on the panel */
+.gerdie-new {
+  background: var(--sticky-1);
+  padding: 10px 14px 12px;
+  border-radius: 2px 2px 12px 2px / 2px 2px 20px 2px;
+  box-shadow: 0 1px 1px rgba(17, 17, 20, 0.08), 0 8px 14px -10px rgba(17, 17, 20, 0.45);
+  transform: rotate(-0.6deg);
+}
+.gerdie-new__lead { font-family: var(--hand); font-weight: 700; font-size: 21px; line-height: 1.15; color: var(--ink); margin-bottom: 4px; }
+
+.gerdie-back {
+  align-self: flex-start;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: 600 14px var(--body);
+  color: var(--ink-soft);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.gerdie-back:hover { color: var(--crimson-deep); }
+
+/* the dot he wears when there is something new. He still does not open himself. */
+.gerdie-dock--new { overflow: visible; }
+.gerdie-dock--new::after {
+  content: '';
+  position: absolute;
+  top: -2px; right: -2px;
+  width: 18px; height: 18px;
+  border-radius: 999px;
+  background: var(--crimson);
+  border: 3px solid var(--white);
+}
+
+/* "Ask me now" inside the hero bubble */
+.gerdie-bubble__ask {
+  display: block;
+  min-height: 44px;
+  margin-top: 4px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: 600 15px var(--body);
+  color: var(--crimson-deep);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.gerdie-bubble__ask:hover { color: var(--ink); }
+
+/* a word Gerdie can translate, inside a note */
+.term {
+  display: inline;
+  padding: 0;
+  border: 0;
+  border-bottom: 2px dotted var(--crimson);
+  border-radius: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  cursor: help;
+}
+.term:hover, .term:focus-visible { background: var(--sticky-1); }
+
+/* his hint on the sticky pad */
+.gerdie-aside--pad { margin: 0; border-left-color: rgba(17, 17, 20, 0.3); }
+.gerdie-aside--pad p { font-family: var(--hand); font-size: 22px; line-height: 1.2; color: var(--ink); }
+
+@media (prefers-reduced-motion: reduce) {
+  .gerdie-pick { transition: none; }
+  .gerdie-pick:hover { transform: none; }
+}
+
 /* ── thread list (the commons) ──────────────────────────── */
 
 .thread {
@@ -497,6 +614,18 @@ a.thread:hover { border-color: var(--crimson); color: inherit; }
   color: var(--grey);
 }
 .thread h3 { font-size: 18px; font-weight: 800; letter-spacing: -0.01em; }
+/* A thread is always a white card. Say so, so it never inherits the white text
+   of a dark section and vanishes (the homepage "Local session" demo did). */
+.thread { color: var(--ink); }
+.thread h3 { color: var(--ink); }
+.section--ink .thread .muted { color: var(--grey); }
+
+/* lead layout: the first card is the big one, the rest stack beside it */
+@media (min-width: 981px) {
+  .grid--lead > :first-child:not(:only-child) { grid-column: span 2; grid-row: span 2; }
+  .grid--lead > :first-child:not(:only-child) .h-card { font-size: 28px; line-height: 1.2; }
+  .grid--lead > :first-child:not(:only-child) .card__body { padding: 32px; gap: 16px; }
+}
 
 /* ── commons threads ────────────────────────────────────── */
 
@@ -904,3 +1033,344 @@ a.thread:hover { border-color: var(--crimson); color: inherit; }
   z-index: 100;
   pointer-events: none;
 }
+
+/* ──────────────────────────────────────────────────────────────
+   Hero motion — the first thing a visitor sees, so it is the one
+   place the page moves on its own. Everything here is a keyframe
+   or starts hidden, so every rule is undone under reduced motion
+   at the bottom of this block.
+   ────────────────────────────────────────────────────────────── */
+
+/* headline: each word rises into place, one after another */
+.is-words .word { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: 0.12em; margin-bottom: -0.12em; }
+.is-words .word__in {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(0.7em);
+  animation: word-in 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
+}
+@keyframes word-in { to { opacity: 1; transform: none; } }
+
+/* Gerdie: a slow float, and the bubble pops in once he has settled */
+.gerdie-full--stack img { animation: gerdie-float 6s ease-in-out infinite; will-change: transform; }
+@keyframes gerdie-float {
+  0%, 100% { transform: translateY(0) rotate(-0.6deg); }
+  50%      { transform: translateY(-9px) rotate(0.6deg); }
+}
+.gerdie-full--stack .gerdie-bubble {
+  opacity: 0;
+  transform: translateY(10px) scale(0.97);
+  transform-origin: 20% 0;
+  animation: bubble-in 0.6s 0.9s cubic-bezier(0.2, 0.9, 0.3, 1.2) forwards;
+}
+@keyframes bubble-in { to { opacity: 1; transform: none; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .is-words .word__in { opacity: 1 !important; transform: none !important; }
+  .gerdie-full--stack .gerdie-bubble { opacity: 1 !important; transform: none !important; }
+  .btn:hover, .btn:active { transform: none; }
+}
+
+/* ──────────────────────────────────────────────────────────────
+   Paper — the field notes are a journal and the Commons is a
+   board of sticky notes. One handwriting face (--hand) for the
+   things a person would write by hand: a date, a name, a note
+   you are about to stick on. Reading text stays in the body face.
+   Everything that moves is undone under reduced motion below.
+   ────────────────────────────────────────────────────────────── */
+
+:root {
+  --hand: Caveat, "Segoe Print", "Bradley Hand", cursive;
+  --sheet: #FFFDF8;
+  --rule: #DDE6F1;
+  --margin-line: #EFA5B1;
+  --sticky-1: #FFF0A6;
+  --sticky-2: #FFD6DD;
+  --sticky-3: #D8EAFF;
+  --sticky-4: #DDF2CF;
+  --sticky-5: #FFDDB8;
+  --sticky-6: #E7DCFB;
+  --paper-shadow: 0 1px 1px rgba(17, 17, 20, 0.08), 0 16px 26px -16px rgba(17, 17, 20, 0.45);
+}
+
+.hand { font-family: var(--hand); font-size: 20px; line-height: 1; color: var(--ink-soft); }
+
+/* ── a page from the journal (note.html) ─────────────────── */
+
+.journal {
+  position: relative;
+  background: var(--sheet);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 44px 44px 60px 84px;
+  box-shadow: var(--paper-shadow);
+}
+/* the red margin line down the left of a ruled page */
+.journal::before {
+  content: '';
+  position: absolute;
+  top: 0; bottom: 0; left: 58px;
+  width: 2px;
+  background: var(--margin-line);
+}
+.journal__date {
+  font-family: var(--hand);
+  font-weight: 700;
+  font-size: 30px;
+  line-height: 1;
+  color: var(--crimson-deep);
+  transform: rotate(-2deg);
+  transform-origin: left center;
+}
+.journal__title { position: relative; padding-bottom: 18px; font-size: clamp(32px, 4.6vw, 52px); }
+/* underlined in pen, drawn left to right as the page opens */
+.journal__title::after {
+  content: '';
+  position: absolute;
+  left: 0; bottom: 0;
+  width: min(280px, 62%);
+  height: 6px;
+  border-radius: 6px 2px 5px 3px;
+  background: var(--crimson);
+  transform: rotate(-0.7deg) scaleX(0);
+  transform-origin: left center;
+  animation: pen-line 0.9s 0.35s cubic-bezier(0.3, 0.6, 0.2, 1) forwards;
+}
+@keyframes pen-line { to { transform: rotate(-0.7deg) scaleX(1); } }
+
+/* Ruled lines sit on each paragraph, not the page, so a photo between two
+   paragraphs can be any height and the next paragraph still lands on a line. */
+.journal__body { gap: 0; }
+.journal__body > p {
+  font-size: 18px;
+  line-height: 32px;
+  padding-bottom: 32px;
+  background-image: repeating-linear-gradient(to bottom, transparent 0 31px, var(--rule) 31px 32px);
+  background-position: 0 -4px;
+}
+.journal__body > .media { margin-bottom: 32px; }
+
+/* written in: a wipe from the left, riding on .reveal */
+.ink { display: block; }
+.reveal.ink {
+  opacity: 0.12;
+  transform: none;
+  clip-path: inset(0 100% 0 0);
+  transition: clip-path 1.2s cubic-bezier(0.3, 0.55, 0.3, 1), opacity 0.4s ease;
+  transition-delay: var(--ink-delay, 0s);
+}
+.reveal.ink.is-in { opacity: 1; clip-path: inset(0 0 0 0); }
+
+/* ── the journal index (notes.html, homepage) ────────────── */
+
+.journal-list a.card:hover { transform: translateY(-3px) rotate(-0.5deg); }
+.journal-list a.card:nth-child(even):hover { transform: translateY(-3px) rotate(0.5deg); }
+.flag-new {
+  font-family: var(--hand);
+  font-weight: 700;
+  font-size: 20px;
+  line-height: 1;
+  color: var(--crimson);
+  transform: rotate(-3deg);
+}
+
+/* ── the question, on a sheet taped to the board (thread.html) ── */
+
+.sheet {
+  position: relative;
+  background: var(--sheet);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  box-shadow: var(--paper-shadow);
+}
+.sheet::before {
+  content: '';
+  position: absolute;
+  top: -13px; left: 50%;
+  width: 116px; height: 28px;
+  margin-left: -58px;
+  background: rgba(255, 236, 150, 0.82);
+  box-shadow: 0 1px 2px rgba(17, 17, 20, 0.14);
+  transform: rotate(-2deg);
+}
+
+/* ── replies: sticky notes ───────────────────────────────── */
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 30px 24px;
+  align-items: start;
+  padding: 8px 4px 12px;
+}
+.reply.sticky {
+  --tilt: -1.4deg;
+  position: relative;
+  background: var(--sticky-1);
+  color: var(--ink);
+  border: 0;
+  padding: 30px 22px 18px;
+  border-radius: 2px 2px 16px 2px / 2px 2px 30px 2px;
+  box-shadow: var(--paper-shadow);
+  transform: rotate(var(--tilt));
+  transition: transform 0.25s cubic-bezier(0.2, 0.7, 0.2, 1), box-shadow 0.25s ease;
+}
+/* the gummed strip along the top edge */
+.reply.sticky::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 16px;
+  background: rgba(17, 17, 20, 0.055);
+}
+.reply.sticky--2 { background: var(--sticky-2); --tilt: 1deg; }
+.reply.sticky--3 { background: var(--sticky-3); --tilt: -0.6deg; }
+.reply.sticky--4 { background: var(--sticky-4); --tilt: 1.6deg; }
+
+/* a colour the writer picked beats the one the board would have dealt */
+.reply.sticky.paper--1 { background: var(--sticky-1); }
+.reply.sticky.paper--2 { background: var(--sticky-2); }
+.reply.sticky.paper--3 { background: var(--sticky-3); }
+.reply.sticky.paper--4 { background: var(--sticky-4); }
+.reply.sticky.paper--5 { background: var(--sticky-5); }
+.reply.sticky.paper--6 { background: var(--sticky-6); }
+
+/* the note itself is handwritten, not just the name on it */
+.sticky > .stack > p {
+  font-family: var(--hand);
+  font-size: 23px;
+  line-height: 1.28;
+  color: var(--ink);
+}
+
+.sticky .reply__who {
+  font-family: var(--hand);
+  font-weight: 700;
+  font-size: 24px;
+  line-height: 1.1;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--ink);
+}
+.sticky__reply {
+  align-self: flex-start;
+  min-height: 36px;
+  padding: 6px 0;
+  border: 0;
+  background: none;
+  font: 600 14px var(--body);
+  color: var(--crimson-deep);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.sticky__reply:hover { color: var(--ink); }
+
+/* stuck on: drops from above, over-rotated, and settles with a little spring */
+.reply.sticky.reveal {
+  opacity: 0;
+  transform: translateY(-20px) rotate(calc(var(--tilt) * 3)) scale(1.08);
+  transition: opacity 0.3s ease, transform 0.6s cubic-bezier(0.2, 1.35, 0.4, 1), box-shadow 0.25s ease;
+}
+.reply.sticky.reveal.is-in { opacity: 1; transform: rotate(var(--tilt)); }
+
+/* picked up to read: straightens and lifts off the board */
+.board .reply.sticky.is-in:hover,
+.board .reply.sticky.is-in:focus-within {
+  transform: rotate(0deg) translateY(-5px) scale(1.015);
+  box-shadow: 0 1px 1px rgba(17, 17, 20, 0.08), 0 26px 34px -18px rgba(17, 17, 20, 0.5);
+  z-index: 1;
+}
+
+/* the one you just stuck on */
+.reply.sticky.is-new { animation: sticky-slap 0.75s cubic-bezier(0.2, 1.4, 0.4, 1) both; }
+@keyframes sticky-slap {
+  from { opacity: 0; transform: translateY(-46px) rotate(-9deg) scale(1.22); }
+  to   { opacity: 1; transform: rotate(var(--tilt)); }
+}
+
+/* ── the blank sticky you write on ───────────────────────── */
+
+.sticky-pad {
+  position: relative;
+  background: var(--sticky-1);
+  border: 0;
+  border-radius: 2px 2px 20px 2px / 2px 2px 34px 2px;
+  box-shadow: var(--paper-shadow);
+  transform: rotate(-0.4deg);
+}
+.sticky-pad { transition: background-color 0.2s ease; }
+.sticky-pad[data-paper="2"] { background: var(--sticky-2); }
+.sticky-pad[data-paper="3"] { background: var(--sticky-3); }
+.sticky-pad[data-paper="4"] { background: var(--sticky-4); }
+.sticky-pad[data-paper="5"] { background: var(--sticky-5); }
+.sticky-pad[data-paper="6"] { background: var(--sticky-6); }
+.sticky-pad .muted { color: #4A4636; }
+
+/* pick your paper: six swatches, each a real radio button underneath */
+.papers { border: 0; padding: 0; margin: 0; min-width: 0; }
+.papers legend { padding: 0; margin-bottom: 8px; font-family: var(--display); font-weight: 700; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; }
+.papers__row { display: flex; flex-wrap: wrap; gap: 10px; }
+.paper-pick { position: relative; display: block; width: 44px; height: 44px; cursor: pointer; }
+.paper-pick input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
+.paper-pick input + span {
+  display: block;
+  width: 100%; height: 100%;
+  border-radius: 2px 2px 10px 2px / 2px 2px 16px 2px;
+  border: 1px solid rgba(17, 17, 20, 0.28);
+  box-shadow: 0 1px 2px rgba(17, 17, 20, 0.18);
+  transition: transform 0.15s ease;
+}
+.paper-pick input:checked + span { outline: 3px solid var(--ink); outline-offset: 2px; transform: rotate(-3deg); }
+.paper-pick input:focus-visible + span { outline: 3px solid var(--crimson); outline-offset: 2px; }
+.paper-pick--1 input + span { background: var(--sticky-1); }
+.paper-pick--2 input + span { background: var(--sticky-2); }
+.paper-pick--3 input + span { background: var(--sticky-3); }
+.paper-pick--4 input + span { background: var(--sticky-4); }
+.paper-pick--5 input + span { background: var(--sticky-5); }
+.paper-pick--6 input + span { background: var(--sticky-6); }
+.sticky-pad textarea {
+  font-family: var(--hand);
+  font-size: 24px;
+  line-height: 1.3;
+  background: rgba(255, 255, 255, 0.5);
+  border-color: rgba(17, 17, 20, 0.22);
+}
+.sticky-pad input { background: rgba(255, 255, 255, 0.5); border-color: rgba(17, 17, 20, 0.22); }
+.sticky-pad textarea::placeholder, .sticky-pad input::placeholder { color: #7A6B2A; }
+
+/* ── Commons list: a thread lifts when you reach for it ───── */
+
+a.thread { transition: transform 0.2s cubic-bezier(0.2, 0.7, 0.2, 1), border-color 0.15s ease, box-shadow 0.2s ease; }
+a.thread:hover { transform: translateY(-3px) rotate(-0.35deg); box-shadow: 0 14px 22px -16px rgba(17, 17, 20, 0.4); }
+
+/* ── the typed demo on the homepage ──────────────────────── */
+
+.typed-off { color: transparent; }
+.is-typing .typed-on::after {
+  content: '';
+  display: inline-block;
+  width: 2px; height: 1em;
+  margin-left: 2px;
+  vertical-align: -0.12em;
+  background: var(--crimson);
+  animation: caret 0.8s steps(1) infinite;
+}
+@keyframes caret { 50% { opacity: 0; } }
+
+@media (max-width: 640px) {
+  .journal { padding: 30px 20px 44px 44px; }
+  .journal::before { left: 28px; }
+  .board { grid-template-columns: minmax(0, 1fr); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .journal__title::after { transform: rotate(-0.7deg) scaleX(1) !important; }
+  .reveal.ink { clip-path: none !important; }
+  .reply.sticky.reveal { transform: rotate(var(--tilt)) !important; }
+  .typed-off { color: inherit; }
+}
+
+/* A label inside a crimson panel was crimson on crimson: "Argue with it" on a
+   note and "House rules" on a thread were there but could not be seen. */
+.panel--crimson .eyebrow { color: rgba(255, 255, 255, 0.82); }

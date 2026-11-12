@@ -77,6 +77,15 @@
     var count = document.querySelector('[data-notes-count]');
     var kind = 'all';
 
+    /* notes.html?kind=build opens already filtered (the homepage links here) */
+    var wanted = new URLSearchParams(window.location.search).get('kind');
+    if (wanted && KIND[wanted]) {
+      kind = wanted;
+      Array.prototype.forEach.call(pills, function (p) {
+        p.setAttribute('aria-pressed', p.getAttribute('data-notes-kind') === kind ? 'true' : 'false');
+      });
+    }
+
     function card(n) {
       var capText = KIND[n.kind] + ' · ' + n.readMinutes + ' min';
       var cap = el('div', { class: 'card__cap' + (CAP[n.kind] || '') }, [el('span', { text: capText })]);
@@ -87,10 +96,17 @@
         el('div', { class: 'card__body' }, [
           el('h2', { class: 'h-card', text: n.title }),
           n.summary ? el('p', { class: 'muted', text: n.summary }) : null,
-          el('div', { class: 'card__foot' }, [el('span', { text: when(n.publishedAt) })]),
+          el('div', { class: 'card__foot' }, [
+            el('span', { class: 'hand', text: when(n.publishedAt) }),
+            isNew(n) ? el('span', { class: 'flag-new', text: 'new since your last visit' }) : null,
+          ]),
         ]),
       ]);
     }
+
+    var lastHere = window.TRHMotion.since();
+    function isNew(n) { return !!lastHere && !!n.publishedAt && n.publishedAt > lastHere; }
+    list.classList.add('journal-list');
 
     function load() {
       window.TRHMotion.skeletons(list, 'note', 3);
@@ -156,13 +172,25 @@
       root.innerHTML = '';
       document.title = n.title + ' | Field Notes';
 
-      var meta = [KIND[n.kind], n.readMinutes + ' min', when(n.publishedAt)];
+      var meta = [KIND[n.kind], n.readMinutes + ' min'];
       if (n.buildState) meta.push(n.buildState);
 
+      // A page from the journal: the date in the margin hand, the title
+      // underlined in pen, and the body written onto ruled paper.
+      root.classList.add('journal');
+      root.appendChild(el('p', { class: 'journal__date', text: when(n.publishedAt) }));
       root.appendChild(el('p', { class: 'eyebrow', text: meta.join(' · ') }));
-      root.appendChild(el('h1', { class: 'h-hero', text: n.title }));
+      root.appendChild(el('h1', { class: 'h-hero journal__title', text: n.title }));
       if (n.summary) root.appendChild(el('p', { class: 'lede', text: n.summary }));
-      root.appendChild(paragraphs(n.body, n.attachments));
+
+      var body = paragraphs(n.body, n.attachments);
+      body.classList.add('journal__body');
+      root.appendChild(body);
+      window.TRHMotion.ink(body.querySelectorAll(':scope > p'));
+
+      // Gerdie underlines the glossary words once the note is on the page.
+      window.TRHNote = n;
+      document.dispatchEvent(new CustomEvent('trh:note'));
 
       // Only worth drawing once there is a note to measure against.
       window.TRHMotion.readingProgress(root);

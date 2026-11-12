@@ -52,6 +52,17 @@ So: write the title, read it once, then publish.
 A draft is not just hidden from the list. Its address returns a 404. Nobody
 can read an unfinished note by guessing the URL.
 
+### Words Gerdie can translate
+
+On `/admin`, under your notes, is **Gerdie's glossary**. Save a word or phrase
+with a one-sentence meaning. The first time that word appears in any note it
+gets a dotted underline, and a reader who taps it gets your meaning from
+Gerdie.
+
+- Saving a word that is already there replaces its meaning
+- It matches whole words and ignores capitals, so `SSH key` also catches `ssh key`
+- Only the first appearance in a note is underlined
+
 ### Things you don't fill in
 
 - **Reading time** — counted from the words, about 220 a minute
