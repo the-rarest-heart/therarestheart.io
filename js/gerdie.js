@@ -380,7 +380,8 @@
     if (page === 'note') {
       if (inThisNote.length) parts.push(action('Translate a word in this note', termList));
       parts.push(action('What should I read next?', readNext));
-      parts.push(link('Take it to the Commons', 'commons.html#start'));
+      var here = new URLSearchParams(window.location.search).get('n');
+      parts.push(link('Take it to the Commons', here ? 'commons.html?note=' + encodeURIComponent(here) + '#start' : 'commons.html#start'));
     } else if (page === 'thread') {
       parts.push(action('How sticky notes work', howStickies));
       parts.push(link('See all the rooms', 'commons.html'));

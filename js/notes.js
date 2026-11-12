@@ -168,6 +168,35 @@
   if (root) {
     var slug = new URLSearchParams(window.location.search).get('n');
 
+    /** The panel beside the note: the conversations on it, or a way to start one. */
+    function conversation(n) {
+      var text = document.querySelector('[data-note-cta-text]');
+      var list = document.querySelector('[data-note-cta-list]');
+      var btn = document.querySelector('[data-note-cta-btn]');
+      if (!text || !list || !btn) return;
+
+      var threads = n.threads || [];
+      list.innerHTML = '';
+
+      if (!threads.length) {
+        text.textContent = 'Nobody has started a conversation on this one yet. Yours can be the first.';
+        btn.textContent = 'Start the conversation';
+        btn.setAttribute('href', 'commons.html?note=' + encodeURIComponent(n.slug) + '#start');
+        return;
+      }
+
+      text.textContent = threads.length === 1 ? 'The conversation on this note:' : 'The conversations on this note:';
+      threads.forEach(function (t) {
+        var count = t.replyCount === 1 ? '1 sticky note' : t.replyCount + ' sticky notes';
+        list.appendChild(el('a', { class: 'thread__link', href: 'thread.html?id=' + t.id }, [
+          el('strong', { text: t.title }),
+          el('span', { text: count }),
+        ]));
+      });
+      btn.textContent = 'Add your sticky note';
+      btn.setAttribute('href', 'thread.html?id=' + threads[0].id + '#reply');
+    }
+
     function show(n) {
       root.innerHTML = '';
       document.title = n.title + ' | Field Notes';
@@ -187,6 +216,8 @@
       body.classList.add('journal__body');
       root.appendChild(body);
       window.TRHMotion.ink(body.querySelectorAll(':scope > p'));
+
+      conversation(n);
 
       // Gerdie underlines the glossary words once the note is on the page.
       window.TRHNote = n;
