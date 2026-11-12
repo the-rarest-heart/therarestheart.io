@@ -24,6 +24,7 @@ step, no framework, no third-party community service: it stays yours.
 | `js/media.js` | The upload box, and drawing attachments back out |
 | `js/admin.js` | Your writing and moderation screen |
 | `js/notes.js` | Field Notes list and the single note page |
+| `js/gerdie.js` | Gerdie's dock panel: the ask box, the starting-point guide, glossary words in a note, the new-notes dot |
 | `note.html` | One field note |
 | `admin.html` | `/admin.html` — write notes, and hide / pin / edit / delete threads |
 | `thread.html` | One thread and its replies |

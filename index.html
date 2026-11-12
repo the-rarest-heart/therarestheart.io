@@ -9,7 +9,7 @@
 <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Inter:wght@400;500;600&family=Caveat:wght@500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/trh.css">
 </head>
 <body>
@@ -42,7 +42,7 @@
     <div class="wrap row">
       <div class="row__main stack stack--lg">
         <p class="eyebrow">Innovation with Heart</p>
-        <h1 class="h-hero">Learn tech and AI without feeling behind.</h1>
+        <h1 class="h-hero" data-words>Learn tech and AI without feeling behind.</h1>
         <p class="lede">I write about the work as I do it: compliance, local AI, the parts nobody puts in a case study. No jargon without a translation, no numbers I can't show you.</p>
         <div class="pills">
           <a class="btn btn--primary" href="notes.html">Read the field notes</a>
@@ -53,10 +53,11 @@
 
       <div class="row__side">
         <div class="panel panel--crimson">
-          <div class="gerdie-full">
+          <div class="gerdie-full gerdie-full--stack">
             <img src="images/gerdie.svg" alt="Gerdie, a cartoon heart character in a white tee">
             <div class="gerdie-bubble">
               <strong>Hi, I'm Gerdie.</strong> Tell me what you're stuck on and I'll point you at one thing to read, not twelve.
+              <button class="gerdie-bubble__ask" type="button" data-gerdie-open>Ask me now</button>
             </div>
           </div>
         </div>
@@ -66,7 +67,7 @@
 
   <!-- ░░ PROOF STRIP ░░ -->
   <section class="section section--tight section--ink">
-    <div class="wrap grid grid--3">
+    <div class="wrap grid grid--3" data-reveal>
       <div class="stack stack--sm">
         <p class="eyebrow">Written in public</p>
         <p>Every build log goes up while it's still unfinished, including the parts that didn't work.</p>
@@ -97,7 +98,7 @@
           <div class="card__body">
             <h3 class="h-card">You keep hearing "AI" and nodding.</h3>
             <p class="muted">Start with the writing. Short pieces that define one thing properly and stop.</p>
-            <div class="card__foot"><a href="notes.html">Writing &rarr;</a></div>
+            <div class="card__foot"><a href="notes.html?kind=write">Writing &rarr;</a></div>
           </div>
         </article>
 
@@ -106,7 +107,7 @@
           <div class="card__body">
             <h3 class="h-card">You need it to pass an audit.</h3>
             <p class="muted">Follow the build logs. Real constraints, real dead ends, dated as they happen.</p>
-            <div class="card__foot"><a href="notes.html">Builds &rarr;</a></div>
+            <div class="card__foot"><a href="notes.html?kind=build">Builds &rarr;</a></div>
           </div>
         </article>
 
@@ -115,7 +116,7 @@
           <div class="card__body">
             <h3 class="h-card">You want the thing worth stealing.</h3>
             <p class="muted">Research notes: something I found, why it matters, and how to use it this week.</p>
-            <div class="card__foot"><a href="notes.html">Research &rarr;</a></div>
+            <div class="card__foot"><a href="notes.html?kind=find">Research &rarr;</a></div>
           </div>
         </article>
       </div>
@@ -141,11 +142,11 @@
           <p class="eyebrow">Local session</p>
           <div class="thread">
             <p class="muted">You</p>
-            <p>Does our backup policy actually meet the retention rule?</p>
+            <p data-typed>Does our backup policy actually meet the retention rule?</p>
           </div>
           <div class="thread" style="border-color: var(--crimson)">
             <p class="muted">Assistant &middot; offline</p>
-            <p>Your policy says 30 days. 45 CFR 164.308(a)(7) asks for 60. Here's the gap, and the line it comes from.</p>
+            <p data-typed>Your policy says 30 days. 45 CFR 164.308(a)(7) asks for 60. Here's the gap, and the line it comes from.</p>
           </div>
           <p class="muted">No network request was made to answer that.</p>
         </div>
@@ -164,33 +165,8 @@
         <div class="row__side" style="flex: 0 0 auto"><a href="notes.html">All notes &rarr;</a></div>
       </div>
 
-      <div class="grid grid--3" data-reveal>
-        <a class="card" href="notes.html">
-          <div class="card__cap">Writing &middot; 6 min</div>
-          <div class="card__body">
-            <h3 class="h-card">Nobody can tell you what "HIPAA compliant" means, and that's the problem.</h3>
-            <p class="muted">There is no certificate. There's a set of questions you have to be able to answer.</p>
-            <div class="card__foot"><span>Oct 28</span><span>14 replies</span></div>
-          </div>
-        </a>
-
-        <a class="card" href="notes.html">
-          <div class="card__cap card__cap--build">Build log &middot; updated Oct 21</div>
-          <div class="card__body">
-            <h3 class="h-card">Week 7: teaching it to say "I don't know"</h3>
-            <p class="muted">A confident wrong answer about a retention rule is worse than no answer. Here's what I changed.</p>
-            <div class="card__foot"><span>In progress</span><span>31 replies</span></div>
-          </div>
-        </a>
-
-        <a class="card" href="notes.html">
-          <div class="card__cap card__cap--find">Research &middot; 5 min</div>
-          <div class="card__body">
-            <h3 class="h-card">The checklist buried in NIST SP 800-66 Rev. 2 that should be your onboarding doc</h3>
-            <p class="muted">Someone already wrote the thing you were going to write. Use it instead.</p>
-            <div class="card__foot"><span>Oct 24</span><span>9 replies</span></div>
-          </div>
-        </a>
+      <div class="grid grid--3 grid--lead" data-home-notes aria-busy="true">
+        <p class="muted">Loading the latest notes&hellip;</p>
       </div>
     </div>
   </section>
@@ -210,34 +186,19 @@
           </div>
         </div>
 
-        <div class="row__side stack stack--sm">
-          <div class="thread">
-            <div class="thread__meta"><span class="badge badge--new">New here</span><span>Ask anything</span></div>
-            <h3>Is it bad that I don't know what a VLAN is?</h3>
-            <p class="muted">22 replies &middot; last one Oct 27</p>
-          </div>
-          <div class="thread">
-            <div class="thread__meta"><span class="badge">Compliance corner</span></div>
-            <h3>Auditor asked for our encryption policy. We don't have one written down.</h3>
-            <p class="muted">17 replies &middot; last one Oct 23</p>
-          </div>
+        <div class="row__side stack stack--sm" data-home-threads aria-busy="true">
+          <p class="muted">Loading the latest questions&hellip;</p>
         </div>
       </div>
     </div>
   </section>
 
   <!-- ░░ GERDIE BAND ░░ -->
-  <section class="section section--crimson" id="gerdie">
-    <div class="wrap row" style="align-items: center">
-      <div class="row__side" style="flex: 0 0 auto">
-        <img src="images/gerdie.svg" alt="" width="150" aria-hidden="true">
-      </div>
-      <div class="row__main stack">
-        <p class="eyebrow">Meet Gerdie</p>
-        <h2 class="h-sect">He's a guide, not a mascot.</h2>
-        <p class="lede">Gerdie turns up when a term needs translating, when a page is empty, or when you're one click from giving up. He goes quiet on anything serious: a breach, a legal line, real risk. A cartoon being cute about those is how you lose trust.</p>
-        <p class="muted">He's docked bottom-right on every page. He never opens himself.</p>
-      </div>
+  <section class="section section--tight section--crimson" id="gerdie">
+    <div class="wrap stack stack--sm">
+      <h2 class="h-sect">He's a guide, not a mascot.</h2>
+      <p class="lede">Gerdie turns up when a term needs translating, when a page is empty, or when you're one click from giving up. He goes quiet on anything serious: a breach, a legal line, real risk. A cartoon being cute about those is how you lose trust.</p>
+      <p class="muted">He's docked bottom-right on every page. He never opens himself.</p>
     </div>
   </section>
 
@@ -334,6 +295,8 @@
 
 <script src="js/site.js"></script>
 <script src="js/motion.js"></script>
+<script src="js/home.js"></script>
+<script src="js/gerdie.js"></script>
 <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
 </body>
 </html>

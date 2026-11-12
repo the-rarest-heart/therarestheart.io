@@ -27,8 +27,13 @@ CREATE TABLE IF NOT EXISTS replies (
   email      TEXT,
   status     TEXT    NOT NULL DEFAULT 'visible',       -- visible | hidden
   created_at TEXT    NOT NULL,
-  ip_hash    TEXT
+  ip_hash    TEXT,
+  color      INTEGER                                   -- paper colour 1-6 the writer picked; NULL = dealt in order
 );
+
+-- A database made before the color column existed needs it added once by hand.
+-- CREATE TABLE IF NOT EXISTS above will not do it:
+--   ALTER TABLE replies ADD COLUMN color INTEGER;
 
 CREATE INDEX IF NOT EXISTS idx_replies_thread
   ON replies (thread_id, status, created_at);
@@ -103,3 +108,13 @@ CREATE INDEX IF NOT EXISTS idx_attachments_owner
 
 CREATE INDEX IF NOT EXISTS idx_attachments_orphans
   ON attachments (owner_kind, created_at);
+
+-- Gerdie's glossary. A term here gets a dotted underline the first time it
+-- appears in a field note; tapping it opens Gerdie with the meaning.
+CREATE TABLE IF NOT EXISTS glossary (
+  id         INTEGER PRIMARY KEY AUTOINCREMENT,
+  term       TEXT    NOT NULL UNIQUE COLLATE NOCASE,
+  meaning    TEXT    NOT NULL,
+  created_at TEXT    NOT NULL,
+  updated_at TEXT    NOT NULL
+);
