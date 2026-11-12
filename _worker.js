@@ -334,6 +334,20 @@ async function adminSaveTerm(db, request) {
   if (term.length < 2) return fail(400, 'Give the word or phrase.');
   if (meaning.length < 10) return fail(400, 'Write the meaning in a sentence.');
 
+  // The table is made the first time a word is saved, so there is no database
+  // step to remember. The same statement lives in schema.sql.
+  await db
+    .prepare(
+      `CREATE TABLE IF NOT EXISTS glossary (
+         id INTEGER PRIMARY KEY AUTOINCREMENT,
+         term TEXT NOT NULL UNIQUE COLLATE NOCASE,
+         meaning TEXT NOT NULL,
+         created_at TEXT NOT NULL,
+         updated_at TEXT NOT NULL
+       )`
+    )
+    .run();
+
   const stamp = now();
   await db
     .prepare(
