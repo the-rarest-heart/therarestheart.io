@@ -13,8 +13,13 @@ CREATE TABLE IF NOT EXISTS threads (
   reply_count  INTEGER NOT NULL DEFAULT 0,
   created_at   TEXT    NOT NULL,
   updated_at   TEXT    NOT NULL,
-  ip_hash      TEXT                                    -- salted hash, for rate limiting only
+  ip_hash      TEXT,                                   -- salted hash, for rate limiting only
+  note_id      INTEGER                                 -- the field note this thread sits under, if any
 );
+
+-- A database made before note_id existed gets the column added by the Worker
+-- the first time a thread is linked to a note. To do it by hand instead:
+--   ALTER TABLE threads ADD COLUMN note_id INTEGER;
 
 CREATE INDEX IF NOT EXISTS idx_threads_room
   ON threads (room, status, new_here DESC, updated_at DESC);

@@ -147,6 +147,28 @@
       var status = form.querySelector('[data-form-note]');
       var files = form.querySelector('[data-upload]');
       var picker = files ? window.TRHMedia.picker(files, {}) : null;
+
+      // Arriving from a field note: the thread will sit under it.
+      var underNote = new URLSearchParams(window.location.search).get('note') || '';
+      if (underNote) {
+        api('/notes/' + encodeURIComponent(underNote))
+          .then(function (data) {
+            var drop = el('button', { class: 'gerdie-back', type: 'button', text: 'Not this note' });
+            var banner = el('p', { class: 'thread__from', role: 'status' }, [
+              document.createTextNode('This thread will sit under the field note '),
+              el('strong', { text: '\u201c' + data.note.title + '\u201d' }),
+              document.createTextNode('. '),
+              drop,
+            ]);
+            drop.addEventListener('click', function () {
+              underNote = '';
+              if (banner.parentNode) banner.parentNode.removeChild(banner);
+            });
+            form.insertBefore(banner, form.firstChild);
+          })
+          .catch(function () { underNote = ''; /* no such note: it is just a thread */ });
+      }
+
       form.addEventListener('submit', function (event) {
         event.preventDefault();
         var button = form.querySelector('button[type="submit"]');
@@ -154,6 +176,7 @@
         note(status, 'Posting…');
 
         var payload = {
+          noteSlug: underNote,
           room: form.room.value,
           title: form.title.value,
           body: form.body.value,
@@ -200,6 +223,13 @@
       meta.appendChild(el('span', { text: t.author + ' · ' + when(t.createdAt) }));
 
       threadRoot.appendChild(meta);
+      if (t.note) {
+        threadRoot.appendChild(el('p', { class: 'thread__from' }, [
+          document.createTextNode('From the field note '),
+          el('a', { href: 'note.html?n=' + encodeURIComponent(t.note.slug), text: '\u201c' + t.note.title + '\u201d' }),
+          document.createTextNode(' \u2192'),
+        ]));
+      }
       threadRoot.appendChild(el('h1', { class: 'h-sect', text: t.title }));
       threadRoot.appendChild(paragraphs(t.body));
 

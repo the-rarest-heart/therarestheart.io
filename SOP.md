@@ -52,6 +52,18 @@ So: write the title, read it once, then publish.
 A draft is not just hidden from the list. Its address returns a 404. Nobody
 can read an unfinished note by guessing the URL.
 
+### Putting a conversation under a note
+
+Publish the note first. Then open it on the site and tap **Start the
+conversation** in the panel beside it. That takes you to the Commons form
+with the note already attached, and the thread you post shows a link back to
+the note, while the note shows the thread and how many sticky notes are on it.
+
+- The link is made from that button only. A thread posted from the Commons
+  page directly is not attached to anything
+- Only a published note can have a thread. A draft cannot
+- To undo it, delete the thread and post it again. There is no unlink button
+
 ### Words Gerdie can translate
 
 On `/admin`, under your notes, is **Gerdie's glossary**. Save a word or phrase

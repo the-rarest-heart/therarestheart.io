@@ -123,6 +123,22 @@ async function overLimit(db, ipHash, cap) {
   return false;
 }
 
+/**
+ * A thread can sit under a field note (threads.note_id). The column is added
+ * the first time a thread is linked, so there is no database step to
+ * remember; every read works without it and just shows no link.
+ */
+let noteLinkReady = false;
+async function ensureNoteLink(db) {
+  if (noteLinkReady) return;
+  try {
+    await db.prepare('ALTER TABLE threads ADD COLUMN note_id INTEGER').run();
+  } catch (e) {
+    if (!/duplicate column/i.test(String(e && e.message))) throw e;
+  }
+  noteLinkReady = true;
+}
+
 /** Strip the columns the public should never see. */
 const publicThread = (t) => ({
   id: t.id,
@@ -177,8 +193,17 @@ async function getThread(db, id) {
     attachmentsForReplies(db, id),
   ]);
 
+  let note = null;
+  if (thread.note_id) {
+    const n = await db
+      .prepare("SELECT slug, title FROM notes WHERE id = ? AND status = 'published'")
+      .bind(thread.note_id)
+      .first();
+    if (n) note = { slug: n.slug, title: n.title };
+  }
+
   return json({
-    thread: Object.assign(publicThread(thread), { attachments: own.map(publicAttachment) }),
+    thread: Object.assign(publicThread(thread), { note, attachments: own.map(publicAttachment) }),
     replies: results.map((r) => Object.assign(publicReply(r), { attachments: byReply[r.id] || [] })),
   });
 }
@@ -202,17 +227,42 @@ async function createThread(db, request, env) {
   if (!author) return fail(400, 'What should people call you?');
   if (!isEmail(email)) return fail(400, 'That email address does not look right.');
 
+  // Optionally under a published field note. Only a published note counts,
+  // so a thread can never be hung on a draft.
+  const noteSlug = clean(payload.noteSlug, 100);
+  let noteId = null;
+  if (noteSlug) {
+    const n = await db
+      .prepare("SELECT id FROM notes WHERE slug = ? AND status = 'published'")
+      .bind(noteSlug)
+      .first();
+    if (!n) return fail(400, 'That field note is not here.');
+    noteId = n.id;
+  }
+
   const ipHash = await hashIp(request, env.IP_SALT);
   if (await overLimit(db, ipHash)) return fail(429, 'That is a lot of posting in one hour. Try again later.');
 
   const stamp = now();
-  const res = await db
-    .prepare(
-      `INSERT INTO threads (room, title, body, author, email, new_here, status, reply_count, created_at, updated_at, ip_hash)
-       VALUES (?, ?, ?, ?, ?, ?, 'open', 0, ?, ?, ?)`
-    )
-    .bind(room, title, body, author, email || null, payload.newHere ? 1 : 0, stamp, stamp, ipHash)
-    .run();
+  let res;
+  if (noteId) {
+    await ensureNoteLink(db);
+    res = await db
+      .prepare(
+        `INSERT INTO threads (room, title, body, author, email, new_here, status, reply_count, created_at, updated_at, ip_hash, note_id)
+         VALUES (?, ?, ?, ?, ?, ?, 'open', 0, ?, ?, ?, ?)`
+      )
+      .bind(room, title, body, author, email || null, payload.newHere ? 1 : 0, stamp, stamp, ipHash, noteId)
+      .run();
+  } else {
+    res = await db
+      .prepare(
+        `INSERT INTO threads (room, title, body, author, email, new_here, status, reply_count, created_at, updated_at, ip_hash)
+         VALUES (?, ?, ?, ?, ?, ?, 'open', 0, ?, ?, ?)`
+      )
+      .bind(room, title, body, author, email || null, payload.newHere ? 1 : 0, stamp, stamp, ipHash)
+      .run();
+  }
 
   const id = res.meta.last_row_id;
   await claimAttachments(db, payload, 'thread', id, authorised(request, env));
@@ -474,7 +524,19 @@ async function getNote(db, slug) {
   if (!note || note.status !== 'published') return fail(404, 'No such note.');
 
   const files = await attachmentsFor(db, 'note', note.id);
-  return json({ note: Object.assign(publicNote(note), { attachments: files.map(publicAttachment) }) });
+
+  // The conversations under this note. A database that has no note links yet
+  // has no column to ask, which just means there are none.
+  let threads = [];
+  try {
+    const { results } = await db
+      .prepare("SELECT id, title, author, reply_count FROM threads WHERE note_id = ? AND status != 'hidden' ORDER BY created_at ASC LIMIT 10")
+      .bind(note.id)
+      .all();
+    threads = results.map((t) => ({ id: t.id, title: t.title, author: t.author, replyCount: t.reply_count }));
+  } catch (e) { /* none yet */ }
+
+  return json({ note: Object.assign(publicNote(note), { attachments: files.map(publicAttachment), threads }) });
 }
 
 /**

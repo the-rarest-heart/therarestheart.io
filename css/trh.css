@@ -1289,6 +1289,25 @@ a.thread:hover { border-color: var(--crimson); color: inherit; }
   to   { opacity: 1; transform: rotate(var(--tilt)); }
 }
 
+/* ── a thread and the field note it belongs to ───────────── */
+
+.thread__from { font-size: 15px; line-height: 1.5; color: var(--ink-soft); }
+.thread__from strong { font-weight: 700; }
+.thread__from .gerdie-back { display: inline; min-height: 0; padding: 2px 0; }
+.thread__link {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 14px;
+  background: var(--white);
+  border-radius: 12px;
+  color: var(--ink);
+  text-decoration: none;
+}
+.thread__link:hover { color: var(--crimson-deep); }
+.thread__link strong { font-family: var(--display); font-size: 16px; line-height: 1.25; }
+.thread__link span { font-size: 13px; color: var(--grey); }
+
 /* ── the blank sticky you write on ───────────────────────── */
 
 .sticky-pad {
