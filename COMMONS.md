@@ -166,7 +166,7 @@ Preview) if you ever want to moderate from a preview.
 Sending goes through Resend (resend.com), because Cloudflare's own email
 service is for receipts and password resets, not newsletters.
 
-1. Make a Resend account, add the domain `therarestheart.io`, and add the
+1. Make a Resend account, add the domain `news.therarestheart.io`, and add the
    DNS records it shows you in Cloudflare. Wait until Resend says Verified.
 2. Create an API key in Resend with sending access.
 3. Set the two secrets, then redeploy (a secret only applies to the next
@@ -181,7 +181,9 @@ npx wrangler pages secret put MAIL_ADDRESS --project-name therarestheart-io
 US law requires one; a PO box or registered-agent address is fine.
 
 Optional: `MAIL_FROM` changes the sender, which defaults to
-`Gerdie's Weekly <weekly@therarestheart.io>`.
+`Gerdie's Weekly <gerdie@news.therarestheart.io>` (the domain verified in
+Resend). `MAIL_REPLY_TO` changes where replies go, which defaults to
+`info@therarestheart.io`.
 
 Until both secrets are set, **Preview the email** works and the send buttons
 say what is missing. Unsubscribe links are signed with `IP_SALT`, so
