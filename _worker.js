@@ -809,11 +809,16 @@ async function unsubscribeUrl(env, origin, subscriberId) {
 }
 
 /** What has to be set before a real send. Names only; never the values. */
-function mailProblems(env) {
+function mailProblems(env, toSubscribers) {
   const missing = [];
   if (!env.RESEND_API_KEY) missing.push('RESEND_API_KEY (the sending service key)');
-  if (!env.MAIL_ADDRESS) missing.push('MAIL_ADDRESS (your postal mailing address, which the law requires in every issue)');
-  if (!unsubSecret(env)) missing.push('IP_SALT (signs the unsubscribe links)');
+  // A test goes only to you, so it can go without these. An issue going to
+  // subscribers cannot: the law wants a postal address in it, and every
+  // copy needs a working unsubscribe link.
+  if (toSubscribers) {
+    if (!env.MAIL_ADDRESS) missing.push('MAIL_ADDRESS (your postal mailing address, which the law requires in every issue sent to subscribers)');
+    if (!unsubSecret(env)) missing.push('IP_SALT (signs the unsubscribe links)');
+  }
   return missing;
 }
 
@@ -863,15 +868,17 @@ async function adminMailNote(db, env, request, url, id, mode) {
   if (note.body.trim().length < 40) return fail(400, 'There is not enough in this issue to send yet.');
 
   const origin = url.origin;
-  const address = env.MAIL_ADDRESS || '[your mailing address goes here]';
+  const address = env.MAIL_ADDRESS || '[your mailing address will go here before the first issue is sent to subscribers]';
   const extras = await weekExtras(db, origin);
 
   if (mode === 'preview') {
     return json(weeklyEmail({ note, extras, unsubscribe: origin + '/api/unsubscribe', address, origin }));
   }
 
-  const missing = mailProblems(env);
-  if (missing.length) return fail(400, 'Email is not set up yet. Still needed: ' + missing.join('; ') + '.');
+  const missing = mailProblems(env, mode === 'send');
+  if (missing.length) {
+    return fail(400, (mode === 'send' ? 'This cannot go to subscribers yet. Still needed: ' : 'Email is not set up yet. Still needed: ') + missing.join('; ') + '.');
+  }
 
   if (mode === 'test') {
     let payload;
