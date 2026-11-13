@@ -92,6 +92,8 @@ Formatting, in any note:
 
 One-time setup for sending (see COMMONS.md): a Resend account with the
 domain verified, and two secrets, `RESEND_API_KEY` and `MAIL_ADDRESS`.
+**Send me a test** works without the mailing address; **Email it to
+subscribers** does not.
 
 ### Putting a conversation under a note
 
