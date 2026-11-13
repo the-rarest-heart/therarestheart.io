@@ -1289,6 +1289,13 @@ a.thread:hover { border-color: var(--crimson); color: inherit; }
   to   { opacity: 1; transform: rotate(var(--tilt)); }
 }
 
+/* ── formatting inside a note: headings, and Gerdie's Weekly ── */
+
+.journal__h2 { font-family: var(--display); font-weight: 800; font-size: 26px; line-height: 1.15; margin-top: 18px; }
+.journal__h3 { font-family: var(--display); font-weight: 700; font-size: 20px; line-height: 1.2; margin-top: 8px; }
+.journal__body a { overflow-wrap: anywhere; }
+.card__cap--weekly { background: var(--sticky-1); color: var(--ink); }
+
 /* ── a thread and the field note it belongs to ───────────── */
 
 .thread__from { font-size: 15px; line-height: 1.5; color: var(--ink-soft); }

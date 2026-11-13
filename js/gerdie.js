@@ -25,7 +25,7 @@
 
   var page = (window.location.pathname.replace(/\/+$/, '').split('/').pop() || 'index').replace(/\.html$/, '') || 'index';
 
-  var KIND = { write: 'Writing', build: 'Build log', find: 'Research' };
+  var KIND = { write: 'Writing', build: 'Build log', find: 'Research', weekly: 'Gerdie\u2019s Weekly' };
   var SERIOUS = /\b(breach(ed|es)?|hacked|ransomware|lawsuit|sued|subpoena|fined|leak(ed)?|stolen|investigat(ion|ed))\b/i;
 
   /* ── small helpers ────────────────────────────────────── */

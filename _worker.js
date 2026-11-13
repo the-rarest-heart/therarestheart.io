@@ -25,6 +25,10 @@
  *   Moderation — all require the X-Admin-Token header:
  *   GET    /api/admin/threads?room=&status=      includes hidden rows
  *   GET    /api/admin/subscribers?format=csv
+ *   GET    /api/unsubscribe?s=&k=               the link in every issue (POST for one-click)
+ *   GET    /api/admin/notes/:id/preview         the email a weekly issue would send
+ *   POST   /api/admin/notes/:id/test            { to }  one copy, to you
+ *   POST   /api/admin/notes/:id/send            every active subscriber, once
  *   GET    /api/glossary                        the words Gerdie can translate
  *   GET    /api/search?q=                       notes and threads matching a question
  *   POST   /api/admin/glossary                  { term, meaning }  (same term again replaces it)
@@ -50,7 +54,11 @@ const ROOMS = [
 
 const ROOM_IDS = ROOMS.map((r) => r.id);
 
-const NOTE_KINDS = ['write', 'build', 'find'];
+const NOTE_KINDS = ['write', 'build', 'find', 'weekly'];
+
+// Gerdie's Weekly goes to email first and reaches the site this many days
+// later: the day before the next issue is sent.
+const WEEKLY_SITE_DELAY_DAYS = 6;
 
 const LIMITS = {
   noteTitle: 160,
@@ -196,8 +204,8 @@ async function getThread(db, id) {
   let note = null;
   if (thread.note_id) {
     const n = await db
-      .prepare("SELECT slug, title FROM notes WHERE id = ? AND status = 'published'")
-      .bind(thread.note_id)
+      .prepare("SELECT slug, title FROM notes WHERE id = ? AND status = 'published' AND published_at <= ?")
+      .bind(thread.note_id, now())
       .first();
     if (n) note = { slug: n.slug, title: n.title };
   }
@@ -233,8 +241,8 @@ async function createThread(db, request, env) {
   let noteId = null;
   if (noteSlug) {
     const n = await db
-      .prepare("SELECT id FROM notes WHERE slug = ? AND status = 'published'")
-      .bind(noteSlug)
+      .prepare("SELECT id FROM notes WHERE slug = ? AND status = 'published' AND published_at <= ?")
+      .bind(noteSlug, now())
       .first();
     if (!n) return fail(400, 'That field note is not here.');
     noteId = n.id;
@@ -436,8 +444,8 @@ async function search(db, url) {
 
   const noteWhere = words.map(() => '(title LIKE ? OR summary LIKE ? OR body LIKE ?)').join(' OR ');
   const noteRows = await db
-    .prepare(`SELECT * FROM notes WHERE status = 'published' AND (${noteWhere}) ORDER BY published_at DESC LIMIT 60`)
-    .bind(...like.flatMap((l) => [l, l, l]))
+    .prepare(`SELECT * FROM notes WHERE status = 'published' AND published_at <= ? AND (${noteWhere}) ORDER BY published_at DESC LIMIT 60`)
+    .bind(now(), ...like.flatMap((l) => [l, l, l]))
     .all();
 
   const threadWhere = words.map(() => '(title LIKE ? OR body LIKE ?)').join(' OR ');
@@ -512,16 +520,21 @@ async function listNotes(db, url) {
   const kind = url.searchParams.get('kind') || 'all';
   if (kind !== 'all' && !NOTE_KINDS.includes(kind)) return fail(400, 'Unknown kind.');
 
-  const where = kind === 'all' ? "status = 'published'" : "status = 'published' AND kind = ?";
+  // "Everything" means your own writing. Gerdie's Weekly has its own page,
+  // so it is only listed when asked for by name. A note dated in the future
+  // (a weekly that has been emailed but not yet released) is not public.
+  const where = kind === 'all'
+    ? "status = 'published' AND published_at <= ? AND kind != 'weekly'"
+    : "status = 'published' AND published_at <= ? AND kind = ?";
   const stmt = db.prepare(`SELECT * FROM notes WHERE ${where} ORDER BY published_at DESC LIMIT 100`);
 
-  const { results } = await (kind === 'all' ? stmt : stmt.bind(kind)).all();
+  const { results } = await (kind === 'all' ? stmt.bind(now()) : stmt.bind(now(), kind)).all();
   return json({ kind, notes: results.map(noteCard) });
 }
 
 async function getNote(db, slug) {
   const note = await db.prepare('SELECT * FROM notes WHERE slug = ?').bind(slug).first();
-  if (!note || note.status !== 'published') return fail(404, 'No such note.');
+  if (!note || note.status !== 'published' || !(note.published_at <= now())) return fail(404, 'No such note.');
 
   const files = await attachmentsFor(db, 'note', note.id);
 
@@ -568,7 +581,7 @@ function intendedStatus(payload) {
 
 async function adminListNotes(db) {
   const { results } = await db.prepare('SELECT * FROM notes ORDER BY updated_at DESC LIMIT 200').all();
-  return json({ notes: results.map((n) => Object.assign(publicNote(n), { status: n.status })) });
+  return json({ notes: results.map((n) => Object.assign(publicNote(n), { status: n.status, emailedAt: n.emailed_at || null })) });
 }
 
 async function adminCreateNote(db, request) {
@@ -643,6 +656,298 @@ async function adminDeleteNote(db, env, id) {
 
   await purgeAttachments(db, env.MEDIA, 'note', id);
   return json({ ok: true });
+}
+
+/* ── gerdie's weekly: turning a note into an email ───────── */
+
+/**
+ * The little formatting a note understands, shared by the email here and
+ * the page in js/notes.js (keep the two in step):
+ *   ## Heading            a line starting with ## or ###
+ *   **bold**
+ *   [words](https://…)    a link; a bare https://… address becomes one too
+ *   What it is: / Why it matters to you: / Try this: / Source:
+ *                         these labels at the start of a line are made bold
+ * A blank line starts a new paragraph; a single line break is kept.
+ */
+const LINE_LABEL = /^(What it is|Why it matters to you|Why it matters|Try this|Source):/;
+const INLINE_MARK = /\*\*(.+?)\*\*|\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)|(https?:\/\/[^\s<>"]+[^\s<>".,;:!?)])/g;
+
+function inlineTokens(line) {
+  const out = [];
+  let rest = line;
+  const label = LINE_LABEL.exec(line);
+  if (label) { out.push({ bold: label[0] }); rest = line.slice(label[0].length); }
+
+  let last = 0;
+  let hit;
+  INLINE_MARK.lastIndex = 0;
+  while ((hit = INLINE_MARK.exec(rest))) {
+    if (hit.index > last) out.push({ text: rest.slice(last, hit.index) });
+    if (hit[1]) out.push({ bold: hit[1] });
+    else if (hit[2]) out.push({ link: hit[3], text: hit[2] });
+    else out.push({ link: hit[4], text: hit[4].replace(/^https?:\/\/(www\.)?/, '').split('/')[0] });
+    last = hit.index + hit[0].length;
+  }
+  if (last < rest.length) out.push({ text: rest.slice(last) });
+  return out;
+}
+
+function bodyBlocks(text) {
+  const blocks = [];
+  String(text || '').split(/\n{2,}/).forEach((raw) => {
+    const chunk = raw.trim();
+    if (!chunk || /^\[media:\d{1,2}\]$/.test(chunk)) return;   // photos stay on the site
+    const lines = chunk.split('\n').map((l) => l.trim()).filter(Boolean);
+    const h = /^(#{2,3})\s+(.+)$/.exec(lines[0]);
+    if (h) { blocks.push({ heading: h[1].length, text: h[2] }); lines.shift(); }
+    if (lines.length) blocks.push({ lines });
+  });
+  return blocks;
+}
+
+const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+
+function tokensHtml(tokens) {
+  return tokens.map((t) => {
+    if (t.link) return `<a href="${esc(t.link)}" style="color:#C8102E">${esc(t.text)}</a>`;
+    if (t.bold) return `<strong>${esc(t.bold)}</strong>`;
+    return esc(t.text);
+  }).join('');
+}
+
+function tokensText(tokens) {
+  return tokens.map((t) => (t.link ? (t.text === t.link ? t.link : `${t.text} (${t.link})`) : (t.bold || t.text))).join('');
+}
+
+/** What else went up this week: the block the signup forms promised. */
+async function weekExtras(db, origin) {
+  const weekAgo = new Date(Date.now() - 7 * 86400000).toISOString();
+  const notes = await db
+    .prepare("SELECT slug, title FROM notes WHERE status = 'published' AND kind != 'weekly' AND published_at <= ? AND published_at >= ? ORDER BY published_at DESC LIMIT 3")
+    .bind(now(), weekAgo)
+    .all();
+  const thread = await db
+    .prepare("SELECT id, title, reply_count FROM threads WHERE status != 'hidden' AND updated_at >= ? ORDER BY reply_count DESC, updated_at DESC LIMIT 1")
+    .bind(weekAgo)
+    .first();
+  return {
+    notes: notes.results.map((n) => ({ title: n.title, url: `${origin}/note.html?n=${encodeURIComponent(n.slug)}` })),
+    thread: thread ? { title: thread.title, url: `${origin}/thread.html?id=${thread.id}` } : null,
+  };
+}
+
+function weeklyEmail({ note, extras, unsubscribe, address, origin }) {
+  const blocks = bodyBlocks(note.body);
+  const font = "font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif";
+
+  const bodyHtml = blocks.map((b) => {
+    if (b.heading) {
+      const size = b.heading === 2 ? 21 : 17;
+      return `<h2 style="${font};font-size:${size}px;line-height:1.25;color:#111114;margin:30px 0 10px">${tokensHtml(inlineTokens(b.text))}</h2>`;
+    }
+    return `<p style="${font};font-size:16px;line-height:1.6;color:#2A2A30;margin:0 0 14px">${b.lines.map((l) => tokensHtml(inlineTokens(l))).join('<br>')}</p>`;
+  }).join('\n');
+
+  const also = [];
+  const alsoText = [];
+  extras.notes.forEach((n) => {
+    also.push(`<li style="margin:0 0 6px"><a href="${esc(n.url)}" style="color:#C8102E">${esc(n.title)}</a></li>`);
+    alsoText.push(`- ${n.title}: ${n.url}`);
+  });
+  if (extras.thread) {
+    also.push(`<li style="margin:0 0 6px">The thread worth reading: <a href="${esc(extras.thread.url)}" style="color:#C8102E">${esc(extras.thread.title)}</a></li>`);
+    alsoText.push(`- The thread worth reading: ${extras.thread.title}: ${extras.thread.url}`);
+  }
+  const alsoHtml = also.length
+    ? `<h2 style="${font};font-size:17px;color:#111114;margin:30px 0 10px">Also on The Rarest Heart this week</h2>
+<ul style="${font};font-size:16px;line-height:1.5;color:#2A2A30;margin:0 0 14px;padding-left:20px">${also.join('')}</ul>`
+    : '';
+
+  const html = `<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${esc(note.title)}</title></head>
+<body style="margin:0;padding:0;background:#F8F7F5">
+<div style="max-width:600px;margin:0 auto;padding:28px 22px;background:#FFFFFF">
+<p style="${font};font-size:13px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#C8102E;margin:0 0 8px">Gerdie's Weekly</p>
+<h1 style="${font};font-size:28px;line-height:1.15;color:#111114;margin:0 0 10px">${esc(note.title)}</h1>
+${note.summary ? `<p style="${font};font-size:17px;line-height:1.5;color:#5C5C66;margin:0 0 6px">${esc(note.summary)}</p>` : ''}
+<hr style="border:0;border-top:3px solid #111114;margin:20px 0 4px">
+${bodyHtml}
+${alsoHtml}
+<hr style="border:0;border-top:1px solid #E4E2DE;margin:30px 0 16px">
+<p style="${font};font-size:13px;line-height:1.55;color:#5C5C66;margin:0 0 8px">You're getting this because you asked for the Friday email at <a href="${esc(origin)}" style="color:#5C5C66">therarestheart.io</a>. This issue reaches the site a week after it reaches you.</p>
+<p style="${font};font-size:13px;line-height:1.55;color:#5C5C66;margin:0 0 8px"><a href="${esc(unsubscribe)}" style="color:#5C5C66">Unsubscribe</a> any time. One click, no questions.</p>
+<p style="${font};font-size:13px;line-height:1.55;color:#5C5C66;margin:0">The Rarest Heart LLC, ${esc(address)}</p>
+</div>
+</body></html>`;
+
+  const text = [
+    "GERDIE'S WEEKLY",
+    note.title,
+    note.summary || '',
+    '',
+    blocks.map((b) => (b.heading
+      ? `\n${tokensText(inlineTokens(b.text)).toUpperCase()}`
+      : b.lines.map((l) => tokensText(inlineTokens(l))).join('\n'))).join('\n\n'),
+    alsoText.length ? `\n\nALSO ON THE RAREST HEART THIS WEEK\n${alsoText.join('\n')}` : '',
+    '',
+    '--',
+    "You're getting this because you asked for the Friday email at therarestheart.io.",
+    `Unsubscribe: ${unsubscribe}`,
+    `The Rarest Heart LLC, ${address}`,
+  ].join('\n');
+
+  return { subject: note.title, html, text };
+}
+
+/** The secret unsubscribe links are signed with. Not the admin token: that one changes. */
+const unsubSecret = (env) => env.IP_SALT || '';
+
+async function unsubscribeUrl(env, origin, subscriberId) {
+  const sig = await previewSignature(unsubSecret(env), 'unsub', String(subscriberId));
+  return `${origin}/api/unsubscribe?s=${subscriberId}&k=${sig}`;
+}
+
+/** What has to be set before a real send. Names only; never the values. */
+function mailProblems(env) {
+  const missing = [];
+  if (!env.RESEND_API_KEY) missing.push('RESEND_API_KEY (the sending service key)');
+  if (!env.MAIL_ADDRESS) missing.push('MAIL_ADDRESS (your postal mailing address, which the law requires in every issue)');
+  if (!unsubSecret(env)) missing.push('IP_SALT (signs the unsubscribe links)');
+  return missing;
+}
+
+const mailFrom = (env) => env.MAIL_FROM || "Gerdie's Weekly <weekly@therarestheart.io>";
+
+async function mailPost(env, path, payload) {
+  const res = await fetch((env.MAIL_API_URL || 'https://api.resend.com') + path, {
+    method: 'POST',
+    headers: {
+      authorization: 'Bearer ' + env.RESEND_API_KEY,
+      'content-type': 'application/json',
+      'user-agent': 'therarestheart-io/1.0',
+    },
+    body: JSON.stringify(payload),
+  });
+  if (res.ok) return null;
+  let detail = '';
+  try { const data = await res.json(); detail = data.message || data.error || data.name || ''; } catch (e) { /* no body */ }
+  return `The sending service said no (${res.status})${detail ? ': ' + String(detail).slice(0, 200) : ''}.`;
+}
+
+/** emailed_at is added the first time an issue is sent; reads work without it. */
+let emailedColumnReady = false;
+async function ensureEmailedColumn(db) {
+  if (emailedColumnReady) return;
+  try {
+    await db.prepare('ALTER TABLE notes ADD COLUMN emailed_at TEXT').run();
+  } catch (e) {
+    if (!/duplicate column/i.test(String(e && e.message))) throw e;
+  }
+  emailedColumnReady = true;
+}
+
+/**
+ * mode 'preview'  → the email as it would be sent, nothing leaves
+ * mode 'test'     → one copy to the address given
+ * mode 'send'     → every active subscriber, once; the note then reaches the
+ *                   site WEEKLY_SITE_DELAY_DAYS later unless it is already public
+ */
+async function adminMailNote(db, env, request, url, id, mode) {
+  const note = await db.prepare('SELECT * FROM notes WHERE id = ?').bind(id).first();
+  if (!note) return fail(404, 'No such note.');
+  if (note.kind !== 'weekly') return fail(400, "Only Gerdie's Weekly goes out by email.");
+  if (note.body.trim().length < 40) return fail(400, 'There is not enough in this issue to send yet.');
+
+  const origin = url.origin;
+  const address = env.MAIL_ADDRESS || '[your mailing address goes here]';
+  const extras = await weekExtras(db, origin);
+
+  if (mode === 'preview') {
+    return json(weeklyEmail({ note, extras, unsubscribe: origin + '/api/unsubscribe', address, origin }));
+  }
+
+  const missing = mailProblems(env);
+  if (missing.length) return fail(400, 'Email is not set up yet. Still needed: ' + missing.join('; ') + '.');
+
+  if (mode === 'test') {
+    let payload;
+    try { payload = await request.json(); } catch (e) { payload = {}; }
+    const to = clean(payload.to, LIMITS.email).toLowerCase();
+    if (!to || !isEmail(to)) return fail(400, 'Give the address to send the test to.');
+    const mail = weeklyEmail({ note, extras, unsubscribe: origin + '/api/unsubscribe', address, origin });
+    const problem = await mailPost(env, '/emails', {
+      from: mailFrom(env), to: [to], subject: '[Test] ' + mail.subject, html: mail.html, text: mail.text,
+    });
+    if (problem) return fail(502, problem);
+    return json({ ok: true, sent: 1 });
+  }
+
+  await ensureEmailedColumn(db);
+  const fresh = await db.prepare('SELECT emailed_at FROM notes WHERE id = ?').bind(id).first();
+  if (fresh && fresh.emailed_at) return fail(409, 'This issue was already emailed on ' + fresh.emailed_at.slice(0, 10) + '.');
+
+  const { results: people } = await db
+    .prepare("SELECT id, email FROM subscribers WHERE status = 'active' ORDER BY id")
+    .all();
+  if (!people.length) return fail(400, 'Nobody is subscribed yet, so there is no one to send it to.');
+
+  let sent = 0;
+  for (let i = 0; i < people.length; i += 100) {
+    const batch = [];
+    for (const p of people.slice(i, i + 100)) {
+      const unsubscribe = await unsubscribeUrl(env, origin, p.id);
+      const mail = weeklyEmail({ note, extras, unsubscribe, address, origin });
+      batch.push({
+        from: mailFrom(env), to: [p.email], subject: mail.subject, html: mail.html, text: mail.text,
+        headers: { 'List-Unsubscribe': `<${unsubscribe}>`, 'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click' },
+      });
+    }
+    const problem = await mailPost(env, '/emails/batch', batch);
+    if (problem) {
+      // Nothing is marked as sent, so the issue can be sent again once the
+      // problem is fixed. Anyone in an earlier batch would then get it twice;
+      // that only arises past 100 subscribers, and the message says so.
+      return fail(502, problem + (sent ? ` ${sent} people had already been sent it.` : ' Nobody was sent anything.'));
+    }
+    sent += batch.length;
+  }
+
+  const stamp = now();
+  const alreadyPublic = note.status === 'published' && note.published_at && note.published_at <= stamp;
+  const siteAt = alreadyPublic ? note.published_at : new Date(Date.now() + WEEKLY_SITE_DELAY_DAYS * 86400000).toISOString();
+  await db
+    .prepare("UPDATE notes SET status = 'published', emailed_at = ?, published_at = ?, updated_at = ? WHERE id = ?")
+    .bind(stamp, siteAt, stamp, id)
+    .run();
+
+  return json({ ok: true, sent, siteAt });
+}
+
+/**
+ * Leaving the list. GET is the link in the email and answers with a page;
+ * POST is the one-click button mail apps show, and answers with nothing.
+ */
+async function unsubscribe(db, env, request, url) {
+  const id = Number(url.searchParams.get('s') || 0);
+  const given = String(url.searchParams.get('k') || '');
+  const expected = id && unsubSecret(env) ? await previewSignature(unsubSecret(env), 'unsub', String(id)) : '';
+  const valid = Boolean(expected) && sameString(given, expected);
+
+  if (valid) {
+    await db.prepare("UPDATE subscribers SET status = 'removed' WHERE id = ?").bind(id).run();
+  }
+  if (request.method === 'POST') return new Response('', { status: valid ? 200 : 400 });
+
+  const page = (title, line) => new Response(
+    `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${title} | The Rarest Heart</title><link rel="stylesheet" href="/css/trh.css"></head>
+<body><main class="section"><div class="wrap stack" style="max-width:36em"><h1 class="h-sect">${title}</h1><p class="lede">${line}</p><p><a href="/">Back to The Rarest Heart</a></p></div></main></body></html>`,
+    { status: valid ? 200 : 400, headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store' } }
+  );
+
+  return valid
+    ? page("You're off the list.", "No more emails from Gerdie's Weekly. If you change your mind, the signup box is at the bottom of every page.")
+    : page('That link did not work.', 'It may have been cut short by your mail app. Write to info@therarestheart.io and you will be taken off by hand.');
 }
 
 /* ── moderation ──────────────────────────────────────────── */
@@ -1508,6 +1813,7 @@ async function api(request, env, url) {
   const fm = path.match(/^\/api\/files\/(\d+)(?:\/[^/]*)?$/);
   if (fm && (method === 'GET' || method === 'HEAD')) return serveFile(db, env, request, Number(fm[1]));
 
+  if (path === '/api/unsubscribe' && (method === 'GET' || method === 'POST')) return unsubscribe(db, env, request, url);
   if (path === '/api/glossary' && method === 'GET') return listGlossary(db);
   if (path === '/api/search' && method === 'GET') return search(db, url);
 
@@ -1535,6 +1841,11 @@ async function api(request, env, url) {
     if (path === '/api/admin/notes') {
       if (method === 'GET') return adminListNotes(db);
       if (method === 'POST') return adminCreateNote(db, request);
+    }
+
+    m = path.match(/^\/api\/admin\/notes\/(\d+)\/(preview|test|send)$/);
+    if (m && (m[2] === 'preview' ? method === 'GET' : method === 'POST')) {
+      return adminMailNote(db, env, request, url, Number(m[1]), m[2]);
     }
 
     m = path.match(/^\/api\/admin\/notes\/(\d+)$/);
