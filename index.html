@@ -27,6 +27,7 @@
     </button>
     <nav class="nav__links" data-nav-links aria-label="Main">
       <a href="notes.html">Field Notes</a>
+      <a href="weekly.html">Gerdie's Weekly</a>
       <a href="commons.html">Community</a>
       <a href="#build">What we build</a>
       <a href="#about">About</a>
@@ -171,6 +172,24 @@
     </div>
   </section>
 
+  <!-- ░░ GERDIE'S WEEKLY ░░ -->
+  <section class="section section--tight">
+    <div class="wrap row" style="align-items: center">
+      <div class="row__main stack stack--sm">
+        <h2 class="h-sect">Gerdie's Weekly</h2>
+        <p class="lede">The week in tech, in plain English. What happened, why it matters to you, and one thing to try.</p>
+        <p class="muted">It goes out by email on Friday and lands here a week later.</p>
+        <div class="pills">
+          <a class="btn btn--primary" href="#nl-email">Get it by email</a>
+          <a class="btn btn--ghost" href="weekly.html">Read past issues</a>
+        </div>
+      </div>
+      <div class="row__side journal-list" data-home-weekly aria-busy="true">
+        <p class="muted">Loading the latest issue&hellip;</p>
+      </div>
+    </div>
+  </section>
+
   <!-- ░░ COMMONS ░░ -->
   <section class="section section--paper">
     <div class="wrap">
@@ -240,9 +259,10 @@
         <h4>Field Notes</h4>
         <div class="stack stack--sm">
           <a href="notes.html">Everything</a>
-          <a href="notes.html">Writing</a>
-          <a href="notes.html">Builds</a>
-          <a href="notes.html">Research</a>
+          <a href="notes.html?kind=write">Writing</a>
+          <a href="notes.html?kind=build">Builds</a>
+          <a href="notes.html?kind=find">Research</a>
+          <a href="weekly.html">Gerdie's Weekly</a>
         </div>
       </div>
       <div>
@@ -256,7 +276,7 @@
       <div>
         <h4>The Friday email</h4>
         <div class="stack stack--sm">
-          <p class="muted">One email a week. What went up, and the one thread worth reading.</p>
+          <p class="muted">Gerdie's Weekly, every Friday: the week in tech in plain English, plus what went up here.</p>
           <form class="stack stack--sm" data-subscribe-form="footer">
             <div class="field">
               <label for="nl-email">Email</label>

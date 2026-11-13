@@ -273,8 +273,49 @@
     noteNote.hidden = !message;
   }
 
+  var weeklyHelp = document.querySelector('[data-weekly-help]');
+  var weeklyTemplate = document.querySelector('[data-weekly-template]');
+
+  // Three stories is the floor; copy a story block for a fourth or fifth.
+  var WEEKLY_TEMPLATE = [
+    '## The short version',
+    '- First thing, in one line',
+    '- Second thing, in one line',
+    '- Third thing, in one line',
+    '',
+    '## 1. Headline, the way you would say it out loud',
+    'What it is: ',
+    'Why it matters to you: ',
+    'Try this: ',
+    'Source: [Name of the source](https://)',
+    '',
+    '## 2. Headline',
+    'What it is: ',
+    'Why it matters to you: ',
+    'Try this: ',
+    'Source: [Name of the source](https://)',
+    '',
+    '## 3. Headline',
+    'What it is: ',
+    'Why it matters to you: ',
+    'Try this: ',
+    'Source: [Name of the source](https://)',
+    '',
+    '## Market Watch',
+    'Weekly moves run from the close on [date] to the close on [date].',
+    '',
+    '**Company:** up or down about X% ([source](https://)). What happened.',
+    'Why it matters: ',
+    '',
+    'This is news, not investment advice.',
+    '',
+    '## Word of the Week: the word',
+    'What it means, the way you would say it to a friend. Then add it to Gerdie\u2019s glossary.',
+  ].join('\n');
+
   function toggleBuildField() {
     if (buildField) buildField.hidden = noteForm.kind.value !== 'build';
+    if (weeklyHelp) weeklyHelp.hidden = noteForm.kind.value !== 'weekly';
   }
 
   function resetNoteForm() {
@@ -341,16 +382,60 @@
           return;
         }
 
-        var KIND = { write: 'Writing', build: 'Build log', find: 'Research' };
+        var KIND = { write: 'Writing', build: 'Build log', find: 'Research', weekly: 'Gerdie\u2019s Weekly' };
+        var day = function (iso) {
+          return new Date(iso).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
+        };
 
         data.notes.forEach(function (n) {
           var live = n.status === 'published';
-          var meta = [KIND[n.kind] || n.kind, n.status, n.readMinutes + ' min'];
+          var weekly = n.kind === 'weekly';
+          // Emailed but not yet on the site: published, with a date still ahead.
+          var waiting = live && n.publishedAt && n.publishedAt > new Date().toISOString();
+          var meta = [KIND[n.kind] || n.kind, waiting ? 'on the site ' + day(n.publishedAt) : n.status, n.readMinutes + ' min'];
           if (n.buildState) meta.push(n.buildState);
+          if (n.emailedAt) meta.push('emailed ' + day(n.emailedAt));
 
-          var acts = el('div', { class: 'mod-row__acts' }, [
-            live ? el('a', { class: 'btn btn--small btn--ghost', href: 'note.html?n=' + n.slug, text: 'View' }) : null,
-            button(live ? 'Unpublish' : 'Publish', 'btn--ghost', function () {
+          var mail = !weekly ? [] : [
+            button('Preview the email', 'btn--ghost', function () {
+              api('/admin/notes/' + n.id + '/preview')
+                .then(function (m) {
+                  var tab = window.open('', '_blank');
+                  if (!tab) { tellNote('Your browser blocked the preview tab. Allow pop-ups for this page.', true); return; }
+                  tab.document.open(); tab.document.write(m.html); tab.document.close();
+                })
+                .catch(function (err) { tellNote(err.message, true); });
+            }),
+            button('Send me a test', 'btn--ghost', function () {
+              var remembered = '';
+              try { remembered = sessionStorage.getItem('trh-test-to') || ''; } catch (e) { /* ask each time */ }
+              var to = window.prompt('Send the test to which address?', remembered);
+              if (!to) return;
+              try { sessionStorage.setItem('trh-test-to', to); } catch (e) { /* fine */ }
+              tellNote('Sending a test\u2026');
+              api('/admin/notes/' + n.id + '/test', { method: 'POST', body: JSON.stringify({ to: to }) })
+                .then(function () { tellNote('Test sent to ' + to + '. Check the inbox, and the spam folder.'); })
+                .catch(function (err) { tellNote(err.message, true); });
+            }),
+            n.emailedAt ? null : button('Email it to subscribers', 'btn--primary', function () {
+              api('/admin/subscribers')
+                .then(function (subs) {
+                  var who = subs.count === 1 ? '1 person' : subs.count + ' people';
+                  if (!window.confirm('Email "' + n.title + '" to ' + who + ' now?\n\nThis cannot be taken back. It reaches the site 6 days from now.')) return null;
+                  tellNote('Sending\u2026');
+                  return api('/admin/notes/' + n.id + '/send', { method: 'POST', body: '{}' })
+                    .then(function (r) {
+                      tellNote('Sent to ' + (r.sent === 1 ? '1 person' : r.sent + ' people') + '. It reaches the site on ' + day(r.siteAt) + '.');
+                      loadNotes();
+                    });
+                })
+                .catch(function (err) { tellNote(err.message, true); });
+            }),
+          ];
+
+          var acts = el('div', { class: 'mod-row__acts' }, mail.concat([
+            live && !waiting ? el('a', { class: 'btn btn--small btn--ghost', href: 'note.html?n=' + n.slug, text: 'View' }) : null,
+            button(live ? 'Unpublish' : (weekly ? 'Put on the site now' : 'Publish'), 'btn--ghost', function () {
               api('/admin/notes/' + n.id, { method: 'PATCH', body: JSON.stringify({ status: live ? 'draft' : 'published' }) })
                 .then(function () { tellNote(live ? 'Back to draft.' : 'Published.'); loadNotes(); })
                 .catch(function (err) { tellNote(err.message, true); });
@@ -363,7 +448,7 @@
                 .then(function () { tellNote('Deleted.'); loadNotes(); })
                 .catch(function (err) { tellNote(err.message, true); });
             }),
-          ]);
+          ]));
 
           var noteFiles = filesPanel('note', n.id);
 
@@ -387,6 +472,13 @@
     noteForm.addEventListener('submit', function (event) { event.preventDefault(); saveNote('published'); });
     document.querySelector('[data-note-draft]').addEventListener('click', function () { saveNote('draft'); });
     if (cancelBtn) cancelBtn.addEventListener('click', resetNoteForm);
+    if (weeklyTemplate) {
+      weeklyTemplate.addEventListener('click', function () {
+        if (noteForm.body.value.trim() && !window.confirm('Replace what is in the note box with the blank template?')) return;
+        noteForm.body.value = WEEKLY_TEMPLATE;
+        noteForm.body.focus();
+      });
+    }
     toggleBuildField();
   }
 

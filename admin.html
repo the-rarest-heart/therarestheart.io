@@ -88,6 +88,7 @@
                 <option value="write">Writing</option>
                 <option value="build">Build log</option>
                 <option value="find">Research</option>
+                <option value="weekly">Gerdie's Weekly</option>
               </select>
             </div>
             <div class="field" data-build-state hidden>
@@ -112,6 +113,14 @@
           <div class="field">
             <label for="n-body">The note</label>
             <textarea id="n-body" name="body" rows="14" placeholder="Write it here." required></textarea>
+            <p class="muted small">A line starting <code>## </code> is a heading. <code>**bold**</code> is bold. <code>[the words](https://the-address)</code> is a link.</p>
+          </div>
+
+          <div class="stack stack--sm" data-weekly-help hidden>
+            <p class="muted">Gerdie's Weekly goes to email first. <strong>Save it as a draft</strong>, then use <strong>Preview the email</strong>, <strong>Send me a test</strong> and <strong>Email it to subscribers</strong> on its row below. It reaches the site 6 days after it is emailed. <strong>Publish</strong> puts it on the site now without emailing anyone.</p>
+            <div class="pills">
+              <button class="btn btn--ghost btn--small" type="button" data-weekly-template>Start from the template</button>
+            </div>
           </div>
 
           <div class="field">

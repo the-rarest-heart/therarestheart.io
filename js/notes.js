@@ -4,8 +4,8 @@
 (function () {
   'use strict';
 
-  var KIND = { write: 'Writing', build: 'Build log', find: 'Research' };
-  var CAP = { write: '', build: ' card__cap--build', find: ' card__cap--find' };
+  var KIND = { write: 'Writing', build: 'Build log', find: 'Research', weekly: 'Gerdie\u2019s Weekly' };
+  var CAP = { write: '', build: ' card__cap--build', find: ' card__cap--find', weekly: ' card__cap--weekly' };
 
   function el(tag, attrs, children) {
     var n = document.createElement(tag);
@@ -21,6 +21,38 @@
   function when(iso) {
     if (!iso) return '';
     return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+  }
+
+  /**
+   * The little formatting a note understands. The email in _worker.js reads
+   * the same marks, so keep the two in step:
+   *   ## Heading, **bold**, [words](https://…), a bare https://… address,
+   *   and the labels "What it is:", "Why it matters to you:", "Try this:",
+   *   "Source:" at the start of a line, which are made bold.
+   * Everything is built as text nodes and elements, never as HTML, so
+   * whatever is typed still cannot turn into markup.
+   */
+  var LINE_LABEL = /^(What it is|Why it matters to you|Why it matters|Try this|Source):/;
+  var INLINE_MARK = /\*\*(.+?)\*\*|\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)|(https?:\/\/[^\s<>"]+[^\s<>".,;:!?)])/g;
+
+  function inline(parent, line) {
+    var rest = line;
+    var label = LINE_LABEL.exec(line);
+    if (label) {
+      parent.appendChild(el('strong', { text: label[0] }));
+      rest = line.slice(label[0].length);
+    }
+    var last = 0;
+    var hit;
+    INLINE_MARK.lastIndex = 0;
+    while ((hit = INLINE_MARK.exec(rest))) {
+      if (hit.index > last) parent.appendChild(document.createTextNode(rest.slice(last, hit.index)));
+      if (hit[1]) parent.appendChild(el('strong', { text: hit[1] }));
+      else if (hit[2]) parent.appendChild(el('a', { href: hit[3], rel: 'noopener', text: hit[2] }));
+      else parent.appendChild(el('a', { href: hit[4], rel: 'noopener', text: hit[4].replace(/^https?:\/\/(www\.)?/, '').split('/')[0] }));
+      last = hit.index + hit[0].length;
+    }
+    if (last < rest.length) parent.appendChild(document.createTextNode(rest.slice(last)));
   }
 
   /**
@@ -49,7 +81,24 @@
         return;
       }
 
-      wrap.appendChild(el('p', { text: line }));
+      // A heading on the first line, then the rest of the chunk as one
+      // paragraph with its line breaks kept.
+      var lines = line.split('\n').map(function (l) { return l.trim(); }).filter(Boolean);
+      var h = /^(#{2,3})\s+(.+)$/.exec(lines[0]);
+      if (h) {
+        var heading = el(h[1].length === 2 ? 'h2' : 'h3', { class: h[1].length === 2 ? 'journal__h2' : 'journal__h3' });
+        inline(heading, h[2]);
+        wrap.appendChild(heading);
+        lines.shift();
+      }
+      if (lines.length) {
+        var p = el('p', {});
+        lines.forEach(function (l, i) {
+          if (i) p.appendChild(document.createElement('br'));
+          inline(p, l);
+        });
+        wrap.appendChild(p);
+      }
     });
 
     var left = media.filter(function (a, i) { return !placed[i]; });
@@ -77,8 +126,12 @@
     var count = document.querySelector('[data-notes-count]');
     var kind = 'all';
 
+    /* weekly.html shows one kind only and has no filter pills */
+    var fixed = list.getAttribute('data-notes-fixed');
+    if (fixed && KIND[fixed]) kind = fixed;
+
     /* notes.html?kind=build opens already filtered (the homepage links here) */
-    var wanted = new URLSearchParams(window.location.search).get('kind');
+    var wanted = fixed ? '' : new URLSearchParams(window.location.search).get('kind');
     if (wanted && KIND[wanted]) {
       kind = wanted;
       Array.prototype.forEach.call(pills, function (p) {
@@ -119,7 +172,9 @@
           if (!data.notes.length) {
             list.appendChild(el('div', { class: 'panel panel--paper stack stack--sm' }, [
               el('h2', { class: 'h-card', text: kind === 'all' ? 'Nothing published yet.' : 'Nothing here yet.' }),
-              el('p', { class: 'muted', text: 'The first notes are being written. The Commons is open in the meantime.' }),
+              el('p', { class: 'muted', text: kind === 'weekly'
+                ? 'Each issue goes to email first and lands here a week later. The first one is on its way.'
+                : 'The first notes are being written. The Commons is open in the meantime.' }),
             ]));
           } else {
             var cards = data.notes.map(function (n) {
@@ -136,6 +191,7 @@
               write: ['essay', 'essays'],
               build: ['build log', 'build logs'],
               find: ['research note', 'research notes'],
+              weekly: ['issue', 'issues'],
             };
             var n = data.notes.length;
             count.textContent = 'Showing ' + n + ' ' + nouns[kind][n === 1 ? 0 : 1] + '.';

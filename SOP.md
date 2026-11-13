@@ -52,6 +52,47 @@ So: write the title, read it once, then publish.
 A draft is not just hidden from the list. Its address returns a 404. Nobody
 can read an unfinished note by guessing the URL.
 
+### Gerdie's Weekly
+
+The weekly is a note with the kind **Gerdie's Weekly**. It goes to email
+first and reaches the site 6 days later, the day before the next issue.
+
+Each week:
+
+1. On `/admin`, choose **Gerdie's Weekly** as the kind and tap **Start from
+   the template**. Fill it in. Three stories is the floor; copy a story block
+   for a fourth or fifth
+2. **Save as draft**
+3. On its row under **Your notes**: **Preview the email** opens exactly what
+   subscribers will get. **Send me a test** sends one copy to you
+4. **Email it to subscribers**. It asks once, says how many people, and
+   cannot be taken back. The row then shows when it reaches the site
+5. Add the Word of the Week to **Gerdie's glossary**
+
+Things to know:
+
+- **Publish** (or **Put on the site now**) puts an issue on the site without
+  emailing anyone. That is how an old issue goes into the archive
+- An issue can only be emailed once
+- Every email carries an unsubscribe link and your mailing address. Someone
+  who unsubscribes is taken off the list at once; signing up again puts
+  them back
+- The email also lists the field notes published that week and the busiest
+  thread, without you writing anything
+- Photos stay on the site. They are not sent in the email
+
+Formatting, in any note:
+
+| Type this | You get |
+| --- | --- |
+| `## A heading` | A heading |
+| `**bold**` | **bold** |
+| `[the words](https://the-address)` | A link on those words |
+| `What it is:` `Why it matters to you:` `Try this:` `Source:` at the start of a line | That label in bold |
+
+One-time setup for sending (see COMMONS.md): a Resend account with the
+domain verified, and two secrets, `RESEND_API_KEY` and `MAIL_ADDRESS`.
+
 ### Putting a conversation under a note
 
 Publish the note first. Then open it on the site and tap **Start the

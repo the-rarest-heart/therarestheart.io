@@ -6,8 +6,8 @@
 (function () {
   'use strict';
 
-  var KIND = { write: 'Writing', build: 'Build log', find: 'Research' };
-  var CAP = { write: '', build: ' card__cap--build', find: ' card__cap--find' };
+  var KIND = { write: 'Writing', build: 'Build log', find: 'Research', weekly: 'Gerdie\u2019s Weekly' };
+  var CAP = { write: '', build: ' card__cap--build', find: ' card__cap--find', weekly: ' card__cap--weekly' };
 
   function el(tag, attrs, children) {
     var n = document.createElement(tag);
@@ -83,6 +83,38 @@
       type(0);
     }, { threshold: 0.6 });
     watcher.observe(typed[0].closest('.panel') || typed[0]);
+  }
+
+  /* ── the latest issue of Gerdie's Weekly ───────────────── */
+
+  var weekly = document.querySelector('[data-home-weekly]');
+  if (weekly) {
+    api('/notes?kind=weekly')
+      .then(function (data) {
+        weekly.innerHTML = '';
+        weekly.removeAttribute('aria-busy');
+        var n = (data.notes || [])[0];
+        if (!n) {
+          weekly.appendChild(empty(
+            'The first issue is on its way.',
+            'Each one goes to email first and lands here a week later.'
+          ));
+          return;
+        }
+        weekly.appendChild(el('a', { class: 'card', href: 'note.html?n=' + encodeURIComponent(n.slug) }, [
+          el('div', { class: 'card__cap card__cap--weekly' }, [el('span', { text: 'Latest issue \u00b7 ' + n.readMinutes + ' min' })]),
+          el('div', { class: 'card__body' }, [
+            el('h3', { class: 'h-card', text: n.title }),
+            n.summary ? el('p', { class: 'muted', text: n.summary }) : null,
+            el('div', { class: 'card__foot' }, [el('span', { class: 'hand', text: when(n.publishedAt) })]),
+          ]),
+        ]));
+      })
+      .catch(function () {
+        weekly.innerHTML = '';
+        weekly.removeAttribute('aria-busy');
+        weekly.appendChild(empty('The latest issue would not load.', 'Past issues are on their own page.', 'weekly.html', 'Gerdie\u2019s Weekly \u2192'));
+      });
   }
 
   /* ── latest notes ──────────────────────────────────────── */
