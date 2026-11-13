@@ -551,7 +551,7 @@
       .then(function (data) {
         subsCount.textContent = data.count === 0
           ? 'Nobody has signed up yet.'
-          : data.count + (data.count === 1 ? ' person has' : ' people have') + ' asked for the Friday email.';
+          : data.count + (data.count === 1 ? ' person has' : ' people have') + ' asked for the Monday email.';
 
         subsList.innerHTML = '';
         data.subscribers.forEach(function (s) {

@@ -323,7 +323,7 @@ On `/admin`, under **The list**:
 
 Signing up twice does not create a duplicate.
 
-**The site collects addresses. It cannot send email.** For the Friday email,
+**The site collects addresses. It cannot send email.** For the Monday email,
 send it from Zoho with the list on BCC. When that gets unwieldy, import the
 CSV into Buttondown or Kit.
 

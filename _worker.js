@@ -775,7 +775,7 @@ ${note.summary ? `<p style="${font};font-size:17px;line-height:1.5;color:#5C5C66
 ${bodyHtml}
 ${alsoHtml}
 <hr style="border:0;border-top:1px solid #E4E2DE;margin:30px 0 16px">
-<p style="${font};font-size:13px;line-height:1.55;color:#5C5C66;margin:0 0 8px">You're getting this because you asked for the Friday email at <a href="${esc(origin)}" style="color:#5C5C66">therarestheart.io</a>. This issue reaches the site a week after it reaches you.</p>
+<p style="${font};font-size:13px;line-height:1.55;color:#5C5C66;margin:0 0 8px">You're getting this because you asked for the Monday email at <a href="${esc(origin)}" style="color:#5C5C66">therarestheart.io</a>. This issue reaches the site a week after it reaches you.</p>
 <p style="${font};font-size:13px;line-height:1.55;color:#5C5C66;margin:0 0 8px"><a href="${esc(unsubscribe)}" style="color:#5C5C66">Unsubscribe</a> any time. One click, no questions.</p>
 <p style="${font};font-size:13px;line-height:1.55;color:#5C5C66;margin:0">The Rarest Heart LLC, ${esc(address)}</p>
 </div>
@@ -792,7 +792,7 @@ ${alsoHtml}
     alsoText.length ? `\n\nALSO ON THE RAREST HEART THIS WEEK\n${alsoText.join('\n')}` : '',
     '',
     '--',
-    "You're getting this because you asked for the Friday email at therarestheart.io.",
+    "You're getting this because you asked for the Monday email at therarestheart.io.",
     `Unsubscribe: ${unsubscribe}`,
     `The Rarest Heart LLC, ${address}`,
   ].join('\n');
