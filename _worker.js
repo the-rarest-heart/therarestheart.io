@@ -817,7 +817,10 @@ function mailProblems(env) {
   return missing;
 }
 
-const mailFrom = (env) => env.MAIL_FROM || "Gerdie's Weekly <weekly@therarestheart.io>";
+const mailFrom = (env) => env.MAIL_FROM || "Gerdie's Weekly <gerdie@news.therarestheart.io>";
+
+// Nobody reads the sending address, so a reply goes to a real inbox.
+const mailReplyTo = (env) => env.MAIL_REPLY_TO || 'info@therarestheart.io';
 
 async function mailPost(env, path, payload) {
   const res = await fetch((env.MAIL_API_URL || 'https://api.resend.com') + path, {
@@ -877,7 +880,8 @@ async function adminMailNote(db, env, request, url, id, mode) {
     if (!to || !isEmail(to)) return fail(400, 'Give the address to send the test to.');
     const mail = weeklyEmail({ note, extras, unsubscribe: origin + '/api/unsubscribe', address, origin });
     const problem = await mailPost(env, '/emails', {
-      from: mailFrom(env), to: [to], subject: '[Test] ' + mail.subject, html: mail.html, text: mail.text,
+      from: mailFrom(env), reply_to: mailReplyTo(env), to: [to],
+      subject: '[Test] ' + mail.subject, html: mail.html, text: mail.text,
     });
     if (problem) return fail(502, problem);
     return json({ ok: true, sent: 1 });
@@ -899,7 +903,8 @@ async function adminMailNote(db, env, request, url, id, mode) {
       const unsubscribe = await unsubscribeUrl(env, origin, p.id);
       const mail = weeklyEmail({ note, extras, unsubscribe, address, origin });
       batch.push({
-        from: mailFrom(env), to: [p.email], subject: mail.subject, html: mail.html, text: mail.text,
+        from: mailFrom(env), reply_to: mailReplyTo(env), to: [p.email],
+        subject: mail.subject, html: mail.html, text: mail.text,
         headers: { 'List-Unsubscribe': `<${unsubscribe}>`, 'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click' },
       });
     }
