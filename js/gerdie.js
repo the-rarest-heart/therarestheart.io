@@ -344,7 +344,7 @@
       'Five rooms. Pick the closest one to your question.',
       'No account and nothing to install. A name is enough.',
       'Replies arrive as sticky notes under your thread.',
-      'One email on Friday catches you up, if you ask for it.',
+      'One email on Monday catches you up, if you ask for it.',
     ], [link('Start a thread', '#start', 'btn--primary')]);
   }
 
@@ -470,8 +470,8 @@
       pad.parentNode.insertBefore(el('div', { class: 'gerdie-aside', role: 'status' }, [
         el('img', { src: 'images/gerdie-head.svg', alt: 'Gerdie' }),
         el('p', {}, [
-          document.createTextNode('That’s your first one on the board. The Friday email is one a week: what went up, and the one thread worth reading. '),
-          el('a', { href: '#nl-email', text: 'Get the Friday email' }),
+          document.createTextNode('That’s your first one on the board. The Monday email is one a week: what went up, and the one thread worth reading. '),
+          el('a', { href: '#nl-email', text: 'Get the Monday email' }),
         ]),
       ]), pad);
     });

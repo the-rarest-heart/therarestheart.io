@@ -366,7 +366,7 @@ table. Duplicate signups quietly update the existing row rather than erroring.
 Open `/admin.html` to see the count, read the list, or **Download CSV**.
 
 **Collecting is not sending.** D1 stores addresses; it cannot send email. For
-the first stretch, send the Friday email from Zoho with the list on BCC. When
+the first stretch, send the Monday email from Zoho with the list on BCC. When
 that stops being practical, import the CSV into Buttondown or Kit and point
 the forms at their endpoint instead.
 
