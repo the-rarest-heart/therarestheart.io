@@ -179,7 +179,7 @@
    * Hide and Delete on each. Threads, replies and notes all use it, so a photo
    * is moderated the same way wherever it was posted.
    */
-  function filesPanel(kind, id, onChange) {
+  function filesPanel(kind, id, onChange, numbered) {
     var box = el('div', { class: 'stack stack--sm' });
     box.hidden = true;
 
@@ -192,7 +192,9 @@
             return;
           }
 
+          var placed = 0;
           data.attachments.forEach(function (a) {
+            var spot = numbered && a.status !== 'hidden' ? ++placed : 0;
             var caption = el('input', {
               type: 'text',
               class: 'input input--small',
@@ -229,7 +231,7 @@
             box.appendChild(el('div', { class: 'mod-row', 'data-hidden': a.status === 'hidden' ? 'true' : 'false' }, [
               el('div', { class: 'mod-row__main' }, [
                 el('strong', { text: a.filename }),
-                el('p', { class: 'muted', text: a.media + ' · ' + window.TRHMedia.size(a.bytes) + ' · ' + a.status }),
+                el('p', { class: 'muted', text: a.media + ' · ' + window.TRHMedia.size(a.bytes) + ' · ' + a.status + (spot ? ' · put [media:' + spot + '] on a line of its own to place it' : '') }),
                 caption,
               ]),
               el('div', { class: 'mod-row__acts' }, [
@@ -263,6 +265,7 @@
   var buildField = document.querySelector('[data-build-state]');
   var cancelBtn = document.querySelector('[data-note-cancel]');
   var noteUpload = document.querySelector('[data-note-upload]');
+  var noteExisting = document.querySelector('[data-note-existing]');
   var notePicker = null;
   var editingId = null;
 
@@ -322,6 +325,7 @@
     editingId = null;
     noteForm.reset();
     if (notePicker) notePicker.reset();
+    if (noteExisting) noteExisting.innerHTML = '';
     toggleBuildField();
     if (noteMode) noteMode.textContent = 'Write a note';
     if (cancelBtn) cancelBtn.hidden = true;
@@ -369,6 +373,15 @@
     if (noteMode) noteMode.textContent = 'Editing: ' + n.title;
     if (cancelBtn) cancelBtn.hidden = false;
     tellNote('');
+    // The files already on this note, right here, so nothing has to be hunted
+    // for in the list below. Each visible one says which [media:N] places it.
+    if (noteExisting) {
+      noteExisting.innerHTML = '';
+      var existing = filesPanel('note', n.id, null, true);
+      noteExisting.appendChild(el('p', { class: 'muted', text: 'Already on this note (hide, delete or caption them here):' }));
+      noteExisting.appendChild(existing.box);
+      existing.toggle();
+    }
     noteForm.scrollIntoView({ block: 'start' });
   }
 

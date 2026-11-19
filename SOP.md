@@ -184,8 +184,10 @@ if you miscount.
 
 ### Files on a note you already published
 
-The box in the editor only adds new files. To caption, hide or delete the
-ones already on a note, find it under **Your notes** and tap **Files**.
+When you tap **Edit** on a note, the files already on it are listed right above
+the upload box, each with **Save caption**, **Hide** and **Delete**, and a line
+saying which `[media:N]` places it. You can also reach the same list any time
+from **Your notes**: tap **Files** on the note's row.
 
 **View** opens the file itself, and it works on a draft — the link it uses is
 signed and lasts two hours, so you can watch a video back before deciding to
