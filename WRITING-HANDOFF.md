@@ -49,6 +49,13 @@ Only these. Anything else shows as plain text.
 - `**bold**`
 - `[the words](https://the-address)` for a link; a bare `https://…` also becomes a link
 - A blank line starts a new paragraph
+- **Charts.** The site draws bars from numbers; never hand Kelvin a picture of a chart.
+  Block, no blank line inside:
+  `[chart: Title]`, optional `unit: Mbps` (before the bars), then `name | number` or
+  `name | number | words to show` per bar (12 max), then optional `caption: …`.
+  Give each measure its own chart (speed and cost are two charts). A block that does not
+  add up shows as plain text. Tables are not supported, so turn a small table into a chart
+  or a sentence
 - These labels are made bold automatically: `What it is:`, `Why it matters to you:`,
   `Why it matters:`, `Try this:`, `Source:`
 

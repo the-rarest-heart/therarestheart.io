@@ -479,6 +479,18 @@
         noteForm.body.focus();
       });
     }
+    var chartButton = noteForm.querySelector('[data-chart-template]');
+    if (chartButton) {
+      chartButton.addEventListener('click', function () {
+        var box = noteForm.body;
+        var block = '[chart: What this compares]\nunit: Mbps\nFirst thing | 1000\nSecond thing | 150 | 100 to 150\ncaption: One line under the chart.';
+        var at = box.selectionStart == null ? box.value.length : box.selectionStart;
+        var before = box.value.slice(0, at).replace(/\n*$/, '');
+        var after = box.value.slice(at).replace(/^\n*/, '');
+        box.value = (before ? before + '\n\n' : '') + block + (after ? '\n\n' + after : '\n');
+        box.focus();
+      });
+    }
     toggleBuildField();
   }
 

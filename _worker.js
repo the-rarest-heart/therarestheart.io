@@ -693,12 +693,34 @@ function inlineTokens(line) {
   return out;
 }
 
+/** The same chart block the page draws; see parseChart in js/notes.js. */
+function parseChart(lines) {
+  const head = /^\[chart(?::\s*(.*?))?\]$/i.exec(lines[0]);
+  if (!head) return null;
+  const chart = { title: (head[1] || '').slice(0, 120), unit: '', caption: '', rows: [] };
+  for (let i = 1; i < lines.length; i++) {
+    const meta = /^(unit|caption):\s*(.*)$/i.exec(lines[i]);
+    if (meta) { chart[meta[1].toLowerCase()] = meta[2].slice(0, 300); continue; }
+    const parts = lines[i].split('|').map((s) => s.trim());
+    const value = parseFloat((parts[1] || '').replace(/[$,~+\s]/g, ''));
+    if (parts.length < 2 || !parts[0] || !Number.isFinite(value) || value < 0) return null;
+    chart.rows.push({
+      label: parts[0].slice(0, 80),
+      value,
+      shown: (parts[2] || (value.toLocaleString('en-US') + (chart.unit ? ' ' + chart.unit : ''))).slice(0, 40),
+    });
+  }
+  return chart.rows.length && chart.rows.length <= 12 ? chart : null;
+}
+
 function bodyBlocks(text) {
   const blocks = [];
   String(text || '').split(/\n{2,}/).forEach((raw) => {
     const chunk = raw.trim();
     if (!chunk || /^\[media:\d{1,2}\]$/.test(chunk)) return;   // photos stay on the site
     const lines = chunk.split('\n').map((l) => l.trim()).filter(Boolean);
+    const chart = parseChart(lines);
+    if (chart) { blocks.push({ chart }); return; }
     const h = /^(#{2,3})\s+(.+)$/.exec(lines[0]);
     if (h) { blocks.push({ heading: h[1].length, text: h[2] }); lines.shift(); }
     if (lines.length) blocks.push({ lines });
@@ -741,7 +763,23 @@ function weeklyEmail({ note, extras, unsubscribe, address, origin }) {
   const blocks = bodyBlocks(note.body);
   const font = "font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif";
 
+  const chartHtml = (c) => {
+    const top = Math.max(...c.rows.map((r) => r.value)) || 1;
+    const rows = c.rows.map((r) => {
+      const pct = Math.max(2, Math.round((r.value / top) * 100));
+      return `<tr><td style="${font};font-size:15px;font-weight:600;color:#111114;padding:10px 0 4px">${esc(r.label)}</td><td align="right" style="${font};font-size:15px;color:#2A2A30;padding:10px 0 4px">${esc(r.shown)}</td></tr>
+<tr><td colspan="2" style="padding:0"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#F8F7F5"><tr><td width="${pct}%" height="14" style="background:#C8102E;font-size:0;line-height:0">&nbsp;</td><td style="font-size:0;line-height:0">&nbsp;</td></tr></table></td></tr>`;
+    }).join('\n');
+    return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 16px;border:1px solid #E4E2DE;padding:6px 16px 14px">
+${c.title ? `<tr><td colspan="2" style="${font};font-size:16px;font-weight:800;color:#111114;padding:12px 0 2px">${esc(c.title)}</td></tr>` : ''}
+${rows}
+${c.caption ? `<tr><td colspan="2" style="${font};font-size:13px;color:#5C5C66;padding:10px 0 0">${esc(c.caption)}</td></tr>` : ''}
+</table>`;
+  };
+  const chartText = (c) => [c.title ? c.title.toUpperCase() : '', ...c.rows.map((r) => `- ${r.label}: ${r.shown}`), c.caption].filter(Boolean).join('\n');
+
   const bodyHtml = blocks.map((b) => {
+    if (b.chart) return chartHtml(b.chart);
     if (b.heading) {
       const size = b.heading === 2 ? 21 : 17;
       return `<h2 style="${font};font-size:${size}px;line-height:1.25;color:#111114;margin:30px 0 10px">${tokensHtml(inlineTokens(b.text))}</h2>`;
@@ -786,7 +824,7 @@ ${alsoHtml}
     note.title,
     note.summary || '',
     '',
-    blocks.map((b) => (b.heading
+    blocks.map((b) => (b.chart ? chartText(b.chart) : b.heading
       ? `\n${tokensText(inlineTokens(b.text)).toUpperCase()}`
       : b.lines.map((l) => tokensText(inlineTokens(l))).join('\n'))).join('\n\n'),
     alsoText.length ? `\n\nALSO ON THE RAREST HEART THIS WEEK\n${alsoText.join('\n')}` : '',
