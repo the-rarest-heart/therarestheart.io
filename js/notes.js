@@ -84,6 +84,8 @@
       // A heading on the first line, then the rest of the chunk as one
       // paragraph with its line breaks kept.
       var lines = line.split('\n').map(function (l) { return l.trim(); }).filter(Boolean);
+      var chart = parseChart(lines);
+      if (chart) { wrap.appendChild(chartNode(chart)); return; }
       var h = /^(#{2,3})\s+(.+)$/.exec(lines[0]);
       if (h) {
         var heading = el(h[1].length === 2 ? 'h2' : 'h3', { class: h[1].length === 2 ? 'journal__h2' : 'journal__h3' });
@@ -106,6 +108,60 @@
     if (rest) wrap.appendChild(rest);
 
     return wrap;
+  }
+
+  /**
+   * A chart is a block of lines with no blank line inside it:
+   *   [chart: Internet speed]
+   *   unit: Mbps
+   *   What I have now | 1000
+   *   Starlink (best case) | 150 | 100 to 150
+   *   caption: One line under the chart.
+   * label | number | (optional) the words to show instead of the number.
+   * The email in _worker.js reads the same block, so keep the two in step.
+   * A block that does not add up is left as plain text so the slip is visible.
+   */
+  function parseChart(lines) {
+    var head = /^\[chart(?::\s*(.*?))?\]$/i.exec(lines[0]);
+    if (!head) return null;
+    var chart = { title: (head[1] || '').slice(0, 120), unit: '', caption: '', rows: [] };
+    for (var i = 1; i < lines.length; i++) {
+      var meta = /^(unit|caption):\s*(.*)$/i.exec(lines[i]);
+      if (meta) { chart[meta[1].toLowerCase()] = meta[2].slice(0, 300); continue; }
+      var parts = lines[i].split('|').map(function (s) { return s.trim(); });
+      var value = parseFloat((parts[1] || '').replace(/[$,~+\s]/g, ''));
+      if (parts.length < 2 || !parts[0] || !isFinite(value) || value < 0) return null;
+      chart.rows.push({
+        label: parts[0].slice(0, 80),
+        value: value,
+        shown: (parts[2] || (value.toLocaleString() + (chart.unit ? ' ' + chart.unit : ''))).slice(0, 40),
+      });
+    }
+    return chart.rows.length && chart.rows.length <= 12 ? chart : null;
+  }
+
+  function chartNode(chart) {
+    var top = Math.max.apply(null, chart.rows.map(function (r) { return r.value; })) || 1;
+    var fig = el('figure', { class: 'chart', role: 'group' });
+    if (chart.title) {
+      fig.setAttribute('aria-label', chart.title);
+      fig.appendChild(el('p', { class: 'chart__title', text: chart.title }));
+    }
+    var ul = el('ul', { class: 'chart__rows' });
+    chart.rows.forEach(function (r, i) {
+      var bar = el('span', { class: 'chart__bar chart__bar--' + (i % 3), 'aria-hidden': 'true' });
+      bar.style.setProperty('--w', Math.max(2, (r.value / top) * 100).toFixed(1) + '%');
+      ul.appendChild(el('li', { class: 'chart__row' }, [
+        el('span', { class: 'chart__head' }, [
+          el('span', { class: 'chart__label', text: r.label }),
+          el('span', { class: 'chart__value', text: r.shown }),
+        ]),
+        el('span', { class: 'chart__track', 'aria-hidden': 'true' }, [bar]),
+      ]));
+    });
+    fig.appendChild(ul);
+    if (chart.caption) fig.appendChild(el('figcaption', { class: 'chart__caption', text: chart.caption }));
+    return fig;
   }
 
   function api(path) {

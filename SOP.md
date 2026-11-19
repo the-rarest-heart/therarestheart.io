@@ -143,6 +143,32 @@ draft" reads better than `policy-v3-FINAL-2.docx`.
 
 **Up and Down** put them in the order you want.
 
+### Adding a chart
+
+A chart is drawn by the site from numbers you type. No picture to make or upload,
+and it reads out loud properly for anyone using a screen reader. Under the note box,
+tap **Add a chart** and it drops a starter block in at your cursor. Or type one:
+
+```
+[chart: Internet speed]
+unit: Mbps
+What I have now | 1000
+Starlink (expected) | 150 | 100 to 150 Mbps
+caption: One line under the chart.
+```
+
+- The first line is `[chart: the title]`
+- Each bar is `name | number`. A third part after another `|` is the words shown
+  instead of the number (use it for ranges like `100 to 150 Mbps` or `$50+`)
+- `unit:` (optional, put it before the bars) is added after each plain number
+- `caption:` (optional) is the small line underneath
+- No blank line inside the block. A blank line ends it
+- Up to 12 bars. Bars are sized against the biggest number in that chart, so two
+  things measured differently (speed and cost) each get their own chart
+- If a line does not add up (no number, a stray blank line), the block shows as
+  plain text on the page so the slip is easy to see. Fix it and save again
+- It works in Gerdie's Weekly too and shows in the email as bars
+
 ### Putting a photo in the middle of the note
 
 By default files sit at the end. To place one, put a line of its own in the
