@@ -73,7 +73,7 @@ A plain-English weekly tech review for non-technical readers. Fun, warm, excitin
 **Routine**
 
 - **Sunday 6:00 PM Eastern:** a scheduled cloud routine emails 8–10 candidate stories to
-  kmartin@therarestheart.io. It sends only that one email. It never publishes, never
+  his business inbox (the address is set in the routine, not stored here). It sends only that one email. It never publishes, never
   emails subscribers and never touches the site. Routine page:
   https://claude.ai/code/routines/trig_015j9eVuD1LixkEKHfFwzqJ5
   (the time shifts by an hour when the clocks change in March).
