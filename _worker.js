@@ -1041,13 +1041,23 @@ async function adminPatchThread(db, request, id) {
     sets.push('body = ?'); binds.push(b);
   }
 
-  if (!sets.length) return fail(400, 'Nothing to change.');
+  const adding = Array.isArray(payload.attachments) && payload.attachments.length > 0;
+  if (!sets.length && !adding) return fail(400, 'Nothing to change.');
 
-  sets.push('updated_at = ?'); binds.push(now());
-  binds.push(id);
+  if (!sets.length) {
+    // Files only: make sure the thread is there before hanging anything on it.
+    const there = await db.prepare('SELECT id FROM threads WHERE id = ?').bind(id).first();
+    if (!there) return fail(404, 'No such thread.');
+  } else {
+    sets.push('updated_at = ?'); binds.push(now());
+    binds.push(id);
 
-  const res = await db.prepare(`UPDATE threads SET ${sets.join(', ')} WHERE id = ?`).bind(...binds).run();
-  if (!res.meta.changes) return fail(404, 'No such thread.');
+    const res = await db.prepare(`UPDATE threads SET ${sets.join(', ')} WHERE id = ?`).bind(...binds).run();
+    if (!res.meta.changes) return fail(404, 'No such thread.');
+  }
+
+  // Files added while editing, same as a note: uploaded first, then claimed.
+  if (adding) await claimAttachments(db, payload, 'thread', id, true);
   return json({ ok: true });
 }
 

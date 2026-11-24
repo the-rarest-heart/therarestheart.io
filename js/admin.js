@@ -115,6 +115,48 @@
 
       var threadFiles = filesPanel('thread', t.id);
 
+      // Edit opens a proper form here: title, words, and files to add. Files
+      // already on the thread are listed underneath, where they can be
+      // captioned, hidden or deleted.
+      var editor = el('div', { class: 'panel stack stack--sm' });
+      editor.hidden = true;
+      var titleIn = el('input', { type: 'text', class: 'input', maxlength: '120', value: t.title });
+      var bodyIn = el('textarea', { class: 'input', rows: '8' });
+      bodyIn.value = t.body;
+      var uploadRoot = el('div');
+      var currentFiles = filesPanel('thread', t.id);
+      var editNote = el('p', { class: 'muted', hidden: 'hidden' });
+      var picker = null;
+
+      function openEditor() {
+        if (!picker) picker = window.TRHMedia.picker(uploadRoot, { admin: true, token: token() });
+        currentFiles.box.hidden = true;
+        currentFiles.toggle();
+      }
+
+      var saveEdit = button('Save changes', 'btn--primary', function () {
+        var payload = { title: titleIn.value, body: bodyIn.value };
+        if (picker) Object.assign(payload, picker.payload());
+        editNote.hidden = false; editNote.className = 'muted'; editNote.textContent = 'Saving\u2026';
+        api('/admin/threads/' + t.id, { method: 'PATCH', body: JSON.stringify(payload) })
+          .then(function () { say('Thread saved.'); load(); })
+          .catch(function (err) {
+            editNote.className = 'muted form-error';
+            editNote.textContent = err.message;
+          });
+      });
+      var cancelEdit = button('Cancel', 'btn--ghost', function () { editor.hidden = true; if (picker) picker.reset(); });
+
+      [
+        el('label', { text: 'Title' }), titleIn,
+        el('label', { text: 'The post' }), bodyIn,
+        el('p', { class: 'muted', text: 'Already on this thread (caption, hide or delete them here):' }),
+        currentFiles.box,
+        el('label', { text: 'Add photos or videos' }), uploadRoot,
+        editNote,
+        el('div', { class: 'pills' }, [saveEdit, cancelEdit]),
+      ].forEach(function (n) { editor.appendChild(n); });
+
       var acts = el('div', { class: 'mod-row__acts' }, [
         el('a', { class: 'btn btn--small btn--ghost', href: 'thread.html?id=' + t.id, text: 'Open' }),
         button('Files', 'btn--ghost', threadFiles.toggle),
@@ -133,11 +175,8 @@
           patch(t.id, { newHere: !t.newHere }, t.newHere ? 'Unpinned.' : 'Pinned to the top of its room.');
         }),
         button('Edit', 'btn--ghost', function () {
-          var title = window.prompt('Title', t.title);
-          if (title === null) return;
-          var body = window.prompt('Body', t.body);
-          if (body === null) return;
-          patch(t.id, { title: title, body: body }, 'Thread edited.');
+          editor.hidden = !editor.hidden;
+          if (!editor.hidden) openEditor();
         }),
         button('Delete', 'btn--danger', function () {
           if (!window.confirm('Delete "' + t.title + '" and all its replies? This cannot be undone.')) return;
@@ -156,7 +195,7 @@
         acts,
       ]);
 
-      rows.appendChild(el('div', { class: 'stack stack--sm' }, [rowEl, threadFiles.box, repliesBox]));
+      rows.appendChild(el('div', { class: 'stack stack--sm' }, [rowEl, editor, threadFiles.box, repliesBox]));
     });
   }
 

@@ -291,8 +291,9 @@ everything.
 rule made real: use it on a question from someone new so it gets seen and
 answered rather than sinking.
 
-**Edit** — fix a title or body. Tapping Edit asks for the title, then the
-body, one at a time.
+**Edit** — opens a form right under the thread: the title, the post, the
+files already on it (caption, hide or delete them), and **Add a file** for more
+photos or videos. Press **Save changes** and the thread is updated on the site.
 
 **Delete** — removes the thread and every reply on it, permanently. No undo.
 
